@@ -1,7 +1,7 @@
 {
   "name": "ipyvue3",
   "version": "0.0.1",
-  "description": "Reactive Jupyter Widgets",
+  "description": "Reactive Jupyter Widgets (ipyvue3-implementation repackaged for Jupyter Notebooks, JupyterLab, …)",
   "author": "Julian Rüth",
   "main": "src/index.js",
   "license": "GPL-3.0-or-later",
@@ -31,11 +31,12 @@
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
-    "webpack": "^5",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "webpack": "^5"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
+    "ipyvue3implementation": "../ts",
     "lodash": "^4.17.21"
   },
   "jupyterlab": {

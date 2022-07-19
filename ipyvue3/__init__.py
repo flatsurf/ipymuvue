@@ -15,8 +15,8 @@
 # along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-version_info = (0, 0, 1)
-__version__ = "0.0.1"
+from ipyvue3.vue_widget import VueWidget
+from ipyvue3.version import version_info, __version__
 
 
 def _jupyter_labextension_paths():
