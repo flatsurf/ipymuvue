@@ -52,17 +52,13 @@ class VueWidget(DOMWidget):
 
         self.__output = None
         if capture_output:
-            # Note that wrapping in this output makes the widget not show
-            # up on refresh ("Host is not attached")
             from ipywidgets import Output
-            output = Output()
-            with output:
-                self._ipython_display_()
-            self.__output = output
+            self.__output = Output()
 
     def _ipython_display_(self):
         if self.__output is not None:
-            return self.__output._ipython_display_()
+            from IPython.display import display
+            display(self.__output)
 
         return super()._ipython_display_()
 
