@@ -17,14 +17,19 @@
 
 import { DOMWidgetModel } from "@jupyter-widgets/base";
 
+const version = require('../package.json').version;
+
 
 export class VueWidgetModel extends DOMWidgetModel {
     defaults() {
         return {
             ...super.defaults(),
             _model_name: 'VueWidgetModel',
+            _view_name: 'VueWidgetView',
             _model_module: 'ipyvue3',
-            _model_module_version: '0.0.1',
+            _view_module: 'ipyvue3',
+            _model_module_version: `^${version}`,
+            _view_module_version: `^${version}`,
         };
     }
 }

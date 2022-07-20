@@ -15,7 +15,30 @@
  * along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-import { VueWidgetModel } from "./VueWidgetModel";
-import { VueWidgetView } from "./VueWidgetView";
+import { DOMWidgetView } from "@jupyter-widgets/base";
+import { createApp, h } from "vue";
+import type { App } from "vue";
 
-export { VueWidgetModel, VueWidgetView };
+
+export class VueWidgetView extends DOMWidgetView {
+    private app?: App;
+
+    public render() {
+        super.render();
+
+        (async () => {
+          await this.displayed;
+
+          const mountPoint = document.createElement('div');
+          this.el.appendChild(mountPoint);
+
+          this.app = createApp(() => h("h1", {innerHTML: this.model.get("audience")}));
+          this.app.mount(mountPoint);
+        })();
+    }
+
+    public remove() {
+        this.app?.unmount();
+        return super.remove();
+    }
+}

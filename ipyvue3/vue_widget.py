@@ -29,5 +29,5 @@ class VueWidget(DOMWidget):
     _view_name = Unicode("VueWidgetView").tag(sync=True)
     _view_module = Unicode("ipyvue3").tag(sync=True)
     _model_module = Unicode("ipyvue3").tag(sync=True)
-    _view_module_version = Unicode(version).tag(sync=True)
-    _model_module_version = Unicode(version).tag(sync=True)
+    _view_module_version = Unicode(f"^{version}").tag(sync=True)
+    _model_module_version = Unicode(f"^{version}").tag(sync=True)

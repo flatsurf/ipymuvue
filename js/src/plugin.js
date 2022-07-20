@@ -17,6 +17,10 @@
 
 const version = require('../package.json').version;
 
+const { VueWidgetModel, VueWidgetView } = require('ipyvue3implementation')
+
 module.exports = {
+  VueWidgetModel,
+  VueWidgetView,
   version,
 }
