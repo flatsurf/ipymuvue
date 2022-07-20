@@ -85,8 +85,13 @@ export class VueWidgetView extends DOMWidgetView {
           return cloneDeep(model.reactiveState);
         },
         created() {
-          for (const key of Object.keys(model.reactiveState))
+          for (const key of Object.keys(model.reactiveState)) {
+            // Watch the model: when it changes, update Vue state.
             self.registerModelListener(`change:${key}`, () => self.onModelChange(key, this));
+
+            // Watch the Vue state: when it changes, update the model.
+            this.$watch(key, () => self.onDataChange(key, this));
+          }
         },
       });
     }
@@ -100,7 +105,21 @@ export class VueWidgetView extends DOMWidgetView {
       this.modelListeners.push([event, callback]);
     }
 
+    /*
+     * Update Vue's `data` because the widget's model has changed for the `key`
+     * attribute.
+     */
     private onModelChange(attribute: string, component: any) {
-      component[attribute] = this.model.get(attribute);
+      component[attribute] = cloneDeep(this.model.get(attribute));
+    }
+
+    /*
+     * Update the widget's model because Vue's `data` has changed for the `key`
+     * attribute.
+     */
+    private onDataChange(attribute: string, component: any) {
+      const value = component[attribute];
+      this.model.set(attribute, value === undefined ? null : value);
+      this.model.save_changes();
     }
 }
