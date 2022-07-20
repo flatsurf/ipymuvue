@@ -15,12 +15,19 @@
  * along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-var path = require('path');
-var version = require('./package.json').version;
+const path = require('path');
+const version = require('./package.json').version;
 
-var rules = [
+const rules = [
     { test: /\.css$/, use: ['style-loader', 'css-loader']}
 ]
+
+const resolve = {
+  alias: {
+    // We need a build of vue that contains the compiler so we can intepret templates at runtime.
+    'vue$': 'vue/dist/vue.esm-bundler.js',
+  }
+}
 
 // Note that unfortunately, we cannot declare "vue" an external. JupyterVue
 // bundles all of Vue but does not export all of it again for us. (Not sure if
@@ -29,7 +36,7 @@ var rules = [
 // does not exist.
 
 module.exports = (env, argv) => {
-    var devtool = argv.mode === 'development' ? 'source-map' : false;
+    const devtool = argv.mode === 'development' ? 'source-map' : false;
     return [
         {// Notebook extension
         //
@@ -47,6 +54,7 @@ module.exports = (env, argv) => {
                 publicPath: '' // publicPath is set in extension.js
             },
             devtool,
+            resolve,
             externals: [],
         },
         {// Bundle for the notebook containing the custom widget views and models
@@ -63,6 +71,7 @@ module.exports = (env, argv) => {
                 publicPath: '',
             },
             devtool,
+            resolve,
             module: {
                 rules: rules
             },
@@ -90,6 +99,7 @@ module.exports = (env, argv) => {
                 publicPath: 'https://unpkg.com/ipyvue3@' + version + '/dist/'
             },
             devtool,
+            resolve,
             module: {
                 rules: rules
             },

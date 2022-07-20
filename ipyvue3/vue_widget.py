@@ -25,9 +25,14 @@ class VueWidget(DOMWidget):
     def __init__(self, template):
         super().__init__()
 
+        self.__template = template
+        self.__type = type(self).__name__
+
     _model_name = Unicode("VueWidgetModel").tag(sync=True)
     _view_name = Unicode("VueWidgetView").tag(sync=True)
     _view_module = Unicode("ipyvue3").tag(sync=True)
     _model_module = Unicode("ipyvue3").tag(sync=True)
     _view_module_version = Unicode(f"^{version}").tag(sync=True)
     _model_module_version = Unicode(f"^{version}").tag(sync=True)
+    __type = Unicode("VueWidget").tag(sync=True)
+    __template = Unicode("<div>…</div>").tag(sync=True)
