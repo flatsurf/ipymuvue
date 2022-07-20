@@ -19,7 +19,6 @@ import { DOMWidgetView } from "@jupyter-widgets/base";
 import { VueWidgetModel } from "./VueWidgetModel";
 import { createApp, defineComponent, h } from "vue";
 import type { App, Component } from "vue";
-import type { EventHandler } from "backbone";
 import cloneDeep from "lodash-es/cloneDeep";
 
 
@@ -34,10 +33,6 @@ import cloneDeep from "lodash-es/cloneDeep";
 export class VueWidgetView extends DOMWidgetView {
     // The Vue App rendering this View (there is one app per view)
     private app?: App;
-
-    // The listeners that this view registered on the model. They need to be
-    // removed from the model when this view disappears.
-    private modelListeners: Array<[string, EventHandler]> = [];
 
     /*
      * Create a Vue App for this view and display it.
@@ -65,9 +60,6 @@ export class VueWidgetView extends DOMWidgetView {
     public override remove() {
         this.app?.unmount();
 
-        for (const [event, callback] of this.modelListeners)
-          this.model.off(event, callback);
-
         return super.remove();
     }
 
@@ -87,22 +79,14 @@ export class VueWidgetView extends DOMWidgetView {
         created() {
           for (const key of Object.keys(model.reactiveState)) {
             // Watch the model: when it changes, update Vue state.
-            self.registerModelListener(`change:${key}`, () => self.onModelChange(key, this));
+            // Note that the listener is automatically removed when this view is destroyed.
+            self.listenTo(self.model, `change:${key}`, () => self.onModelChange(key, this));
 
             // Watch the Vue state: when it changes, update the model.
             this.$watch(key, () => self.onDataChange(key, this));
           }
         },
       });
-    }
-
-    /*
-     * Register a listener on the model coming from this view that we are going
-     * to clean up once the view is destroyed.
-     */
-    private registerModelListener(event: string, callback: EventHandler) {
-      this.model.on(event, callback);
-      this.modelListeners.push([event, callback]);
     }
 
     /*
