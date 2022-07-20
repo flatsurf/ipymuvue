@@ -23,6 +23,11 @@ const projectRoot = path.resolve(__dirname, '..');
 
 const baseConfig = {
   input: 'src/index.ts',
+  external: [
+    'vue',
+    '@jupyter-widgets/base',
+    'vue3-sfc-loader',
+  ],
   plugins: {
     preVue: [
       alias({
@@ -54,19 +59,11 @@ const baseConfig = {
   },
 };
 
-// ESM/UMD/IIFE shared settings: externals
-// Refer to https://rollupjs.org/guide/en/#warning-treating-module-as-external-dependency
-const external = [
-  'vue',
-  '@jupyter-widgets/base',
-];
-
 // Customize configs for individual targets
 const buildFormats = [];
 if (!argv.format || argv.format === 'es') {
   const esConfig = {
     ...baseConfig,
-    external,
     output: {
       file: 'dist/ipyvue3implementation.esm.js',
       format: 'esm',
@@ -102,7 +99,6 @@ if (!argv.format || argv.format === 'es') {
 if (!argv.format || argv.format === 'cjs') {
   const umdConfig = {
     ...baseConfig,
-    external,
     output: {
       compact: true,
       file: 'dist/ipyvue3implementation.ssr.js',
@@ -133,7 +129,6 @@ if (!argv.format || argv.format === 'cjs') {
 if (!argv.format || argv.format === 'iife') {
   const unpkgConfig = {
     ...baseConfig,
-    external,
     output: {
       compact: true,
       file: 'dist/ipyvue3implementation.min.js',
