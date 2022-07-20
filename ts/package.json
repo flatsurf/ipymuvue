@@ -20,7 +20,8 @@
     "src/**/*.vue"
   ],
   "dependencies": {
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "vue3-sfc-loader": "^0.8.4"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",

@@ -18,7 +18,7 @@
 
 from ipywidgets import DOMWidget
 from ipyvue3.version import __version__ as version
-from traitlets import Unicode, List
+from traitlets import Unicode, List, Dict
 
 
 class VueWidget(DOMWidget):
@@ -36,24 +36,72 @@ class VueWidget(DOMWidget):
       display the output of print statements and stack traces of
       exceptions produced by callbacks underneath this widget.
 
+    - ``watch`` -- boolean (default: ``True``) whether to watch ``components``
+      and ``assets`` that are backed by files for changes and perform updates
+      when they change.
+
     """
 
-    def __init__(self, template, capture_output=True):
+    def __init__(self, template, components=None, assets=None, capture_output=True, watch=True):
         super().__init__()
+
+        components = components or {}
+        assets = assets or {}
 
         self.__template = template
         self.__type = type(self).__name__
 
+        self._initialize_components(components, assets)
+        self._initialize_assets(assets)
+
+        # Wire up callbacks that can be called from Vue component
         import inspect
         self.__methods = [
             name for (name, method) in inspect.getmembers(self, predicate=inspect.ismethod)
             if hasattr(method, '_VueWidget__is_callback') and method.__is_callback]
         self.on_msg(self._handle_event)
 
-        self.__output = None
-        if capture_output:
-            from ipywidgets import Output
-            self.__output = Output()
+        # Create output area for stdout, stderr, and tracebacks
+        from ipywidgets import Output
+        self.__output = Output() if capture_output else None
+
+    def _initialize_components(self, components, assets):
+        r"""
+        Link components to file in assets.
+        """
+        for (component, definition) in components.items():
+            if not isinstance(component, str):
+                raise TypeError("component name must be a string")
+
+            if definition in assets:
+                continue
+
+            if hasattr(definition, 'read') or isinstance(definition, str):
+                # Move this component's definition to the assets.
+                from uuid import uuid4
+                asset = f"{uuid4()}.vue"
+
+                assets[asset] = definition
+                components[component] = asset
+                continue
+
+            raise NotImplementedError("cannot process this kind of component definition yet")
+
+        self.__components = components
+
+    def _initialize_assets(self, assets):
+        r"""
+        Prepare virtual file system for assets.
+        """
+        for (fname, content) in assets.items():
+            if not isinstance(fname, str):
+                raise TypeError("file name must be a string")
+
+            if hasattr(content, 'read'):
+                # Resolve files to their actual content.
+                assets[fname] = content.read()
+
+        self.__assets = assets
 
     def _ipython_display_(self):
         if self.__output is not None:
@@ -94,3 +142,5 @@ class VueWidget(DOMWidget):
     __type = Unicode("VueWidget").tag(sync=True)
     __template = Unicode("<div>…</div>").tag(sync=True)
     __methods = List([]).tag(sync=True)
+    __components = Dict().tag(sync=True)
+    __assets = Dict().tag(sync=True)

@@ -37,6 +37,10 @@ export class VueWidgetModel extends DOMWidgetModel {
             _VueWidget__template: '<div>…</div>',
             /* callbacks in Python that are `methods` on the Vue instance */
             _VueWidget__methods: [],
+            /* child components that can be used in this component's template */
+            _VueWidget__components: {},
+            /* files that can be used to define child components */
+            _VueWidget__assets: {},
         };
     }
 

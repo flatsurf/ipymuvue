@@ -17,6 +17,7 @@
 
 import { DOMWidgetView } from "@jupyter-widgets/base";
 import { VueWidgetModel } from "./VueWidgetModel";
+import { VueComponentCompiler } from "./VueComponentCompiler";
 import { createApp, defineComponent, h } from "vue";
 import type { App, Component } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
@@ -49,7 +50,9 @@ export class VueWidgetView extends DOMWidgetView {
           if (!(this.model instanceof VueWidgetModel))
             throw Error("VueWidgetView can only be created from a VueWidgetModel");
 
-          this.app = createApp(() => h(this.component));
+          const component = await this.component;
+
+          this.app = createApp(() => h(component));
           this.app.mount(mountPoint);
         })();
     }
@@ -66,28 +69,33 @@ export class VueWidgetView extends DOMWidgetView {
     /*
      * Return a Vue component that renders this view.
      */
-    private get component() : Component {
-      const self = this;
-      const model = this.model as VueWidgetModel;
+    private get component() : Promise<Component> {
+      return (async () => {
+        const self = this;
+        const model = this.model as VueWidgetModel;
 
-      return defineComponent({
-        name: model.get("_VueWidget__type"),
-        template: model.get("_VueWidget__template"),
-        data() {
-          return cloneDeep(model.reactiveState);
-        },
-        created() {
-          for (const key of Object.keys(model.reactiveState)) {
-            // Watch the model: when it changes, update Vue state.
-            // Note that the listener is automatically removed when this view is destroyed.
-            self.listenTo(self.model, `change:${key}`, () => self.onModelChange(key, this));
+        return defineComponent({
+          name: model.get("_VueWidget__type"),
+          template: model.get("_VueWidget__template"),
+          data() {
+            return cloneDeep(model.reactiveState);
+          },
+          created() {
+            for (const key of Object.keys(model.reactiveState)) {
+              // Watch the model: when it changes, update Vue state.
+              // Note that the listener is automatically removed when this view is destroyed.
+              self.listenTo(self.model, `change:${key}`, () => self.onModelChange(key, this));
 
-            // Watch the Vue state: when it changes, update the model.
-            this.$watch(key, () => self.onDataChange(key, this));
-          }
-        },
-        methods: model.methods,
-      });
+              // Watch the Vue state: when it changes, update the model.
+              this.$watch(key, () => self.onDataChange(key, this));
+            }
+          },
+          components: await new VueComponentCompiler(
+            this.model.get('_VueWidget__components'),
+            this.model.get('_VueWidget__assets')).components,
+          methods: model.methods,
+        });
+      })();
     }
 
     /*
