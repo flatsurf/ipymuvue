@@ -86,6 +86,7 @@ export class VueWidgetView extends DOMWidgetView {
             this.$watch(key, () => self.onDataChange(key, this));
           }
         },
+        methods: model.methods,
       });
     }
 

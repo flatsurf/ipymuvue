@@ -34,7 +34,9 @@ export class VueWidgetModel extends DOMWidgetModel {
             /* the name of the widget, useful for debugging */
             _VueWidget__type: 'VueWidget',
             /* the Vue template to render the widget */
-            _VueWidget__template: '<div>…</div>'
+            _VueWidget__template: '<div>…</div>',
+            /* callbacks in Python that are `methods` on the Vue instance */
+            _VueWidget__methods: [],
         };
     }
 
@@ -48,5 +50,22 @@ export class VueWidgetModel extends DOMWidgetModel {
       return Object.fromEntries(
         this.keys().filter((key) => !specialAttributes.includes(key)).
           map((key) => [key, this.get(key)]));
+    }
+
+    /*
+     * Return the `methods` callbacks that can be invoked on each Vue app
+     * representing this model.
+     */
+    public get methods() {
+      const names = this.get('_VueWidget__methods') as string[];
+      return Object.fromEntries(names.map(method =>
+        [method, (args?: any[]) => this.callback(method, args || [])]));
+    }
+
+    /*
+     * Call `method` on the backend with `args`.
+     */
+    private callback(method: string, args: any[]) {
+      this.send({method, args}, this.callbacks());
     }
 }
