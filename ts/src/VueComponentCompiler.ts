@@ -46,7 +46,12 @@ export class VueComponentCompiler {
           return this.assets[url]
         throw Error(`cannot resolve ${url} from provided assets`);
       },
-      addStyle() {},
+      addStyle(textContent: string) {
+        // We currently do not deduplicate styles. We should probably do that,
+        // in particular when we get hot-reloading.
+        const style = Object.assign(document.createElement('style'), {textContent});
+        document.head.appendChild(style);
+      },
     }
     // Note that the typings of vue3-sfc-loader are incorrect so we need to
     // cast to any to convince it to not require us to implement getResource().
