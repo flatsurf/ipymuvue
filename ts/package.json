@@ -4,11 +4,11 @@
   "description": "Reactive Jupyter Widgets",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
-    "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
-    "build:es:dev": "cross-env NODE_ENV=development rollup --config build/rollup.config.js --format es",
-    "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
+    "build": "cross-env NODE_ENV=production rollup --config rollup.config.js",
+    "build:es": "cross-env NODE_ENV=production rollup --config rollup.config.js --format es",
+    "build:es:dev": "cross-env NODE_ENV=development rollup --config rollup.config.js --format es",
+    "build:ssr": "cross-env NODE_ENV=production rollup --config rollup.config.js --format cjs",
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config rollup.config.js --format iife"
   },
   "main": "dist/ipyvue3implementation.ssr.js",
   "module": "dist/ipyvue3implementation.esm.js",
@@ -30,6 +30,7 @@
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-commonjs": "^22.0.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.3",
     "@types/lodash-es": "^4.17.6",
