@@ -78,8 +78,12 @@ class VueWidget(DOMWidget):
 
             if hasattr(definition, 'read') or isinstance(definition, str):
                 # Move this component's definition to the assets.
-                from uuid import uuid4
-                asset = f"{uuid4()}.vue"
+                if hasattr(definition, "name"):
+                    import pathlib
+                    asset = pathlib.Path(definition.name).name
+                else:
+                    from uuid import uuid4
+                    asset = f"{uuid4()}.vue"
 
                 assets[asset] = definition
                 components[component] = asset

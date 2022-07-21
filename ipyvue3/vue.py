@@ -43,7 +43,7 @@ def __VUE_COMPONENT_COMPILER__(value = None):
     return sys.modules[name].name
 
 
-def define_component(template=None, components=None):
+def define_component(template=None, components=None, props=None, name=None):
     r"""
     Return a new Vue component.
 
@@ -51,7 +51,7 @@ def define_component(template=None, components=None):
     documented in the Vue API https://vuejs.org/api/#options-api
     """
     import js
-    component = js.Object()
+    component = js.Object.new()
 
     if template is not None:
         component.template = template
@@ -59,23 +59,40 @@ def define_component(template=None, components=None):
     if components is not None:
         component.components = prepare_components(components)
 
+    if props is not None:
+        component.props = prepare_props(props)
+
+    if name is not None:
+        component.name = name
+
     return component
 
 
+def set_default_export(globals, object):
+    # TODO: Explain, check type.
+    globals.update({key: getattr(object, key) for key in dir(object)})
+
+
 def prepare_components(components):
-    import pyodide
-    import js
-
-    print("preparing components")
-
     for (name, component) in components.items():
+        if not isinstance(name, str):
+            raise TypeError("name of component must be a string")
+
         if hasattr(component, 'read'):
             # Component is a (.vue) file. Load it with our VueComponentCompiler.
             # TODO: We should be more careful and in other places to get the paths right.
-            print("compiling", component.name)
-            components[name] = __VUE_COMPONENT_COMPILER__().compile(component.name)
+            component = __VUE_COMPONENT_COMPILER__().compile(component.name)
 
+        components[name] = component
+
+    import pyodide
+    import js
     return pyodide.ffi.to_js(components, dict_converter=js.Object.fromEntries)
+
+
+def prepare_props(props):
+    import js
+    return js.Array(*props)
 
 
 __all__ = ["define_component", "__VUE_COMPONENT_COMPILER__"]
