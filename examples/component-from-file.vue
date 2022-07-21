@@ -1,7 +1,7 @@
 <template>
   <div class="styled">Component from File</div>
 </template>
-<style>
+<style scoped>
 .styled {
   color: cornflowerblue;
 }
