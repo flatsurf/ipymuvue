@@ -23,6 +23,13 @@ vue components.
 
 
 def __VUE_COMPONENT_COMPILER__(value = None):
+    r"""
+    Return some VueComponentCompiler instance as defined in JavaScript.
+
+    TODO: This is a hack. We keep a reference to the latest instance used whose
+    assets might be completely wrong. Instead we should instantiate our own
+    compiler and run with the latest assets from the virtual file system.
+    """
     name = "__VUE_COMPONENT_COMPILER__"
 
     import sys
@@ -59,13 +66,14 @@ def prepare_components(components):
     import pyodide
     import js
 
+    print("preparing components")
+
     for (name, component) in components.items():
         if hasattr(component, 'read'):
-            # Component is a (.vue) file. Load it with our
-            # VueComponentCompiler.
-            # TODO: We shuold be more careful and in other places to get the paths right.
+            # Component is a (.vue) file. Load it with our VueComponentCompiler.
+            # TODO: We should be more careful and in other places to get the paths right.
+            print("compiling", component.name)
             components[name] = __VUE_COMPONENT_COMPILER__().compile(component.name)
-            print(name, components[name])
 
     return pyodide.ffi.to_js(components, dict_converter=js.Object.fromEntries)
 

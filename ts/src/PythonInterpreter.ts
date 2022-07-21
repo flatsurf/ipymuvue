@@ -59,29 +59,44 @@ export class PythonInterpreter {
       if (provisioned.replaced) {
         console.info(`replaced modified asset ${name}`);
 
+        // Even if only some asset changed, we need to reload all modules to
+        // make sure that everything rerenders correctly. Namely, a Python
+        // module might include with open() a static asset and we would
+        // otherwise miss that it changed.
+        console.warn(`will reload all modules because ${name} changed`);
+
+        reload = true;
+
+        /*
         if (provisioned.abspath in modules) {
           console.log(`will reload all modules because loaded module ${name} changed`);
           reload = true;
         }
+        */
       }
     }
 
-    if (reload)
-      for (const module of Object.values(modules))
+    if (reload) {
+      for (const [name, module] of Object.values(modules))
         if (PythonInterpreter.provisioned.has(module.__file__)) {
-          console.debug(`reloading ${module}`);
-          pyodide.pyimport("importlib").reload(module);
+          // Note that just importlib.reload() is not good enough here. Mostly,
+          // because we would have to reload things in the correct order
+          // (bottom up). Looking around on stackoverflow, nobody has really
+          // managed to get this to work, so we just reload everything instead.
+          console.debug(`resetting ${module}`);
+          pyodide.pyimport('sys').modules.delete(name);
         }
+    }
   }
 
-  private get modules(): Promise<Record<string, PyProxy>> {
+  private get modules(): Promise<Record<string, [string, PyProxy]>> {
     return (async () => {
-      const modules: Record<string, PyProxy> = {};
+      const modules: Record<string, [string, PyProxy]> = {};
 
       const sys = (await this.pyodide).pyimport('sys');
-      for (const module of sys.modules.values())
+      for (const [name, module] of sys.modules.items())
         if ("__file__" in module)
-          modules[module.__file__ as string] = module;
+          modules[module.__file__ as string] = [name, module];
 
       return modules;
     })();

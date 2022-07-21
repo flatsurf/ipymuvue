@@ -70,10 +70,13 @@ export class VueComponentCompiler {
         },
         handleModule: async(type, _getContentData, path_) => {
           const path = path_.toString();
-          console.debug(`loading module ${path} for ${filename}`);
 
           switch (type) {
             case '.py':
+              // TODO: These are probably not the correct assets to provision.
+              // Since this instance gets called through the
+              // VUE_COMPONENT_COMPILER hack, this.assets might not have updated?
+              // See also the comment in vue.py.
               await this.pyodide.provisionAssets(this.assets);
 
               if (!path.endsWith(".py"))
@@ -87,7 +90,7 @@ export class VueComponentCompiler {
 
               return pyodide.pyimport(name);
             default:
-              // Work around a typing errors in vue3-sfc-loader.
+              // Work around a typing error in vue3-sfc-loader.
               return undefined as unknown as null;
           }
         },
