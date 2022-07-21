@@ -46,21 +46,26 @@ export class VueComponentCompiler {
         getFile: async (path_) => {
           const path = path_.toString();
 
-          if (path in this.assets) {
-            return {
-              getContentData: async (binary: Boolean) => {
+          return {
+            getContentData: async (binary: Boolean) => {
+              if (path in this.assets) {
                 const asset = this.assets[path];
 
                 if (!(asset.buffer instanceof ArrayBuffer))
                   throw Error(`asset of incorrect type: ${asset}`)
 
                 return binary ? asset.buffer : new TextDecoder().decode(asset.buffer);
-              },
-              type: path.includes('.') ? ("." + path.split('.').pop()!) : "",
-            };
-          }
+              }
 
-          throw Error(`cannot resolve ${path} from provided assets`);
+              if (path.startsWith("https://")) {
+                const raw = await fetch(path);
+                return await raw.text();
+              }
+
+              throw Error(`cannot resolve ${path} from provided assets`);
+            },
+            type: path.includes('.') ? ("." + path.split('.').pop()!) : "",
+          }
         },
         addStyle(textContent) {
           // We currently do not deduplicate styles. We should probably do that,
