@@ -22,8 +22,52 @@ vue components.
 # ******************************************************************************
 
 
-def define_component():
+def __VUE_COMPONENT_COMPILER__(value = None):
+    name = "__VUE_COMPONENT_COMPILER__"
+
+    import sys
+    if name not in sys.modules:
+        import importlib
+        sys.modules[name] = importlib.util.module_from_spec(importlib.util.spec_from_loader(name, loader=None))
+
+    if value is not None:
+        sys.modules[name].name = value
+
+    return sys.modules[name].name
+
+
+def define_component(template=None, components=None):
+    r"""
+    Return a new Vue component.
+
+    A Vue component is a dict (more precisely a JavaScript object) as
+    documented in the Vue API https://vuejs.org/api/#options-api
+    """
+    import js
+    component = js.Object()
+
+    if template is not None:
+        component.template = template
+
+    if components is not None:
+        component.components = prepare_components(components)
+
+    return component
+
+
+def prepare_components(components):
     import pyodide
     import js
 
-    return pyodide.ffi.to_js({}, dict_converter=js.Object.fromEntries)
+    for (name, component) in components.items():
+        if hasattr(component, 'read'):
+            # Component is a (.vue) file. Load it with our
+            # VueComponentCompiler.
+            # TODO: We shuold be more careful and in other places to get the paths right.
+            components[name] = __VUE_COMPONENT_COMPILER__().compile(component.name)
+            print(name, components[name])
+
+    return pyodide.ffi.to_js(components, dict_converter=js.Object.fromEntries)
+
+
+__all__ = ["define_component", "__VUE_COMPONENT_COMPILER__"]

@@ -73,6 +73,7 @@ export class VueWidgetView extends DOMWidgetView {
       return (async () => {
         const self = this;
         const model = this.model as VueWidgetModel;
+        const components: Record<string, string> = this.model.get("_VueWidget__components");
 
         return defineComponent({
           name: model.get("_VueWidget__type"),
@@ -91,8 +92,8 @@ export class VueWidgetView extends DOMWidgetView {
             }
           },
           components: await new VueComponentCompiler(
-            this.model.get('_VueWidget__components'),
-            this.model.get('_VueWidget__assets')).components,
+                              this.model.get('_VueWidget__assets')
+                            ).compileAsync(components),
           methods: model.methods,
         });
       })();

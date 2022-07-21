@@ -93,17 +93,25 @@ class VueWidget(DOMWidget):
         r"""
         Prepare virtual file system for assets.
         """
+        if "vue.py" not in assets:
+            import os.path
+            assets["vue.py"] = open(os.path.join(os.path.dirname(__file__), "vue.py"), "rb").read()
+
         for (fname, content) in assets.items():
             if not isinstance(fname, str):
                 raise TypeError("file name must be a string")
 
             if hasattr(content, 'read'):
                 # Resolve files to their actual content.
-                assets[fname] = content.read()
+                content = content.read()
 
-        if "vue.py" not in assets:
-            import os.path
-            assets["vue.py"] = open(os.path.join(os.path.dirname(__file__), "vue.py")).read()
+            if isinstance(content, str):
+                content = content.encode('utf-8')
+
+            if not isinstance(content, bytes):
+                raise NotImplementedError("assets must be convertible to bytes")
+
+            assets[fname] = content
 
         self.__assets = assets
 

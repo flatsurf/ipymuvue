@@ -16,78 +16,103 @@
  * ******************************************************************************/
 
 import type { Component } from "vue";
+import { defineAsyncComponent } from "vue";
 import { loadModule } from 'vue3-sfc-loader';
 import type { Options, Resource, AbstractPath } from 'vue3-sfc-loader';
 import { PythonInterpreter } from './PythonInterpreter';
 import * as Vue from "vue";
 
 export class VueComponentCompiler {
-  public constructor(components: Record<string, string>, assets: Record<string, string>) {
-    this.definitions = components;
+  public constructor(assets: Record<string, DataView>) {
     this.assets = assets;
+    this.pyodide = new PythonInterpreter();
   }
 
-  private readonly definitions;
   private readonly assets;
+  private readonly pyodide;
 
-  public get components(): Promise<Record<string, Component>> {
-    return (async () => {
-      return Object.fromEntries(
-        await Promise.all(Object.entries(this.definitions).map(
-          async ([name, definition]) => [name, await this.compile(definition)])));
-    })();
+  public compile(filename: string): Component {
+    return defineAsyncComponent(() => this.compileAsync(filename));
   }
 
-  private async compile(definition: string) {
-    const self = this;
+  public async compileAsync(filename: string): Promise<Component>;
+  public async compileAsync(components: Record<string, string>): Promise<Record<string, Component>>;
+  public async compileAsync(filename: string | Record<string, string>) {
+    if (typeof filename === "string") {
+      const options: Options = {
+        moduleCache: {
+          vue: Vue,
+        },
+        getFile: async (path_) => {
+          const path = path_.toString();
 
-    const options: Options = {
-      moduleCache: {
-        vue: Vue,
-      },
-      getFile: async (url) => {
-        const path = url.toString();
-        if (path in this.assets)
-          return this.assets[path]
-        throw Error(`cannot resolve ${path} from provided assets`);
-      },
-      addStyle(textContent) {
-        // We currently do not deduplicate styles. We should probably do that,
-        // in particular when we get hot-reloading.
-        const style = Object.assign(document.createElement('style'), {textContent});
-        document.head.appendChild(style);
-      },
-      async handleModule(type, _getContentData, path_) {
-        switch (type) {
-          case '.py':
-            const interpreter = new PythonInterpreter(self.assets);
+          if (path in this.assets) {
+            return {
+              getContentData: async (binary: Boolean) => {
+                const asset = this.assets[path];
 
-            const path = path_.toString();
-            if (!path.endsWith(".py"))
-              throw Error("Python file must end in .py")
+                if (!(asset.buffer instanceof ArrayBuffer))
+                  throw Error(`asset of incorrect type: ${asset}`)
 
-            const name = path.replace(/\//g, '.').substring(0, path.length - 3);
+                return binary ? asset.buffer : new TextDecoder().decode(asset.buffer);
+              },
+              type: path.includes('.') ? ("." + path.split('.').pop()!) : "",
+            };
+          }
 
-            const module = await interpreter.import(name);
-            // const jsModule = interpreter.asNativeJavaScript(module);
-            return module;
-          default:
-            // Work around a typing errors in vue3-sfc-loader.
-            return undefined as unknown as null;
-        }
-      },
-      getResource(_path, _options_): Resource {
-        throw Error("not implemented");
-      },
-      pathResolve(_path): AbstractPath {
-        throw Error("not implemented");
-      },
-    };
+          throw Error(`cannot resolve ${path} from provided assets`);
+        },
+        addStyle(textContent) {
+          // We currently do not deduplicate styles. We should probably do that,
+          // in particular when we get hot-reloading.
+          const style = Object.assign(document.createElement('style'), {textContent});
+          document.head.appendChild(style);
+        },
+        handleModule: async(type, _getContentData, path_) => {
+          const path = path_.toString();
+          console.debug(`loading module ${path} for ${filename}`);
 
-    // Work around typing errors in vue3-sfc-loader.
-    delete((options as any).getResource);
-    delete((options as any).pathResolve);
+          switch (type) {
+            case '.py':
+              await this.pyodide.provisionAssets(this.assets);
 
-    return await loadModule(definition, options);
+              if (!path.endsWith(".py"))
+                throw Error("Python file must end in .py")
+
+              const name = path.replace(/\//g, '.').substring(0, path.length - 3);
+
+              const pyodide = await this.pyodide.pyodide;
+              const vue = pyodide.pyimport("vue");
+              vue.__VUE_COMPONENT_COMPILER__(this)
+
+              return pyodide.pyimport(name);
+            default:
+              // Work around a typing errors in vue3-sfc-loader.
+              return undefined as unknown as null;
+          }
+        },
+        getResource(_path, _options_): Resource {
+          throw Error("not implemented");
+        },
+        pathResolve(_path): AbstractPath {
+          throw Error("not implemented");
+        },
+      };
+
+      // Work around typing errors in vue3-sfc-loader.
+      delete((options as any).getResource);
+      delete((options as any).pathResolve);
+
+      return await loadModule(filename, options);
+    } else {
+      const components = filename;
+      return (async () => {
+        return Object.fromEntries(
+          await Promise.all(Object.entries(components).map(
+            async ([name, filename]) => {
+              return [name, await this.compileAsync(filename)]
+            })));
+      })();
+    }
   }
 }
