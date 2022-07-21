@@ -32,9 +32,7 @@
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
     "rimraf": "^2.6.1",
-    "webpack": "^5",
-    "vue": "^3.2.37",
-    "vue3-sfc-loader": "^3.2.37"
+    "webpack": "^5"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",

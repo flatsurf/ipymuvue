@@ -101,6 +101,10 @@ class VueWidget(DOMWidget):
                 # Resolve files to their actual content.
                 assets[fname] = content.read()
 
+        if "vue.py" not in assets:
+            import os.path
+            assets["vue.py"] = open(os.path.join(os.path.dirname(__file__), "vue.py")).read()
+
         self.__assets = assets
 
     def _ipython_display_(self):

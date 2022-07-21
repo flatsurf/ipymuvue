@@ -17,6 +17,8 @@
 
 import type { Component } from "vue";
 import { loadModule } from 'vue3-sfc-loader';
+import type { Options, Resource, AbstractPath } from 'vue3-sfc-loader';
+import { PythonInterpreter } from './PythonInterpreter';
 import * as Vue from "vue";
 
 export class VueComponentCompiler {
@@ -37,24 +39,55 @@ export class VueComponentCompiler {
   }
 
   private async compile(definition: string) {
-    const options = {
+    const self = this;
+
+    const options: Options = {
       moduleCache: {
         vue: Vue,
       },
-      getFile: async (url: string) => {
-        if (url in this.assets)
-          return this.assets[url]
-        throw Error(`cannot resolve ${url} from provided assets`);
+      getFile: async (url) => {
+        const path = url.toString();
+        if (path in this.assets)
+          return this.assets[path]
+        throw Error(`cannot resolve ${path} from provided assets`);
       },
-      addStyle(textContent: string) {
+      addStyle(textContent) {
         // We currently do not deduplicate styles. We should probably do that,
         // in particular when we get hot-reloading.
         const style = Object.assign(document.createElement('style'), {textContent});
         document.head.appendChild(style);
       },
-    }
-    // Note that the typings of vue3-sfc-loader are incorrect so we need to
-    // cast to any to convince it to not require us to implement getResource().
-    return await loadModule(definition, options as any);
+      async handleModule(type, _getContentData, path_) {
+        switch (type) {
+          case '.py':
+            const interpreter = new PythonInterpreter(self.assets);
+
+            const path = path_.toString();
+            if (!path.endsWith(".py"))
+              throw Error("Python file must end in .py")
+
+            const name = path.replace(/\//g, '.').substring(0, path.length - 3);
+
+            const module = await interpreter.import(name);
+            // const jsModule = interpreter.asNativeJavaScript(module);
+            return module;
+          default:
+            // Work around a typing errors in vue3-sfc-loader.
+            return undefined as unknown as null;
+        }
+      },
+      getResource(_path, _options_): Resource {
+        throw Error("not implemented");
+      },
+      pathResolve(_path): AbstractPath {
+        throw Error("not implemented");
+      },
+    };
+
+    // Work around typing errors in vue3-sfc-loader.
+    delete((options as any).getResource);
+    delete((options as any).pathResolve);
+
+    return await loadModule(definition, options);
   }
 }
