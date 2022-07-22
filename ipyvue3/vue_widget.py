@@ -16,9 +16,9 @@
 # ******************************************************************************
 
 
-from ipywidgets import DOMWidget
+from ipywidgets import DOMWidget, widget_serialization
 from ipyvue3.version import __version__ as version
-from traitlets import Unicode, List, Dict
+from traitlets import Unicode, List, Dict, Instance
 
 
 class VueWidget(DOMWidget):
@@ -119,6 +119,18 @@ class VueWidget(DOMWidget):
 
         self.__assets = assets
 
+    def slot(self, name, content=None):
+        if content is None:
+            content = name
+            name = "default"
+
+        if not isinstance(name, str):
+            raise TypeError("name of slot must be string")
+
+        children = dict(**self.__children)
+        children[name] = content
+        self.__children = children
+
     def _ipython_display_(self):
         if self.__output is not None:
             from IPython.display import display
@@ -160,3 +172,4 @@ class VueWidget(DOMWidget):
     __methods = List([]).tag(sync=True)
     __components = Dict().tag(sync=True)
     __assets = Dict().tag(sync=True)
+    __children = Dict(Instance(DOMWidget), key_trait=Unicode).tag(sync=True, **widget_serialization)

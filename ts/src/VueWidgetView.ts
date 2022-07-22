@@ -15,12 +15,13 @@
  * along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-import { DOMWidgetView } from "@jupyter-widgets/base";
+import { DOMWidgetView, JupyterPhosphorWidget } from "@jupyter-widgets/base";
 import { VueWidgetModel } from "./VueWidgetModel";
 import { VueComponentCompiler } from "./VueComponentCompiler";
 import { createApp, defineComponent, h } from "vue";
 import type { App, Component } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
+import mapValues from "lodash-es/mapValues";
 
 
 /*
@@ -44,15 +45,16 @@ export class VueWidgetView extends DOMWidgetView {
         (async () => {
           await this.displayed;
 
+          // TODO: Make tag configurable.
           const mountPoint = document.createElement('div');
           this.el.appendChild(mountPoint);
 
           if (!(this.model instanceof VueWidgetModel))
             throw Error("VueWidgetView can only be created from a VueWidgetModel");
 
-          const component = await this.component;
+          const container = await this.container;
 
-          this.app = createApp(() => h(component));
+          this.app = createApp(() => h(container));
           this.app.mount(mountPoint);
         })();
     }
@@ -67,7 +69,9 @@ export class VueWidgetView extends DOMWidgetView {
     }
 
     /*
-     * Return a Vue component that renders this view.
+     * Return a Vue component that renders the template defining this view.
+     * This is going to be wrapped in the `container` which adds rendering for
+     * the slots.
      */
     private get component() : Promise<Component> {
       return (async () => {
@@ -100,11 +104,122 @@ export class VueWidgetView extends DOMWidgetView {
     }
 
     /*
-     * Update Vue's `data` because the widget's model has changed for the `key`
-     * attribute.
+     * Return a Vue component that renders this View.
+     *
+     * We need this additional wrapper to render slots into the component.
+     * The wrapper component holds the mapping slot-name -> model-id and
+     * creates ``modelRenderer`` components to render into these slots.
      */
-    private onModelChange(attribute: string, component: any) {
-      component[attribute] = cloneDeep(this.model.get(attribute));
+    private get container() : Promise<Component> {
+      return (async () => {
+        const self = this;
+        const component = await this.component;
+        const modelRenderer = this.modelRenderer;
+
+        return defineComponent({
+          name: "VueWidgetContainer",
+          data() {
+            return {
+              // Maps slot name to a widget model id shown in that slot.
+              children: {} as Record<string, string>,
+            };
+          },
+          created() {
+            const onChange = () => self.onModelChange("_VueWidget__children", this, "children");
+            self.listenTo(self.model, "change:_VueWidget__children", onChange);
+            onChange();
+          },
+          render() {
+            return h(component, null, mapValues(this.children, (modelId) => {
+              return () => h(modelRenderer, {
+                modelId: modelId.substring("IPY_MODEL_".length)
+              });
+            }));
+          },
+        });
+      })();
+    }
+
+    /*
+     * Return a Vue component that renders a DOMWidgetModel.
+     */
+    private get modelRenderer() {
+      const self = this;
+
+      return defineComponent({
+        name: "ModelRenderer",
+        props: {
+          modelId: String,
+        },
+        data() {
+          return {
+            widget: null as { view: DOMWidgetView } | null,
+            trash: Object.freeze({ views: [] as DOMWidgetView[] }),
+          }
+        },
+        watch: {
+          modelId: {
+            /*
+             * Create a new DOMWidgetView when the model changes.
+             * Schedule the previous view for destruction.
+             */
+            async handler(current: string, previous: string) {
+              if (current === previous)
+                return;
+
+              const model = await self.model.widget_manager.get_model(current);
+
+              if (model === undefined) {
+                console.error(`ignoring child ${current} which has not active model`);
+                return null;
+              }
+
+              if (this.widget != null)
+                this.trash.views.push(this.widget.view);
+
+              this.widget = Object.freeze({ view: await self.create_child_view(model) });
+            },
+            immediate: true,
+          }
+        },
+        render() {
+          const self = this;
+          const widget = this.widget;
+
+          if (widget == null) {
+            this.cleanup();
+            return;
+          }
+
+          return h(defineComponent({
+            mounted() {
+              JupyterPhosphorWidget.attach((widget.view as DOMWidgetView).pWidget, this.$el);
+
+              self.cleanup();
+            },
+            render() {
+              return h("div");
+            }
+          }));
+        },
+        destroyed() {
+          this.cleanup();
+        },
+        methods: {
+          cleanup() {
+            while (this.trash.views.length)
+              this.trash.views.pop()!.remove();
+          }
+        }
+      })
+    }
+
+    /*
+     * Update Vue's `data` because the widget's model has changed for the
+     * `modelAttribute` attribute.
+     */
+    private onModelChange(modelAttribute: string, component: any, componentAttribute?: string) {
+      component[componentAttribute || modelAttribute] = cloneDeep(this.model.get(modelAttribute));
     }
 
     /*
@@ -113,7 +228,7 @@ export class VueWidgetView extends DOMWidgetView {
      */
     private onDataChange(attribute: string, component: any) {
       const value = component[attribute];
-      this.model.set(attribute, value === undefined ? null : value);
+      this.model.set(attribute, value === undefined ? null : cloneDeep(value));
       this.model.save_changes();
     }
 }

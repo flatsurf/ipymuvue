@@ -41,6 +41,8 @@ export class VueWidgetModel extends DOMWidgetModel {
             _VueWidget__components: {},
             /* files that can be used to define child components */
             _VueWidget__assets: {},
+            /* widgets for the (named) slots of the component */
+            _VueWidget__children: {},
         };
     }
 
