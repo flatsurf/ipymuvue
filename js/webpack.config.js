@@ -17,6 +17,12 @@
 
 const path = require('path');
 const version = require('./package.json').version;
+const webpack = require('webpack');
+
+const define = new webpack.DefinePlugin({
+    '__VUE_OPTIONS_API__': true,
+    '__VUE_PROD_DEVTOOLS__': true,
+});
 
 const rules = [
     { test: /\.css$/, use: ['style-loader', 'css-loader']}
@@ -56,6 +62,7 @@ module.exports = (env, argv) => {
             devtool,
             resolve,
             externals: [],
+            plugins: [ define],
         },
         {// Bundle for the notebook containing the custom widget views and models
         //
@@ -76,6 +83,7 @@ module.exports = (env, argv) => {
                 rules: rules
             },
             externals: ['@jupyter-widgets/base'],
+            plugins: [ define],
         },
         {// Embeddable ipyvue3 bundle
         //
@@ -104,6 +112,7 @@ module.exports = (env, argv) => {
                 rules: rules
             },
             externals: ['@jupyter-widgets/base'],
+            plugins: [ define],
         }
     ];
 }
