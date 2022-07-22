@@ -23,6 +23,8 @@ import { AssetProvisioner } from "./Assets";
 
 import { JavaScriptLoader } from "./JavaScriptLoader";
 
+const PYODIDE_CDN = "https://cdn.jsdelivr.net/pyodide/v0.21.0a3/full";
+
 /*
  * A Python interpreter powered by pyodide.
  *
@@ -105,11 +107,11 @@ export class PythonInterpreter {
   public get pyodide(): Promise<PyodideInterface> {
     if (PythonInterpreter.instance == null)
       PythonInterpreter.instance = (async () => {
-        const pyodide = await new JavaScriptLoader("pyodide", "https://cdn.jsdelivr.net/pyodide/v0.21.0a3/full/pyodide.js").object;
+        const pyodide = await new JavaScriptLoader("pyodide", `${PYODIDE_CDN}/pyodide.js`).object;
 
         const loadPyodideBrowser: typeof loadPyodide = pyodide.loadPyodide;
         return await loadPyodideBrowser({
-          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.21.0a3/full/"
+          indexURL: `${PYODIDE_CDN}/`,
         });
       })();
 

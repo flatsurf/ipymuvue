@@ -38,8 +38,11 @@ const baseConfig = {
       }),
     ],
     replace: {
-      'process.env.NODE_ENV': JSON.stringify('production'),
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
       'process.env.ES_BUILD': JSON.stringify('false'),
+      ... process.env.PYODIDE_CDN ? {
+        'PYODIDE_CDN': JSON.stringify(process.env.PYODIDE_CDN),
+      } : {},
       'preventAssignment': true,
     },
     typescript: {
