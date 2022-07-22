@@ -56,7 +56,9 @@ setup_args = dict(
     description='Reactive Jupyter Widgets',
     long_description='Reactive Jupyter Widgets',
     include_package_data=True,
-    install_requires=[],
+    install_requires=[
+        'ipywidgets>=7,<9',
+    ],
     packages=find_packages(),
     zip_safe=False,
     cmdclass=cmdclass,
