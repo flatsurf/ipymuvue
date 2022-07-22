@@ -21,7 +21,6 @@ import { loadModule } from 'vue3-sfc-loader';
 import type { Options, Resource, AbstractPath } from 'vue3-sfc-loader';
 import { PythonInterpreter } from './PythonInterpreter';
 import * as Vue from "vue";
-import { mapValues } from "async";
 
 export class VueComponentCompiler {
   public constructor(assets: Record<string, DataView>) {
@@ -115,7 +114,13 @@ export class VueComponentCompiler {
       return await loadModule(filename, options);
     } else {
       const components = filename;
-      return mapValues(components, (filename, _name, _) => this.compileAsync(filename));
+      return (async () => {
+        return Object.fromEntries(
+          await Promise.all(Object.entries(components).map(
+            async ([name, filename]) => {
+              return [name, await this.compileAsync(filename)]
+            })));
+      })();
     }
   }
 }
