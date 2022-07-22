@@ -29,8 +29,8 @@ export class VueWidgetModel extends DOMWidgetModel {
             _view_name: 'VueWidgetView',
             _model_module: 'ipyvue3',
             _view_module: 'ipyvue3',
-            _model_module_version: `^${version}`,
-            _view_module_version: `^${version}`,
+            _model_module_version: `~${version}`,
+            _view_module_version: `~${version}`,
             /* the name of the widget, useful for debugging */
             _VueWidget__type: 'VueWidget',
             /* the Vue template to render the widget */
