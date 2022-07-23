@@ -65,7 +65,7 @@ export class VueWidgetModel extends DOMWidgetModel {
     public get methods() {
       const names = this.get('_VueWidget__methods') as string[];
       return Object.fromEntries(names.map(method =>
-        [method, (args?: any[]) => this.callback(method, args || [])]));
+        [method, (...args: any[]) => this.callback(method, args || [])]));
     }
 
     /*
