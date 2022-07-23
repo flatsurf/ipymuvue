@@ -172,4 +172,4 @@ class VueWidget(DOMWidget):
     __methods = List([]).tag(sync=True)
     __components = Dict().tag(sync=True)
     __assets = Dict().tag(sync=True)
-    __children = Dict(Instance(DOMWidget), key_trait=Unicode).tag(sync=True, **widget_serialization)
+    __children = Dict(Instance(DOMWidget), key_trait=Unicode()).tag(sync=True, **widget_serialization)
