@@ -1,4 +1,4 @@
-from vue import define_component, set_default_export
+from vue import define_component
 
 component = define_component(
     template=r"""
@@ -10,5 +10,3 @@ component = define_component(
     """,
     props=["depth"],
     name="component-recursive-in-python")
-
-set_default_export(globals(), component)

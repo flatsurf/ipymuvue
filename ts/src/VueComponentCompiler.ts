@@ -21,10 +21,13 @@ import { loadModule } from 'vue3-sfc-loader';
 import type { Options, Resource, AbstractPath } from 'vue3-sfc-loader';
 import { PythonInterpreter } from './PythonInterpreter';
 import * as Vue from "vue";
+import isCallable from "is-callable";
 
 export class VueComponentCompiler {
-  public constructor(assets: Record<string, DataView>) {
-    this.assets = assets;
+  public constructor(assets?: (name: string) => DataView | null);
+  public constructor(assets?: Record<string, DataView>);
+  public constructor(assets?: Record<string, DataView> | ((name: string) => DataView | null)) {
+    this.assets = assets || {};
     this.pyodide = new PythonInterpreter();
   }
 
@@ -48,9 +51,10 @@ export class VueComponentCompiler {
 
           return {
             getContentData: async (binary: Boolean) => {
-              if (path in this.assets) {
-                const asset = this.assets[path];
-
+              const asset = isCallable(this.assets) ?
+                this.assets(path) :
+                this.assets[path];
+              if (asset) {
                 if (!(asset.buffer instanceof ArrayBuffer))
                   throw Error(`asset of incorrect type: ${asset}`)
 
@@ -73,16 +77,18 @@ export class VueComponentCompiler {
           const style = Object.assign(document.createElement('style'), {textContent});
           document.head.appendChild(style);
         },
-        handleModule: async(type, _getContentData, path_) => {
+        handleModule: async(type, getContentData, path_) => {
           const path = path_.toString();
 
           switch (type) {
             case '.py':
-              // TODO: These are probably not the correct assets to provision.
-              // Since this instance gets called through the
-              // VUE_COMPONENT_COMPILER hack, this.assets might not have updated?
-              // See also the comment in vue.py.
-              await this.pyodide.provisionAssets(this.assets);
+              const content = await getContentData(true);
+              if (typeof content === "string")
+                throw Error("getContentData(true) should have returned binary data but found a literal string instead");
+              await this.pyodide.provisionAssets({[path]: new DataView(content)});
+              if (!(this.assets instanceof Function))
+                await this.pyodide.provisionAssets(this.assets);
+              await this.pyodide.provisionModule("ipyvue3_vue_component_compiler", { VueComponentCompiler })
 
               if (!path.endsWith(".py"))
                 throw Error("Python file must end in .py")
@@ -90,9 +96,6 @@ export class VueComponentCompiler {
               const name = path.replace(/\//g, '.').substring(0, path.length - 3);
 
               const pyodide = await this.pyodide.pyodide;
-              const vue = pyodide.pyimport("vue");
-              vue.__VUE_COMPONENT_COMPILER__(this)
-
               return pyodide.pyimport(name);
             default:
               // Work around a typing error in vue3-sfc-loader.
@@ -111,7 +114,11 @@ export class VueComponentCompiler {
       delete((options as any).getResource);
       delete((options as any).pathResolve);
 
-      return await loadModule(filename, options);
+      const module = await loadModule(filename, options);
+
+      if (filename.toLowerCase().endsWith(".py"))
+        return (module as any).component;
+      return module;
     } else {
       const components = filename;
       return (async () => {
