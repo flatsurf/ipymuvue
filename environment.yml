@@ -9,6 +9,7 @@ dependencies:
   - sage
   - jupytext
   - jupyterlab
+  - jupyter-packaging
   - myst-nb
   - pip
   - rever
