@@ -11,3 +11,4 @@ dependencies:
   - jupyterlab
   - myst-nb
   - pip
+  - rever
