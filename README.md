@@ -49,4 +49,4 @@ Or, enable it in JupyterLab (see #8):
 
     jupyter labextension develop --overwrite ipymuvue
 
-Now, start a `jupyter` notebook or `jupyter lab` and verify that the notebooks `examples/` work correctly.
+Now, start a `jupyter` notebook or `jupyter lab` and verify that the notebooks in `examples/` work correctly.
