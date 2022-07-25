@@ -48,3 +48,5 @@ Enable the extension in the notebook:
 Or, enable it in JupyterLab (see #8):
 
     jupyter labextension develop --overwrite ipymuvue
+
+Now, start a `jupyter` notebook or `jupyter lab` and verify that the notebooks `examples/` work correctly.
