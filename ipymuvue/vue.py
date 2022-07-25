@@ -98,9 +98,6 @@ def prepare_components(components):
             if hasattr(component, "name") and Path(component.name).suffix.lower() == ".py":
                 key = "component"
 
-            from ipymuvue_vue_component_compiler import VueComponentCompiler
-            # TODO: Provision assets as a callback.
-
             import pyodide
 
             @pyodide.create_proxy
@@ -111,6 +108,8 @@ def prepare_components(components):
                 buffer.assign(content)
                 view = js.Uint8Array.new(buffer)
                 return view
+
+            from ipymuvue_vue_component_compiler import VueComponentCompiler
 
             component = VueComponentCompiler.new(read_file).compile(component.name)
 
