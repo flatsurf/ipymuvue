@@ -13,3 +13,4 @@ dependencies:
   - myst-nb
   - pip
   - rever
+  - twine
