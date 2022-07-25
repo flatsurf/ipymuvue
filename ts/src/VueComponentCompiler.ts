@@ -88,7 +88,7 @@ export class VueComponentCompiler {
               await this.pyodide.provisionAssets({[path]: new DataView(content)});
               if (!(this.assets instanceof Function))
                 await this.pyodide.provisionAssets(this.assets);
-              await this.pyodide.provisionModule("ipyvue3_vue_component_compiler", { VueComponentCompiler })
+              (await this.pyodide.pyodide).registerJsModule("ipyvue3_vue_component_compiler", { VueComponentCompiler })
 
               if (!path.endsWith(".py"))
                 throw Error("Python file must end in .py")

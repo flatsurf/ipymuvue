@@ -1,11 +1,4 @@
-from vue import define_component, ref, to_dict, computed, Vue, create_pyproxy, watch
-
-# Plan: (leave everything that is primitive alone)
-# - props: on access, return a computed whose value is a (deep) Python version of the prop.
-#       or provide a dict/list that is backed by the prop.
-# - return: wrap everything returned into a computed whose value is a (deep) JavaScript version of the prop/or an error if the conversion was not possible.
-# - ref: convert the argument to javascript, create a ref, return a dict/list that is backed by the ref.
-
+from vue import define_component, ref, watch
 
 def setup(props, context):
     def vertex_rclick(vertex):
