@@ -5,10 +5,6 @@ build/
 *.py[cod]
 node_modules/
 
-# Compiled javascript
-ipyvue3/nbextension/
-ipyvue3/labextension/
-
 # OS X
 .DS_Store
 

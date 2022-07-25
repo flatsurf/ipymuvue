@@ -2217,10 +2217,18 @@ ipaddr.js@1.9.1:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.1.tgz#bff38543eeb8984825079ff3a2a8e6cbd46781b3"
   integrity sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==
 
-ipyvue3implementation@../ts:
+ipymuvueimplementation@../ts:
   version "0.0.1"
   dependencies:
+    is-callable "^1.2.4"
     lodash-es "^4.17.21"
+    vue "^3.2.37"
+    vue3-sfc-loader "^0.8.4"
+
+is-callable@^1.2.4:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/is-callable/-/is-callable-1.2.4.tgz#47301d58dd0259407865547853df6d61fe471945"
+  integrity sha512-nsuwtxZfMX67Oryl9LCQ+upnC0Z0BgpwntpS89m1H/TLF0zNfzfLMV/9Wa/6MZsj0acpEjAO0KF1xT6ZdLl95w==
 
 is-core-module@^2.9.0:
   version "2.9.0"
@@ -4156,7 +4164,7 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vue3-sfc-loader@0.8.4:
+vue3-sfc-loader@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/vue3-sfc-loader/-/vue3-sfc-loader-0.8.4.tgz#b13309c2a466a4a9139ece4a42047e157ad8e21b"
   integrity sha512-eziaIrk/N9f9OCpyFEkR6vMsZUHcF5mQslXjffwcb5Iq6EuU74QrlpBeJqA04MvAGT7f5O8la2v9k3NtQnJb3Q==

@@ -68,7 +68,7 @@ if (!argv.format || argv.format === 'es') {
   const esConfig = {
     ...baseConfig,
     output: {
-      file: 'dist/ipyvue3implementation.esm.js',
+      file: 'dist/ipymuvueimplementation.esm.js',
       format: 'esm',
       exports: 'named',
       sourcemap: true,
@@ -104,9 +104,9 @@ if (!argv.format || argv.format === 'cjs') {
     ...baseConfig,
     output: {
       compact: true,
-      file: 'dist/ipyvue3implementation.ssr.js',
+      file: 'dist/ipymuvueimplementation.ssr.js',
       format: 'cjs',
-      name: 'ipyvue3implementation',
+      name: 'ipymuvueimplementation',
       exports: 'named',
       sourcemap: true,
     },
@@ -134,9 +134,9 @@ if (!argv.format || argv.format === 'iife') {
     ...baseConfig,
     output: {
       compact: true,
-      file: 'dist/ipyvue3implementation.min.js',
+      file: 'dist/ipymuvueimplementation.min.js',
       format: 'iife',
-      name: 'ipyvue3implementation',
+      name: 'ipymuvueimplementation',
       exports: 'named',
       sourcemap: true,
     },

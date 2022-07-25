@@ -1,5 +1,5 @@
 {
-  "name": "ipyvue3implementation",
+  "name": "ipymuvueimplementation",
   "version": "0.0.1",
   "description": "Reactive Jupyter Widgets",
   "license": "GPL-3.0-or-later",
@@ -10,13 +10,13 @@
     "build:ssr": "cross-env NODE_ENV=production rollup --config rollup.config.js --format cjs",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config rollup.config.js --format iife"
   },
-  "main": "dist/ipyvue3implementation.ssr.js",
-  "module": "dist/ipyvue3implementation.esm.js",
-  "browser": "dist/ipyvue3implementation.esm.js",
-  "unpkg": "dist/ipyvue3implementation.min.js",
+  "main": "dist/ipymuvueimplementation.ssr.js",
+  "module": "dist/ipymuvueimplementation.esm.js",
+  "browser": "dist/ipymuvueimplementation.esm.js",
+  "unpkg": "dist/ipymuvueimplementation.min.js",
   "files": [
     "dist/*",
-    "ipyvue3implementation.d.ts",
+    "ipymuvueimplementation.d.ts",
     "src/**/*.vue"
   ],
   "dependencies": {
@@ -55,5 +55,5 @@
   "engines": {
     "node": ">=10"
   },
-  "types": "ipyvue3implementation.d.ts"
+  "types": "ipymuvueimplementation.d.ts"
 }

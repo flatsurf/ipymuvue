@@ -1,18 +1,18 @@
 /* ******************************************************************************
  * Copyright (c) 2022 Julian Rüth <julian.rueth@fsfe.org>
  *
- * ipyvue3 is free software: you can redistribute it and/or modify
+ * ipymuvue is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ipyvue3 is distributed in the hope that it will be useful,
+ * ipymuvue is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
+ * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
 const path = require('path');
@@ -55,7 +55,7 @@ module.exports = (env, argv) => {
             entry: './src/extension.js',
             output: {
                 filename: 'extension.js',
-                path: path.resolve(__dirname, '..', 'ipyvue3', 'nbextension'),
+                path: path.resolve(__dirname, '..', 'ipymuvue', 'nbextension'),
                 libraryTarget: 'amd',
                 publicPath: '' // publicPath is set in extension.js
             },
@@ -73,7 +73,7 @@ module.exports = (env, argv) => {
             entry: './src/index.js',
             output: {
                 filename: 'index.js',
-                path: path.resolve(__dirname, '..', 'ipyvue3', 'nbextension'),
+                path: path.resolve(__dirname, '..', 'ipymuvue', 'nbextension'),
                 libraryTarget: 'amd',
                 publicPath: '',
             },
@@ -85,7 +85,7 @@ module.exports = (env, argv) => {
             externals: ['@jupyter-widgets/base'],
             plugins: [ define],
         },
-        {// Embeddable ipyvue3 bundle
+        {// Embeddable ipymuvue bundle
         //
         // This bundle is generally almost identical to the notebook bundle
         // containing the custom widget views and models.
@@ -104,7 +104,7 @@ module.exports = (env, argv) => {
                 filename: 'index.js',
                 path: path.resolve(__dirname, 'dist'),
                 libraryTarget: 'amd',
-                publicPath: 'https://unpkg.com/ipyvue3@' + version + '/dist/'
+                publicPath: 'https://unpkg.com/ipymuvue@' + version + '/dist/'
             },
             devtool,
             resolve,

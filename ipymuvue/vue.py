@@ -7,21 +7,21 @@ vue components.
 # ******************************************************************************
 # Copyright (c) 2022 Julian Rüth <julian.rueth@fsfe.org>
 #
-# ipyvue3 is free software: you can redistribute it and/or modify
+# ipymuvue is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# ipyvue3 is distributed in the hope that it will be useful,
+# ipymuvue is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
+# along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-from ipyvue3_utils import Vue, withArity
+from ipymuvue_utils import Vue, withArity
 from collections.abc import MutableMapping
 
 
@@ -98,7 +98,7 @@ def prepare_components(components):
             if hasattr(component, "name") and Path(component.name).suffix.lower() == ".py":
                 key = "component"
 
-            from ipyvue3_vue_component_compiler import VueComponentCompiler
+            from ipymuvue_vue_component_compiler import VueComponentCompiler
             # TODO: Provision assets as a callback.
 
             import pyodide

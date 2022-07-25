@@ -1,11 +1,11 @@
-graft ipyvue3/nbextension
-graft ipyvue3/labextension
+graft ipymuvue/nbextension
+graft ipymuvue/labextension
 
 graft js
 graft tests
 prune **/node_modules
 
-include ipyvue3.json
+include ipymuvue.json
 
 include LICENSE
 include setup.py

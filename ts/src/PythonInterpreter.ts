@@ -1,18 +1,18 @@
 /* ******************************************************************************
  * Copyright (c) 2022 Julian Rüth <julian.rueth@fsfe.org>
  *
- * ipyvue3 is free software: you can redistribute it and/or modify
+ * ipymuvue is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ipyvue3 is distributed in the hope that it will be useful,
+ * ipymuvue is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
+ * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
 // Currently, the pyodide package only works from Node but not in the browser.
@@ -22,7 +22,7 @@ import type { loadPyodide, PyodideInterface, PyProxy } from "pyodide";
 import { AssetProvisioner } from "./Assets";
 
 import { JavaScriptLoader } from "./JavaScriptLoader";
-import * as ipyvue3_utils from "./Utils";
+import * as ipymuvue_utils from "./Utils";
 
 const PYODIDE_CDN = "https://cdn.jsdelivr.net/pyodide/v0.21.0a3/full";
 
@@ -117,7 +117,7 @@ export class PythonInterpreter {
           indexURL: `${PYODIDE_CDN}/`,
         });
 
-        instance.registerJsModule("ipyvue3_utils", ipyvue3_utils);
+        instance.registerJsModule("ipymuvue_utils", ipymuvue_utils);
 
         return instance;
       })();

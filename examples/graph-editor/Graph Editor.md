@@ -35,7 +35,7 @@ svg
 ## Displaying a Graph
 
 ```{code-cell} ipython3
-from ipyvue3 import VueWidget
+from ipymuvue import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor0(VueWidget):
@@ -122,7 +122,7 @@ widget.graph = graphs.BarbellGraph(15, 1)
 Right clicking on a vertex deletes it. Right clicking somewhere else relayouts the graph.
 
 ```{code-cell} ipython3
-from ipyvue3 import VueWidget
+from ipymuvue import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor1(GraphEditor0):
@@ -170,7 +170,7 @@ widget
 Change the position of the vertices by dragging them.
 
 ```{code-cell} ipython3
-from ipyvue3 import VueWidget
+from ipymuvue import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor2(GraphEditor1):
@@ -196,7 +196,7 @@ widget
 ```
 
 ```{code-cell} ipython3
-from ipyvue3 import VueWidget
+from ipymuvue import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor2(GraphEditor1):
@@ -240,7 +240,7 @@ widget.graph.plot()
 ```
 
 ```{code-cell} ipython3
-from ipyvue3 import VueWidget
+from ipymuvue import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor3(GraphEditor1):

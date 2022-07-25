@@ -1,13 +1,13 @@
 {
-  "name": "ipyvue3",
+  "name": "ipymuvue",
   "version": "0.0.1",
-  "description": "Reactive Jupyter Widgets (ipyvue3-implementation repackaged for Jupyter Notebooks, JupyterLab, …)",
+  "description": "Reactive Jupyter Widgets (ipymuvue-implementation repackaged for Jupyter Notebooks, JupyterLab, …)",
   "author": "Julian Rüth",
   "main": "src/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://github.com/flatsurf/ipyvue3.git"
+    "url": "https://github.com/flatsurf/ipymuvue.git"
   },
   "keywords": [
     "jupyter",
@@ -21,7 +21,7 @@
     "dist/*.js"
   ],
   "scripts": {
-    "clean": "rimraf dist/ && rimraf ../ipyvue3/labextension/ && rimraf ../ipyvue3/nbextension",
+    "clean": "rimraf dist/ && rimraf ../ipymuvue/labextension/ && rimraf ../ipymuvue/nbextension",
     "prepublish": "yarn run clean && yarn run build:prod",
     "build": "webpack --mode=development && yarn run build:labextension:dev",
     "build:prod": "webpack --mode=production && yarn run build:labextension",
@@ -36,12 +36,12 @@
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
-    "ipyvue3implementation": "../ts",
+    "ipymuvueimplementation": "../ts",
     "lodash": "^4.17.21"
   },
   "jupyterlab": {
     "extension": "src/labplugin",
-    "outputDir": "../ipyvue3/labextension",
+    "outputDir": "../ipymuvue/labextension",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,

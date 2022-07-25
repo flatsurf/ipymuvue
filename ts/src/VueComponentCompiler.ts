@@ -1,18 +1,18 @@
 /* ******************************************************************************
  * Copyright (c) 2022 Julian Rüth <julian.rueth@fsfe.org>
  *
- * ipyvue3 is free software: you can redistribute it and/or modify
+ * ipymuvue is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ipyvue3 is distributed in the hope that it will be useful,
+ * ipymuvue is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
+ * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
 import type { Component } from "vue";
@@ -88,7 +88,7 @@ export class VueComponentCompiler {
               await this.pyodide.provisionAssets({[path]: new DataView(content)});
               if (!(this.assets instanceof Function))
                 await this.pyodide.provisionAssets(this.assets);
-              (await this.pyodide.pyodide).registerJsModule("ipyvue3_vue_component_compiler", { VueComponentCompiler })
+              (await this.pyodide.pyodide).registerJsModule("ipymuvue_vue_component_compiler", { VueComponentCompiler })
 
               if (!path.endsWith(".py"))
                 throw Error("Python file must end in .py")

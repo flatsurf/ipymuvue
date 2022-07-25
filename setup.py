@@ -1,18 +1,18 @@
 # ******************************************************************************
 # Copyright (c) 2022 Julian Rüth <julian.rueth@fsfe.org>
 #
-# ipyvue3 is free software: you can redistribute it and/or modify
+# ipymuvue is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# ipyvue3 is distributed in the hope that it will be useful,
+# ipymuvue is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ipyvue3. If not, see <https://www.gnu.org/licenses/>.
+# along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
 from __future__ import print_function
@@ -39,10 +39,10 @@ jstargets = [
 ]
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/ipyvue3', 'ipyvue3/nbextension', '*.*'),
-    ('share/jupyter/labextensions/ipyvue3', 'ipyvue3/labextension', "**"),
-    ("share/jupyter/labextensions/ipyvue3", '.', "install.json"),
-    ('etc/jupyter/nbconfig/notebook.d', '.', 'ipyvue3.json'),
+    ('share/jupyter/nbextensions/ipymuvue', 'ipymuvue/nbextension', '*.*'),
+    ('share/jupyter/labextensions/ipymuvue', 'ipymuvue/labextension', "**"),
+    ("share/jupyter/labextensions/ipymuvue", '.', "install.json"),
+    ('etc/jupyter/nbconfig/notebook.d', '.', 'ipymuvue.json'),
 ]
 
 cmdclass = create_cmdclass('jsdeps', data_files_spec=data_files_spec)
@@ -51,7 +51,7 @@ cmdclass['jsdeps'] = combine_commands(
 )
 
 setup_args = dict(
-    name='ipyvue3',
+    name='ipymuvue',
     version="0.0.1",
     description='Reactive Jupyter Widgets',
     long_description='Reactive Jupyter Widgets',
@@ -64,7 +64,7 @@ setup_args = dict(
     cmdclass=cmdclass,
     author='Julian Rüth',
     author_email='julian.rueth@fsfe.org',
-    url='https://github.com/flatsurf/ipyvue3',
+    url='https://github.com/flatsurf/ipymuvue',
     keywords=[
         'ipython',
         'jupyter',

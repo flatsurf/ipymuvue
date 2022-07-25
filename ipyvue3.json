@@ -1,5 +1,5 @@
 {
   "load_extensions": {
-    "ipyvue3/extension": true
+    "ipymuvue/extension": true
   }
 }
