@@ -19,19 +19,20 @@ Install development dependencies:
 
     cd ts
     yarn
+    yarn link
     cd ../js
+    yarn link ipymuvueimplementation
     yarn
+    cd ..
 
 Start the rollup/typescript build:
 
     cd ts
-    yarn link  # only necessary the first time
     yarn cross-env NODE_ENV=development rollup --config rollup.config.js --watch --parallel
 
 In another console, start the webpack bundling:
 
     cd js
-    yarn link ipymuvueimplementation  # only necessary the first time
     yarn watch --progress
 
 If you had not done so before, install a development version of ipymuvue:

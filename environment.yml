@@ -1,0 +1,12 @@
+# This file lists the dependencies needed to build and test all of ipymuvue.
+# Create a conda environment with these dependencies preinstalled with:
+# conda env create -f environment.yml
+name: ipyvue-flatsurf-build
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - sage
+  - jupytext
+  - myst-nb
+  - pip
