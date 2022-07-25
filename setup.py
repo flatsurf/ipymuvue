@@ -30,7 +30,7 @@ from jupyter_packaging import (
 
 here = os.path.dirname(os.path.abspath(__file__))
 
-# TODO: Compile ts files first.
+# The ts/ files are compiled automatically by the js/ prepublish command.
 js_dir = pjoin(here, 'js')
 
 # Representative files that should exist after a successful build
