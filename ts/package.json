@@ -6,7 +6,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=development rollup --config rollup.config.js",
     "build:prod": "cross-env NODE_ENV=production rollup --config rollup.config.js",
-    "dev": "cross-env NODE_ENV=development rollup --config rollup.config.js --watch --parallel --format es"
+    "dev": "cross-env NODE_ENV=development rollup --config rollup.config.js --watch --parallel --format cjs"
   },
   "main": "dist/ipymuvueimplementation.ssr.js",
   "module": "dist/ipymuvueimplementation.esm.js",
