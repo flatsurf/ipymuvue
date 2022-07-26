@@ -22,7 +22,7 @@ vue components.
 # ******************************************************************************
 
 from ipymuvue_utils import Vue, withArity
-from collections.abc import MutableMapping
+from collections.abc import MutableMapping, MutableSequence
 
 
 def define_component(*, setup=None, template=None, components=None, name=None, props=None, emits=None):
@@ -160,6 +160,26 @@ class ProxyDict(MutableMapping):
         return create_pyproxy(value)
 
 
+class ProxyList(MutableSequence):
+    def __init__(self, proxy):
+        self._proxy = proxy
+
+    def insert(self, index, object):
+        raise NotImplementedError
+
+    def __getitem__(self, index):
+        return create_pyproxy(self._proxy[index])
+
+    def __setitem__(self, index, value):
+        raise NotImplementedError
+
+    def __delitem__(self, index):
+        raise NotImplementedError
+
+    def __len__(self):
+        return self._proxy.length
+
+
 class ProxyRef:
     def __init__(self, ref):
         if not Vue.isRef(ref):
@@ -182,6 +202,10 @@ def create_pyproxy(x):
     if Vue.isRef(x):
         return ProxyRef(x)
     if Vue.isProxy(x):
+        import js
+        if js.Array.isArray(x):
+            return ProxyList(x)
+
         if x.typeof != "object":
             raise Exception(f"not implemented, wrapping a proxy of {x.typeof}")
 
