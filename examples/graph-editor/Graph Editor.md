@@ -95,8 +95,8 @@ class GraphEditor0(VueWidget):
 
         return bbox
 
-    width = Int(800R).tag(sync=True)
-    height = Int(800R).tag(sync=True)
+    width = Int(600R).tag(sync=True)
+    height = Int(600R).tag(sync=True)
 
     # A list of vertex ids. (Vertices can be more than just integers in SageMath, but let's pretend they are all integers.)
     vertices = List(Int()).tag(sync=True)
@@ -111,10 +111,6 @@ graph = graphs.BuckyBall()
 
 widget = GraphEditor0(graph)
 widget
-```
-
-```{code-cell} ipython3
-widget.graph = graphs.BarbellGraph(15, 1)
 ```
 
 ## Interacting with the Graph
@@ -167,7 +163,14 @@ widget
 ```
 
 ## Dragging Vertices
+
 Change the position of the vertices by dragging them.
+
+Listening to mouse move events inside the backend code is not a great idea (we'd need to serialize and deserialize the state at 60 fps, send it back and forth between frontend and backend.) So, we would like to run that dragging code on the frontend directly.
+
+The recommended way to do this, is to write proper Vue components. We get the best development experience by writing these components in a separate project that uses standard Vue tooling and then load these components.
+
+For prototyping, it's best to create `.vue` files locally, as we do in the following example:
 
 ```{code-cell} ipython3
 from ipymuvue import VueWidget
@@ -194,6 +197,8 @@ graph = graphs.BuckyBall()
 widget = GraphEditor2(graph)
 widget
 ```
+
+We can, however, also implement things purely in Python. Note that this is **highly experimental**.
 
 ```{code-cell} ipython3
 from ipymuvue import VueWidget
@@ -235,9 +240,7 @@ widget = GraphEditor2(graph)
 widget
 ```
 
-```{code-cell} ipython3
-widget.graph.plot()
-```
+Finally, we can use a mix of `.vue` and `.py` files to use JavaScript packages in Python. This is equally **highly experimental**.
 
 ```{code-cell} ipython3
 from ipymuvue import VueWidget
