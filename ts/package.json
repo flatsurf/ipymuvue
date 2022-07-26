@@ -1,6 +1,6 @@
 {
   "name": "ipymuvueimplementation",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Reactive Jupyter Widgets",
   "license": "GPL-3.0-or-later",
   "scripts": {
