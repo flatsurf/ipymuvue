@@ -17,6 +17,8 @@
 
 export * as Vue from "vue";
 
+import type {Ref} from "vue";
+
 
 export function withArity(f: Function, n: number) {
   if (n === 2) {
@@ -27,4 +29,8 @@ export function withArity(f: Function, n: number) {
   }
 
   throw Error("not implemented")
+}
+
+export function getValue(ref: Ref) {
+  return ref.value;
 }

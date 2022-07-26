@@ -21,7 +21,7 @@ vue components.
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-from ipymuvue_utils import Vue, withArity
+from ipymuvue_utils import Vue, withArity, getValue
 from collections.abc import MutableMapping, MutableSequence
 
 
@@ -188,7 +188,7 @@ class ProxyRef:
 
     @property
     def value(self):
-        return create_pyproxy(self._ref.value)
+        return create_pyproxy(getValue(self._ref))
 
     @value.setter
     def value(self, value):
@@ -217,7 +217,7 @@ def create_pyproxy(x):
     raise Exception(f"not implemented for {x.typeof}")
 
 
-def to_vue(x):
+def to_vue(x, clone=False):
     if callable(x):
         return x
 
@@ -233,17 +233,20 @@ def to_vue(x):
         assert Vue.isRef(x._ref)
         return x._ref
 
-    if isinstance(x, ProxyDict):
+    if isinstance(x, ProxyDict) and not clone:
         return x._proxy
 
-    if isinstance(x, list):
+    if isinstance(x, ProxyList) and not clone:
+        return x._proxy
+
+    if isinstance(x, MutableSequence):
         import js
         y = js.Array.new()
         for item in x:
             y.push(to_vue(item))
         return y
 
-    if isinstance(x, dict):
+    if isinstance(x, MutableMapping):
         import js
         o = js.Object.new()
         for key in x.keys():
