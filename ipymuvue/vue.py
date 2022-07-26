@@ -199,6 +199,9 @@ def create_pyproxy(x):
     if type(x) in [int, str, float, bool, type(None)]:
         return x
 
+    if callable(x):
+        return x
+
     if Vue.isRef(x):
         return ProxyRef(x)
     if Vue.isProxy(x):

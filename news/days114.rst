@@ -13,3 +13,7 @@
 **Fixed:**
 
 * Fixed highlighting of vertices in demo application.
+
+* Wrap reactive JavaScript lists as proxies in Python.
+
+* Do not rewrap JavaScript functions in Python.
