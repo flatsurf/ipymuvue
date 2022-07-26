@@ -204,17 +204,24 @@ def create_pyproxy(x):
 
     if Vue.isRef(x):
         return ProxyRef(x)
+
     if Vue.isProxy(x):
         import js
         if js.Array.isArray(x):
             return ProxyList(x)
 
         if x.typeof != "object":
-            raise Exception(f"not implemented, wrapping a proxy of {x.typeof}")
+            raise Exception(f"not implemented, wrapping a proxy {x.typeof}")
 
         return ProxyDict(x)
 
-    raise Exception(f"not implemented for {x.typeof}")
+    import js
+    if js.Array.isArray(x):
+        # TODO: Go deep?
+        return list(x)
+
+    # TODO: Go deep?
+    return dict(js.Object.entries(x))
 
 
 def to_vue(x, clone=False):
@@ -239,7 +246,7 @@ def to_vue(x, clone=False):
     if isinstance(x, ProxyList) and not clone:
         return x._proxy
 
-    if isinstance(x, MutableSequence):
+    if isinstance(x, (MutableSequence, tuple)):
         import js
         y = js.Array.new()
         for item in x:
@@ -263,12 +270,24 @@ def to_vue(x, clone=False):
 
 
 def ref(x):
-    return create_pyproxy(Vue.ref(to_vue(x)))
+    return create_pyproxy(Vue.ref(to_vue(x, clone=True)))
 
 
 def watch(x, f):
+    if not callable(x):
+        raise TypeError("first argument to watch must be callable")
+
+    # TODO: Enforce harder that no Python objects go into the Vue machinery.
+    # Otherwise, they are turned into proxies and strange things tend to
+    # happen. E.g., when omitting the to_vue here.
+    def y():
+        return to_vue(x())
+
+    def on_change(current, previous, _):
+        f(create_pyproxy(current), create_pyproxy(previous), _)
+
     import pyodide
-    return Vue.watch(pyodide.create_proxy(x), pyodide.create_proxy(f))
+    Vue.watch(pyodide.create_proxy(y), pyodide.create_proxy(on_change))
 
 
 def computed(f):

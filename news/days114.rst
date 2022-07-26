@@ -17,3 +17,5 @@
 * Wrap reactive JavaScript lists as proxies in Python.
 
 * Do not rewrap JavaScript functions in Python.
+
+* Added a hack to deep-clone some Python objects when putting them into Vue.
