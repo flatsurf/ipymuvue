@@ -116,7 +116,7 @@ def prepare_components(components):
             if key:
                 component = getattr(component, key)
 
-            # TODO: Cannot destroy because the component is async.
+            # Cannot destroy because the component is async. See #9.
             # read_file.destroy()
 
         components[name] = component
