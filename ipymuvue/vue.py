@@ -72,7 +72,7 @@ def prepare_setup(setup):
         js_exports = js.Object.new()
         for name in exports:
             if name.startswith("_"):
-                # TODO: Should we warn?
+                # Should we warn? See #3.
                 continue
 
             if exports[name] is python_props:
