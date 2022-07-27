@@ -45,7 +45,7 @@ export class VueWidgetView extends DOMWidgetView {
         (async () => {
           await this.displayed;
 
-          // TODO: Make tag configurable.
+          // Currently, the tag emitted is not configurable, see #13.
           const mountPoint = document.createElement('div');
           this.el.appendChild(mountPoint);
 
