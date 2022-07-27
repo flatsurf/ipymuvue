@@ -27,6 +27,9 @@ export class AssetProvisioner {
   private readonly FS;
 
   public async provision(name: string, content: DataView) {
+      if (name.lastIndexOf('/') != -1)
+        await this.mkdir(name.substring(0, name.lastIndexOf('/')));
+
       const stat = this.FS.analyzePath(name, true);
 
       const provisioned = {
@@ -44,6 +47,17 @@ export class AssetProvisioner {
       this.FS.writeFile(name, new Uint8Array(content.buffer), { encoding: "binary" });
 
       return provisioned;
+  }
+
+  /*
+   * Create directory `name` recursively.
+   */
+  private async mkdir(name: string) {
+    if (name.lastIndexOf('/') != -1)
+      await this.mkdir(name.substring(0, name.lastIndexOf('/')));
+
+    if (!this.FS.analyzePath(name, true).exists)
+      await this.FS.mkdir(name);
   }
 
   private static equal(lhs: ArrayBuffer, rhs: ArrayBuffer) {

@@ -1,4 +1,4 @@
-from vue import define_component, ref, watch, to_vue
+from ipymuvue.pyodide.vue import define_component, ref, watch, to_vue
 
 
 def create_setup(gsap):

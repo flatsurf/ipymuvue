@@ -1,4 +1,4 @@
-from vue import define_component, ref, watch
+from ipymuvue.pyodide.vue import define_component, ref, watch
 
 def setup(props, context):
     def vertex_rclick(vertex):

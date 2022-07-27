@@ -97,9 +97,14 @@ class VueWidget(DOMWidget):
         r"""
         Prepare virtual file system for assets.
         """
-        if "vue.py" not in assets:
-            import os.path
-            assets["vue.py"] = open(os.path.join(os.path.dirname(__file__), "vue.py"), "rb").read()
+        import os.path
+        import glob
+
+        # Ship ipymuvue to the client (they probably only need the things that are in pyodide/
+        for fname in glob.glob(os.path.join(os.path.dirname(__file__), "**/*.py")):
+            if fname in assets:
+                raise ValueError(f"assets must not contain {fname} as it is shipped with ipymuvue")
+            assets[os.path.relpath(fname, start=os.path.dirname(os.path.dirname(__file__)))] = open(fname, 'rb').read()
 
         for (fname, content) in assets.items():
             if not isinstance(fname, str):

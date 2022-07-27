@@ -1,8 +1,45 @@
 r"""
-Helper methods to create Vue components from Python.
+The Vue API in Python.
 
 This module is automatically provided with the "assets" available when defining
 vue components.
+
+The general strategy of this module is to make sure that Vue.js never sees any
+pyodide PyProxy objects and that the Python developer is not bothered with
+JsProxy objects. The former is necessary for Vue to function, the latter is
+mostly a convenience.
+
+==============================
+Accessing the Vue API directly
+==============================
+
+We export the `vue` module as `Vue`. If you know what you are doing, it can be
+used to call into Vue directly through its JavaScript API. Note that calling
+into Vue with any Python objects that are not primitives such as int or bool is
+likely not going to work reliably.
+
+Vue gets confused if it's presented any PyProxy objects, i.e., proxy objects
+that live in JavaScript and wrap a Python object. There is no single reason why
+exactly this is a problem but often, Vue tries to install its proxy
+infrastructure which does not seem to play well the WASM objects that back the
+pyodide implementation. To avoid such problems, the general strategy here is to
+make sure that Vue only sees plain old JavaScript objects or sometimes things
+that it will mostly leave alone such as shallow refs holding a PyProxy.
+
+In the opposite direction, there is essenially the same problem. It's certainly
+very inconvenient for Python developers to be able to call into Vue with Python
+objects such as dicts and lists and at the same time receive JsProxy objects
+that are Object and Array since the interface of the former is quite different
+from a dict. The bigger problem here is however, if we return a reactive Object
+to Python at some point, Python code might modify it and insert a PyProxy such
+as a dict somewhere. We can't really do anything about such operations and Vue
+is going to stop to function as outlined above. So our strategy here is to make
+sure that the objects we return are proxy objects that emulate a Python
+interface such as :class:`ProxyDict`, :class:`ProxyList` and at the same time
+rewrite all modifications to be compatible with Vue's expectations. Sometimes,
+we also return read-only objects or just convert things to dicts or lists if we
+find that the connection to the Vue machinery is not needed and such conversion
+is easier.
 """
 # ******************************************************************************
 # Copyright (c) 2022 Julian Rüth <julian.rueth@fsfe.org>
@@ -39,21 +76,33 @@ def define_component(*, setup=None, template=None, components=None, name=None, p
     component = js.Object.new()
 
     if setup is not None:
+        if not callable(setup):
+            raise TypeError("setup must be a function")
         component.setup = prepare_setup(setup)
 
     if template is not None:
+        if not isinstance(template, str):
+            raise TypeError("template must be a string")
         component.template = template
 
     if components is not None:
+        if not isinstance(components, dict):
+            raise TypeError("components must be a dict")
         component.components = prepare_components(components)
 
     if props is not None:
+        if not isinstance(props, list) or not all(isinstance(prop, str) for prop in props):
+            raise TypeError("props must be a list of strings")
         component.props = to_vue(props)
 
     if emits is not None:
+        if not isinstance(emits, list) or not all(isinstance(prop, str) for prop in emits):
+            raise TypeError("emits must be a list of strings")
         component.emits = to_vue(emits)
 
     if name is not None:
+        if not isinstance(name, str):
+            raise TypeError("name must be a string")
         component.name = name
 
     return component
@@ -296,6 +345,3 @@ def computed(f):
 
     from pyodide import create_proxy
     return create_pyproxy(Vue.computed(create_proxy(g)))
-
-
-__all__ = ["define_component", "ref", "computed"]
