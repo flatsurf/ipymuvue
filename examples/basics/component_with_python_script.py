@@ -1,4 +1,4 @@
-from vue import define_component
+from ipymuvue.pyodide.vue import define_component
 
 from subcomponent_pure_python import component as subcomponent_pure_python
 

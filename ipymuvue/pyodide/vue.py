@@ -174,6 +174,8 @@ def prepare_components(components):
     r"""
     Rewrite the subcomponents dict to make it compatible with the Vue API.
     """
+    import pyodide
+
     for (name, component) in components.items():
         if not isinstance(name, str):
             raise TypeError("name of component must be a string")
@@ -183,8 +185,6 @@ def prepare_components(components):
             from pathlib import Path
             fname = component.name if hasattr(component, "name") else None
             component_name = Path(fname).stem or name
-
-            import pyodide
 
             @pyodide.ffi.create_proxy
             def read_file_from_wasm(fname):
@@ -196,7 +196,11 @@ def prepare_components(components):
                 return view
 
             from ipymuvue_vue_component_compiler import VueComponentCompiler
-            component = VueComponentCompiler.new(read_file_from_wasm).compile(component_name)
+
+            if fname is None:
+                raise NotImplementedError("cannot compile components from string in the frontend yet")
+
+            component = VueComponentCompiler.new(read_file_from_wasm).compile(fname)
 
             # Since Python files have no default export, we use the global
             # variable "component" instead.
@@ -211,7 +215,7 @@ def prepare_components(components):
 
         components[name] = component
 
-    return vue_compatible(components, shallow=True)
+    return vue_compatible(components, reference=None, shallow=True)
 
 
 class ObjectWrapper(MutableMapping):

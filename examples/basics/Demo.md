@@ -17,7 +17,7 @@ kernelspec:
 A left click on the title is handled by JavaScript in the frontend, a right click is handled by Python in the backend.
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode
 
 class Widget(VueWidget):
@@ -58,7 +58,7 @@ widget.audience = "Jupyter"
 Subcomponents can be implemented in JavaScript or in Python in a variety of ways.
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode
 
 class Widget(VueWidget):
