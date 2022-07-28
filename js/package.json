@@ -1,6 +1,6 @@
 {
   "name": "ipymuvue",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Reactive Jupyter Widgets (ipymuvue-implementation repackaged for Jupyter Notebooks, JupyterLab, …)",
   "author": "Julian Rüth",
   "main": "src/index.js",

@@ -52,7 +52,7 @@ cmdclass['jsdeps'] = combine_commands(
 
 setup_args = dict(
     name='ipymuvue',
-    version="0.0.3",
+    version="0.0.4",
     description='Reactive Jupyter Widgets',
     long_description='Reactive Jupyter Widgets',
     include_package_data=True,
