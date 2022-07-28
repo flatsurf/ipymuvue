@@ -58,7 +58,7 @@ is easier.
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-from ipymuvue_utils import Vue, withArity, cloneDeep
+from ipymuvue_utils import Vue, withArity, cloneDeep, clone, asVueCompatibleFunction
 from collections.abc import MutableMapping, MutableSequence
 
 
@@ -116,7 +116,7 @@ def _is_vue_proxy(x):
     Return whether ``x`` is a un unwrapped reactive Vue Proxy.
     """
     import pyodide
-    return isinstance(x, pyodide.JsProxy) and Vue.isProxy(x)
+    return isinstance(x, pyodide.ffi.JsProxy) and Vue.isProxy(x)
 
 
 def _is_vue_ref(x):
@@ -124,7 +124,7 @@ def _is_vue_ref(x):
     Return whether ``x`` is a un unwrapped reactive Vue Ref.
     """
     import pyodide
-    return isinstance(x, pyodide.JsProxy) and Vue.isRef(x)
+    return isinstance(x, pyodide.ffi.JsProxy) and Vue.isRef(x)
 
 
 def prepare_setup(setup):
@@ -154,8 +154,10 @@ def prepare_setup(setup):
                 # Should we write a warning to the console? See #6.
                 continue
 
-            # TODO: try{} catch{}, warn and ignore if this cannot be converted.
-            export = vue_compatible(exports[name])
+            try:
+                export = vue_compatible(exports[name])
+            except Exception:
+                raise TypeError(f"could not convert {name} returned by setup() to be used in the component template")
 
             setattr(js_exports, name, export)
 
@@ -204,7 +206,7 @@ def prepare_components(components):
             # Cannot destroy because the component is async. See #9.
             # read_file.destroy()
 
-        if not isinstance(component, pyodide.JsProxy) or component.typeof != "object":
+        if not isinstance(component, pyodide.ffi.JsProxy) or component.typeof != "object":
             raise TypeError("component must be a JavaScript object")
 
         components[name] = component
@@ -337,9 +339,9 @@ def create_pyproxy(x):
         return x
 
     if callable(x):
-        # TODO
-        # raise NotImplementedError("cannot properly wrap functions from the Vue API yet")
-        return x
+        import pyodide
+        assert isinstance(x, pyodide.ffi.JsProxy), "received a function from Vue that is not defined in JavaScript"
+        raise NotImplementedError("cannot properly wrap functions from the Vue API yet")
 
     if _is_vue_ref(x):
         return ProxyRef(x)
@@ -377,25 +379,24 @@ def vue_compatible(x, reference=True, shallow=False):
 
     If ``reference`` is ``None``, return whatever is chepest to accomplish.
     """
+    import pyodide
+
     if type(x) in [int, str, float, bool, type(None)]:
         return x
 
     if callable(x):
-        # TODO
-        # raise NotImplementedError("cannot properly wrap functions for the Vue API yet")
-        return x
+        if isinstance(x, pyodide.ffi.JsProxy):
+            return x
 
-    import pyodide
-    if isinstance(x, pyodide.JsProxy):
+        return asVueCompatibleFunction(pyodide.ffi.create_proxy(x), pyodide.ffi.create_proxy(create_pyproxy), pyodide.ffi.create_proxy(vue_compatible))
+
+    if isinstance(x, pyodide.ffi.JsProxy):
         if reference is not False:
             # Note that we are not yet checking whether the insides of this
             # object contain no PyProxy instances.
             return x
         else:
-            if shallow:
-                raise NotImplementedError("shallow cloning of javascript object not implemented")
-            else:
-                return cloneDeep(x)
+            return clone(x) if shallow else cloneDeep(x)
 
     if isinstance(x, ProxyRef):
         assert _is_vue_ref(x._ref)

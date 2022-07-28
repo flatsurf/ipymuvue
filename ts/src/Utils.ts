@@ -18,6 +18,7 @@
 export * as Vue from "vue";
 
 export { default as cloneDeep } from "lodash-es/cloneDeep"
+export { default as clone } from "lodash-es/clone"
 
 export function withArity(f: Function, n: number) {
   if (n === 2) {
@@ -28,4 +29,11 @@ export function withArity(f: Function, n: number) {
   }
 
   throw Error("not implemented")
+}
+
+export function asVueCompatibleFunction(f: (...args: any) => any, createPyProxy: (obj: any) => any, vueCompatible: (obj: any) => any) {
+  function g(...args: any[]) {
+    return vueCompatible(f(...args.map((arg) => createPyProxy(arg))));
+  }
+  return g
 }
