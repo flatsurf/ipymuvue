@@ -14,17 +14,17 @@ Accessing the Vue API directly
 ==============================
 
 We export the `vue` module as `Vue`. If you know what you are doing, it can be
-used to call into Vue directly through its JavaScript API. Note that calling
+used to call into Vue directly using its JavaScript API. Note that calling
 into Vue with any Python objects that are not primitives such as int or bool is
 likely not going to work reliably.
 
-Vue gets confused if it's presented any PyProxy objects, i.e., proxy objects
-that live in JavaScript and wrap a Python object. There is no single reason why
-exactly this is a problem but often, Vue tries to install its proxy
-infrastructure which does not seem to play well the WASM objects that back the
-pyodide implementation. To avoid such problems, the general strategy here is to
-make sure that Vue only sees plain old JavaScript objects or sometimes things
-that it will mostly leave alone such as shallow refs holding a PyProxy.
+Things tend to go wrong when Vue is presented any PyProxy objects, i.e., proxy
+objects that live in JavaScript and wrap a Python object. The truth is that
+it's not clear to us what exactly is the problem here but there seem to be
+issues when Vue is installing its own proxy on the PyProxy. This changes the
+identity of these objects, so pyodide is going to rewrap these proxies using a
+JsProxy. Also, methods called on these objects are not going through the Vue
+proxy machinery.
 
 In the opposite direction, there is essenially the same problem. It's certainly
 very inconvenient for Python developers to be able to call into Vue with Python
@@ -58,7 +58,7 @@ is easier.
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-from ipymuvue_utils import Vue, withArity, getValue
+from ipymuvue_utils import Vue, withArity, cloneDeep
 from collections.abc import MutableMapping, MutableSequence
 
 
@@ -71,6 +71,9 @@ def define_component(*, setup=None, template=None, components=None, name=None, p
 
     Currently, we only support the composition API, i.e., defining a setup()
     function instead of defining computed(), methods(), ...
+
+    Digressing from the official API, the values of `components` can be
+    filenames. The component is then loaded from the file at runtime.
     """
     import js
     component = js.Object.new()
@@ -93,12 +96,12 @@ def define_component(*, setup=None, template=None, components=None, name=None, p
     if props is not None:
         if not isinstance(props, list) or not all(isinstance(prop, str) for prop in props):
             raise TypeError("props must be a list of strings")
-        component.props = to_vue(props)
+        component.props = vue_compatible(props, reference=False)
 
     if emits is not None:
         if not isinstance(emits, list) or not all(isinstance(prop, str) for prop in emits):
             raise TypeError("emits must be a list of strings")
-        component.emits = to_vue(emits)
+        component.emits = vue_compatible(emits, reference=False)
 
     if name is not None:
         if not isinstance(name, str):
@@ -108,49 +111,81 @@ def define_component(*, setup=None, template=None, components=None, name=None, p
     return component
 
 
-def prepare_setup(setup):
-    def prepared_setup(props, context):
-        python_props = create_pyproxy(props)
+def _is_vue_proxy(x):
+    r"""
+    Return whether ``x`` is a un unwrapped reactive Vue Proxy.
+    """
+    import pyodide
+    return isinstance(x, pyodide.JsProxy) and Vue.isProxy(x)
 
-        exports = setup(python_props, context)
+
+def _is_vue_ref(x):
+    r"""
+    Return whether ``x`` is a un unwrapped reactive Vue Ref.
+    """
+    import pyodide
+    return isinstance(x, pyodide.JsProxy) and Vue.isRef(x)
+
+
+def prepare_setup(setup):
+    r"""
+    Wraps a setup function to make it compatible with the Vue API.
+    """
+    import pyodide
+
+    @pyodide.ffi.create_proxy
+    def prepared_setup(props, context):
+        # The props are a Vue proxy. Wrap it so that it behaves like a Python,
+        # e.g., so its entries appear to be dicts and lists.
+        assert _is_vue_proxy(props)
+        props = create_pyproxy(props)
+
+        exports = setup(props, context)
 
         if not isinstance(exports, dict):
-            raise TypeError("setup must return a dict, e.g., locals()")
+            raise TypeError("setup() must return a dict, e.g., locals()")
 
         import js
         js_exports = js.Object.new()
+
         for name in exports:
-            if name.startswith("_"):
-                # Should we warn? See #3.
+            from ipymuvue.special import is_special
+            if is_special(name):
+                # Should we write a warning to the console? See #6.
                 continue
 
-            if exports[name] is python_props:
-                continue
+            # TODO: try{} catch{}, warn and ignore if this cannot be converted.
+            export = vue_compatible(exports[name])
 
-            setattr(js_exports, name, to_vue(exports[name]))
+            setattr(js_exports, name, export)
 
         return js_exports
 
-    import pyodide
-    return withArity(pyodide.ffi.create_proxy(prepared_setup), 2)
+    # Vue checks the arity of the setup function to decide whether to call with
+    # a `context` parameter or use an optimized call without `context`.
+    # The arity of Python functions is always zero from JavaScript's
+    # perspective so we need to fix the arity to get a context.
+    return withArity(prepared_setup, 2)
 
 
 def prepare_components(components):
+    r"""
+    Rewrite the subcomponents dict to make it compatible with the Vue API.
+    """
     for (name, component) in components.items():
         if not isinstance(name, str):
             raise TypeError("name of component must be a string")
 
+        # If the component is a (.vue/.py) file. Load it with our VueComponentCompiler.
         if hasattr(component, 'read'):
-            # Component is a (.vue/.py) file. Load it with our VueComponentCompiler.
             from pathlib import Path
-            key = None
-            if hasattr(component, "name") and Path(component.name).suffix.lower() == ".py":
-                key = "component"
+            fname = component.name if hasattr(component, "name") else None
+            component_name = Path(fname).stem or name
 
             import pyodide
 
-            @pyodide.create_proxy
-            def read_file(fname):
+            @pyodide.ffi.create_proxy
+            def read_file_from_wasm(fname):
                 content = open(fname, 'rb').read()
                 import js
                 buffer = js.ArrayBuffer.new(len(content))
@@ -159,25 +194,34 @@ def prepare_components(components):
                 return view
 
             from ipymuvue_vue_component_compiler import VueComponentCompiler
+            component = VueComponentCompiler.new(read_file_from_wasm).compile(component_name)
 
-            component = VueComponentCompiler.new(read_file).compile(component.name)
-
-            if key:
-                component = getattr(component, key)
+            # Since Python files have no default export, we use the global
+            # variable "component" instead.
+            if Path(fname).suffix.lower() == ".py":
+                component = getattr(component, "component")
 
             # Cannot destroy because the component is async. See #9.
             # read_file.destroy()
 
+        if not isinstance(component, pyodide.JsProxy) or component.typeof != "object":
+            raise TypeError("component must be a JavaScript object")
+
         components[name] = component
 
-    import pyodide
-    import js
-    return pyodide.ffi.to_js(components, dict_converter=js.Object.fromEntries)
+    return vue_compatible(components, shallow=True)
 
 
-class ProxyDict(MutableMapping):
-    def __init__(self, proxy):
-        self._proxy = proxy
+class ObjectWrapper(MutableMapping):
+    r"""
+    Wraps a JavaScript object with a Python dict interface.
+    """
+
+    def __init__(self, object):
+        if not object.typeof == "object":
+            raise TypeError("object must be a JavaScript object")
+
+        self._object = object
 
     def __delitem__(self, key):
         raise Exception("not implemented __delitem__")
@@ -189,159 +233,262 @@ class ProxyDict(MutableMapping):
         if not isinstance(key, (int, str)):
             raise TypeError(f"key must be int or str but was {type(key)}")
 
-        key = str(key)
-        setattr(self._proxy, key, to_vue(value))
+        setattr(self._object, str(key), vue_compatible(value))
 
     def __iter__(self):
         import js
-        for key in js.Object.keys(self._proxy):
+        for key in js.Object.keys(self._object):
             yield key
 
     def __len__(self):
-        return len(self._proxy)
+        return len(self._object)
 
     def __getitem__(self, key):
         if not isinstance(key, (int, str)):
             raise TypeError(f"key must be int or str but was {type(key)}")
 
-        key = str(key)
-        value = getattr(self._proxy, key)
-        return create_pyproxy(value)
+        return create_pyproxy(getattr(self._object, str(key)))
 
 
-class ProxyList(MutableSequence):
+class ProxyDict(ObjectWrapper):
+    r"""
+    Wraps a Vue proxy with a Python dict interface.
+    """
+
     def __init__(self, proxy):
-        self._proxy = proxy
+        if not _is_vue_proxy(proxy):
+            raise TypeError("proxy must be a Vue proxy")
+
+        super().__init__(proxy)
+
+    def __setitem__(self, key, value):
+        if not isinstance(key, (int, str)):
+            raise TypeError(f"key must be int or str but was {type(key)}")
+
+        setattr(self._object, str(key), vue_compatible(value, reference=False))
+
+
+class ArrayWrapper(MutableSequence):
+    r"""
+    Wraps a JavaScript Array with a Python list interface.
+    """
+
+    def __init__(self, array):
+        import js
+        if not js.Array.isArray(array):
+            raise TypeError("array must be a JavaScript array")
+
+        self._array = array
 
     def insert(self, index, object):
-        raise NotImplementedError
+        raise NotImplementedError("writing to a list proxy is not implemented yet")
 
     def __getitem__(self, index):
-        return create_pyproxy(self._proxy[index])
+        return create_pyproxy(self._array[index])
 
     def __setitem__(self, index, value):
-        raise NotImplementedError
+        raise NotImplementedError("writing to a list proxy is not implemented yet")
 
     def __delitem__(self, index):
-        raise NotImplementedError
+        raise NotImplementedError("writing to a list proxy is not implemented yet")
 
     def __len__(self):
-        return self._proxy.length
+        return self._array.length
+
+
+class ProxyList(ArrayWrapper):
+    r"""
+    Wraps a Vue proxy with a Python list interface.
+    """
+
+    def __init__(self, proxy):
+        if not _is_vue_proxy(proxy):
+            raise TypeError("proxy must be a Vue proxy")
+        super().__init__(proxy)
 
 
 class ProxyRef:
+    r"""
+    Wraps a Vue ref object with a Python property interface.
+    """
+
     def __init__(self, ref):
-        if not Vue.isRef(ref):
-            raise TypeError
+        if not _is_vue_ref(ref):
+            raise TypeError("ref must be a Vue ref")
         self._ref = ref
 
     @property
     def value(self):
-        return create_pyproxy(getValue(self._ref))
+        # For a readonly ref, Python does not see its .value attribute so we
+        # run the .value in JavaScript.
+        return create_pyproxy(Vue.unref(self._ref))
 
     @value.setter
     def value(self, value):
-        self._ref.value = to_vue(value)
+        self._ref.value = vue_compatible(value, reference=False)
 
 
 def create_pyproxy(x):
+    r"""
+    Wrap ``x`` that came out of a Vue API for use in Python.
+    """
+    # Some elementary types are converted automatically by pyodide.
     if type(x) in [int, str, float, bool, type(None)]:
         return x
 
     if callable(x):
+        # TODO
+        # raise NotImplementedError("cannot properly wrap functions from the Vue API yet")
         return x
 
-    if Vue.isRef(x):
+    if _is_vue_ref(x):
         return ProxyRef(x)
-
-    if Vue.isProxy(x):
-        import js
-        if js.Array.isArray(x):
-            return ProxyList(x)
-
-        if x.typeof != "object":
-            raise Exception(f"not implemented, wrapping a proxy {x.typeof}")
-
-        return ProxyDict(x)
 
     import js
     if js.Array.isArray(x):
-        # TODO: Go deep?
-        return list(x)
+        if _is_vue_proxy(x):
+            return ProxyList(x)
+        return ArrayWrapper(x)
 
-    # TODO: Go deep?
-    return dict(js.Object.entries(x))
+    if x.typeof == "object":
+        if _is_vue_proxy(x):
+            return ProxyDict(x)
+        return ObjectWrapper(x)
+
+    raise Exception(f"not implemented, wrapping a proxy {x.typeof}")
 
 
-def to_vue(x, clone=False):
-    if callable(x):
+def vue_compatible(x, reference=True, shallow=False):
+    r"""
+    Return ``x`` as a native JavaScript object that can be safely consumed by
+    the Vue API.
+
+    If ``x`` is a primitive value such as a number or a string, return it
+    unchanged.
+
+    If ``reference`` is ``True``, returns a value that behaves like a reference
+    of ``x``. Changes to ``x`` are reflected in the returned
+    value and vice versa. If ``shallow`` is not set, verify that values nested
+    in ``x`` are also compatible with Vue's JavaScript API. (That last part is
+    sometimes not actually verified yet.)
+
+    If ``reference`` is ``False``, return clone of ``x``; the clone is deep
+    unless ``shallow`` is set.
+
+    If ``reference`` is ``None``, return whatever is chepest to accomplish.
+    """
+    if type(x) in [int, str, float, bool, type(None)]:
         return x
 
-    if type(x) in [int, str, float, bool, type(None)]:
-        import pyodide
-        return pyodide.to_js(x)
+    if callable(x):
+        # TODO
+        # raise NotImplementedError("cannot properly wrap functions for the Vue API yet")
+        return x
 
     import pyodide
     if isinstance(x, pyodide.JsProxy):
-        return x
+        if reference is not False:
+            # Note that we are not yet checking whether the insides of this
+            # object contain no PyProxy instances.
+            return x
+        else:
+            if shallow:
+                raise NotImplementedError("shallow cloning of javascript object not implemented")
+            else:
+                return cloneDeep(x)
 
     if isinstance(x, ProxyRef):
-        assert Vue.isRef(x._ref)
-        return x._ref
+        assert _is_vue_ref(x._ref)
+        return vue_compatible(x._ref, reference=reference, shallow=shallow)
 
-    if isinstance(x, ProxyDict) and not clone:
-        return x._proxy
+    if isinstance(x, ObjectWrapper):
+        return vue_compatible(x._object, reference=reference, shallow=shallow)
 
-    if isinstance(x, ProxyList) and not clone:
-        return x._proxy
+    if isinstance(x, ArrayWrapper):
+        return vue_compatible(x._array, reference=reference, shallow=shallow)
 
-    if isinstance(x, (MutableSequence, tuple)):
-        import js
-        y = js.Array.new()
-        for item in x:
-            y.push(to_vue(item))
-        return y
+    from collections.abc import Sequence
+    if isinstance(x, Sequence):
+        if reference is True:
+            raise TypeError("cannot call Vue API with this Python sequence; use vue_compatible(..., reference=False) to create a deep clone that can be consumed by thue Vue API")
+        else:
+            import js
+            y = js.Array.new()
+            for item in x:
+                y.push(vue_compatible(item, reference=None, shallow=shallow))
+            return y
 
-    if isinstance(x, MutableMapping):
-        import js
-        o = js.Object.new()
-        for key in x.keys():
-            if not isinstance(key, (str, int)):
-                raise TypeError(f"key must be str or int but was {type(key)}")
-            strkey = str(key)
-            if hasattr(o, strkey):
-                raise ValueError("duplicate key in dict after conversion to str")
-            setattr(o, strkey, to_vue(x[key]))
+    from collections.abc import Mapping
+    if isinstance(x, Mapping):
+        if reference is True:
+            raise TypeError("cannot call Vue API with this Python mapping; use vue_compatible(..., reference=False) to create a deep clone that can be consumed by the Vue API")
+        else:
+            import js
+            o = js.Object.new()
+            for key in x.keys():
+                if not isinstance(key, (str, int)):
+                    raise TypeError(f"key must be str or int but was {type(key)}")
+                strkey = str(key)
+                if hasattr(o, strkey):
+                    raise ValueError("duplicate key in dict after conversion to str")
+                setattr(o, strkey, vue_compatible(x[key], reference=None, shallow=shallow))
 
-        return o
+            return o
 
-    raise Exception(f"not implemented for {type(x)}")
-
-
-def ref(x):
-    return create_pyproxy(Vue.ref(to_vue(x, clone=True)))
+    raise NotImplementedError(f"cannot wrap this {type(x)} yet")
 
 
-def watch(x, f):
-    if not callable(x):
+def ref(value):
+    r"""
+    Create a Vue Ref with initial ``value``.
+    """
+    if _is_vue_ref(value) or _is_vue_proxy(value):
+        pass
+    else:
+        value = vue_compatible(value, reference=False)
+
+    return create_pyproxy(Vue.ref(value))
+
+
+def watch(watched, on_change):
+    r"""
+    Watch the result of ``watched`` which must produce a Vue Ref or a Vue Proxy.
+
+    When it changes, run ``on_change``.
+    """
+    if not callable(watched):
         raise TypeError("first argument to watch must be callable")
 
-    # TODO: Enforce harder that no Python objects go into the Vue machinery.
-    # Otherwise, they are turned into proxies and strange things tend to
-    # happen. E.g., when omitting the to_vue here.
-    def y():
-        return to_vue(x())
+    import pyodide
 
-    def on_change(current, previous, _):
-        f(create_pyproxy(current), create_pyproxy(previous), _)
+    @pyodide.ffi.create_proxy
+    def _watched():
+        reactive = vue_compatible(watched(), shallow=True)
+        if not _is_vue_ref(reactive) and not _is_vue_proxy(reactive):
+            raise TypeError("watched object must be Vue Ref or a reactive Vue Proxy")
+        return reactive
+
+    @pyodide.ffi.create_proxy
+    def _on_change(current, previous, on_cleanup):
+        on_change(create_pyproxy(current), create_pyproxy(previous), on_cleanup)
 
     import pyodide
-    Vue.watch(pyodide.create_proxy(y), pyodide.create_proxy(on_change))
+    return Vue.watch(_watched, _on_change)
 
 
-def computed(f):
-    def g():
-        return to_vue(f())
+def computed(getter):
+    r"""
+    Return a readonly Vue Ref that contains the value produced by ``getter``.
 
-    from pyodide import create_proxy
-    return create_pyproxy(Vue.computed(create_proxy(g)))
+    The value produce by ``getter`` must be compatible with
+    ``as_vue_compatible`` since Vue is going to install its reactivity hooks
+    into it. If returning a list or a dict, use ``to_vue_compatible``
+    explicitly inside the getter to make the value compatible.
+    """
+    import pyodide
+
+    @pyodide.ffi.ceate_proxy
+    def _getter():
+        return vue_compatible(getter(), reference=None)
+
+    return create_pyproxy(Vue.computed(_getter))

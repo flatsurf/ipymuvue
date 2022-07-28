@@ -35,7 +35,7 @@ svg
 ## Displaying a Graph
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor0(VueWidget):
@@ -118,7 +118,7 @@ widget
 Right clicking on a vertex deletes it. Right clicking somewhere else relayouts the graph.
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor1(GraphEditor0):
@@ -173,7 +173,7 @@ The recommended way to do this, is to write proper Vue components. We get the be
 For prototyping, it's best to create `.vue` files locally, as we do in the following example:
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor2(GraphEditor1):
@@ -201,7 +201,7 @@ widget
 We can, however, also implement things purely in Python. Note that this is **highly experimental**.
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor2(GraphEditor1):
@@ -243,7 +243,7 @@ widget
 Finally, we can use a mix of `.vue` and `.py` files to use JavaScript packages in Python. This is equally **highly experimental**.
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor3(GraphEditor1):

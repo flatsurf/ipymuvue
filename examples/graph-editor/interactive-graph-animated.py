@@ -1,4 +1,4 @@
-from ipymuvue.pyodide.vue import define_component, ref, watch, to_vue
+from ipymuvue.pyodide.vue import define_component, ref, watch, vue_compatible
 
 
 def create_setup(gsap):
@@ -12,11 +12,11 @@ def create_setup(gsap):
             nonlocal pos
             pos.value = {vertex: pos.value.get(vertex, new.get(vertex)) for vertex in new}
             for vertex in new:
-                gsap.to(to_vue(pos.value[vertex]), to_vue({
+                gsap.to(vue_compatible(pos.value[vertex]), vue_compatible({
                     "duration": .5,
                     "0": new[vertex][0],
                     "1": new[vertex][1],
-                }))
+                }, reference=False))
 
         watch(lambda: props.positions, update_positions)
 

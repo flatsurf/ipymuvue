@@ -15,7 +15,6 @@
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-from ipymuvue.vue_widget import VueWidget
 from ipymuvue.version import version_info, __version__
 
 

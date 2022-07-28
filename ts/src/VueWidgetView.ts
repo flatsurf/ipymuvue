@@ -54,8 +54,9 @@ export class VueWidgetView extends DOMWidgetView {
 
           const container = await this.container;
 
-          this.app = createApp(() => h(container));
-          this.app.mount(mountPoint);
+          const app = createApp(() => h(container));
+          app.mount(mountPoint);
+          this.app = app;
         })();
     }
 
