@@ -19,21 +19,9 @@ const path = require('path');
 const version = require('./package.json').version;
 const webpack = require('webpack');
 
-const define = new webpack.DefinePlugin({
-    '__VUE_OPTIONS_API__': true,
-    '__VUE_PROD_DEVTOOLS__': true,
-});
-
 const rules = [
     { test: /\.css$/, use: ['style-loader', 'css-loader']}
 ]
-
-const resolve = {
-  alias: {
-    // We need a build of vue that contains the compiler so we can intepret templates at runtime.
-    'vue$': 'vue/dist/vue.esm-bundler.js',
-  }
-}
 
 // Note that unfortunately, we cannot declare "vue" an external. JupyterVue
 // bundles all of Vue but does not export all of it again for us. (Not sure if
@@ -60,9 +48,8 @@ module.exports = (env, argv) => {
                 publicPath: '' // publicPath is set in extension.js
             },
             devtool,
-            resolve,
             externals: [],
-            plugins: [ define],
+            plugins: [],
         },
         {// Bundle for the notebook containing the custom widget views and models
         //
@@ -78,12 +65,11 @@ module.exports = (env, argv) => {
                 publicPath: '',
             },
             devtool,
-            resolve,
             module: {
                 rules: rules
             },
             externals: ['@jupyter-widgets/base'],
-            plugins: [ define],
+            plugins: [],
         },
         {// Embeddable ipymuvue bundle
         //
@@ -107,12 +93,11 @@ module.exports = (env, argv) => {
                 publicPath: 'https://unpkg.com/ipymuvue@' + version + '/dist/'
             },
             devtool,
-            resolve,
             module: {
                 rules: rules
             },
             externals: ['@jupyter-widgets/base'],
-            plugins: [ define],
+            plugins: [],
         }
     ];
 }

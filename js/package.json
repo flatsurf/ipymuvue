@@ -49,9 +49,8 @@
         "bundled": false,
         "singleton": true
       },
-      "vue": {
-        "bundled": false
-      }
+      "vue": {},
+      "vue/dist/vue.esm-bundler.js": {}
     }
   }
 }

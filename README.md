@@ -47,6 +47,13 @@ Enable the extension in the notebook:
 
 Or, enable it in JupyterLab (see #8):
 
+    (cd js && yarn build:labextension)
     jupyter labextension develop --overwrite ipymuvue
 
 Now, start a `jupyter` notebook or `jupyter lab` and verify that the notebooks in `examples/` work correctly.
+
+Any changes you make to the Python code should be picked up automatically. Changes to `ipymuvue.pyodide` become effective by re-creating a widget (all the modules are reloaded in pyodide when a change to these files happens.) Other changes require a kernel restart as usual.
+
+When working with the classic notebook, any changes to the TypeScript/Javascript code, get picked up automatically and become effective once refreshing your browser. In JupyterLab, you need to rebuild the prebuilt extension and refresh the browser:
+
+    (cd js && yarn build:labextension)
