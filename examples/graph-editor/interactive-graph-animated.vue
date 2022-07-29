@@ -22,7 +22,7 @@
   </svg>
 </template>
 <script>
-import { create_component } from "./interactive-graph-animated.py";
+import { create_component } from "./interactive_graph_animated.py";
 import gsap from "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.2.4/gsap.min.js";
 
 const component = create_component(gsap)
