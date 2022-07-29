@@ -24,7 +24,7 @@ class Widget(VueWidget):
     def __init__(self):
         super().__init__(template=r"""
             <div>
-                <h1 @click="audience += '!'" @click.right.prevent="rclick()" style="border: solid 1px blue; text-align: center; padding: 20px; user-select: none">
+                <h1 @click="audience += '!'" @click.right.prevent.stop="rclick()" style="border: solid 1px blue; text-align: center; padding: 20px; user-select: none">
                     Hello {{ audience }}!
                 </h1>
             </div>
@@ -113,7 +113,7 @@ widget
 Note that such components (like anything that's happening in the Jupyter notebook frontend) can run arbitrary code in the notebook, therefore have full access to the kernel, i.e., Python, on your local system. Please only load remote code that you trust.
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Dict
 
 class Widget(VueWidget):
@@ -146,7 +146,7 @@ widget
 # Nested Widgets
 
 ```{code-cell} ipython3
-from ipymuvue import VueWidget
+from ipymuvue.widgets import VueWidget
 from traitlets import Unicode
 
 class Widget(VueWidget):

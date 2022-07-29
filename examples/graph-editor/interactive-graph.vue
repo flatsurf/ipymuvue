@@ -1,5 +1,5 @@
 <template>
-  <svg :width="width" :height="height" @click.right.prevent="relayout()" @mousemove="drag">
+  <svg :width="width" :height="height" @click.right.prevent.stop="relayout()" @mousemove="drag">
       <line v-for="(edge, i) of edges" :key="i" stroke="black" stroke-width="2px"
           :x1="pos[edge[0]][0]" :y1="pos[edge[0]][1]"
           :x2="pos[edge[1]][0]" :y2="pos[edge[1]][1]"

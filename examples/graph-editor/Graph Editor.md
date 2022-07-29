@@ -123,7 +123,7 @@ from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
 class GraphEditor1(GraphEditor0):
     template = r"""
-    <svg :width="width" :height="height" @click.right.prevent="relayout">
+    <svg :width="width" :height="height" @click.right.prevent.stop="relayout">
         <line v-for="(edge, i) of edges" :key="i" stroke="black" stroke-width="2px"
             :x1="positions[edge[0]][0]" :y1="positions[edge[0]][1]"
             :x2="positions[edge[1]][0]" :y2="positions[edge[1]][1]"
