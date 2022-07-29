@@ -4,6 +4,15 @@ ipymuvue Change Log
 
 .. current developments
 
+v0.0.5
+====================
+
+**Fixed:**
+
+* Fixed build for JupyterLab.
+
+
+
 v0.0.4
 ====================
 
