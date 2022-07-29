@@ -184,7 +184,6 @@ def prepare_components(components):
         if hasattr(component, 'read'):
             from pathlib import Path
             fname = component.name if hasattr(component, "name") else None
-            component_name = Path(fname).stem or name
 
             @pyodide.ffi.create_proxy
             def read_file_from_wasm(fname):
