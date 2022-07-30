@@ -1,8 +1,9 @@
 from ipymuvue.pyodide.vue import define_component, ref, watch
 
+
 def setup(props, context):
     def vertex_rclick(vertex):
-        context.emit('vertex-rclick', vertex)
+        context.emit("vertex-rclick", vertex)
 
     pos = ref(props.positions)
 
@@ -15,7 +16,7 @@ def setup(props, context):
     dragged = ref(None)
 
     def rclick():
-        context.emit('rclick')
+        context.emit("rclick")
 
     def startdrag(vertex):
         nonlocal dragged
@@ -27,7 +28,12 @@ def setup(props, context):
         # without the [0], [1] here. We send an empty {} corresponding to a
         # proxy dict somehow. We don't also seem to be able to send
         # list(.values()) instead. See #12.
-        context.emit('dragged', dragged.value, pos.value[dragged.value][0], pos.value[dragged.value][1])
+        context.emit(
+            "dragged",
+            dragged.value,
+            pos.value[dragged.value][0],
+            pos.value[dragged.value][1],
+        )
         dragged.value = None
 
     def drag(event):
@@ -63,4 +69,5 @@ component = define_component(
                     :cy="pos[vertex][1]"/>
             </g>
         </svg>
-    """)
+    """,
+)

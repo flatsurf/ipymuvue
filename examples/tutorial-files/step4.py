@@ -14,6 +14,9 @@ def setup(props, context):
     return locals()
 
 
-component = define_component(setup=setup, template=r"""
+component = define_component(
+    setup=setup,
+    template=r"""
     <button @click="increment">count is: {{ count }}</button>
-""")
+""",
+)

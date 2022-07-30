@@ -10,11 +10,13 @@ def setup(props, context):
         return id
 
     new_todo = ref("")
-    todos = ref([
-        {"id": next_id(), "text": "Learn HTML"},
-        {"id": next_id(), "text": "Learn Python"},
-        {"id": next_id(), "text": "Learn Vue"},
-    ])
+    todos = ref(
+        [
+            {"id": next_id(), "text": "Learn HTML"},
+            {"id": next_id(), "text": "Learn Python"},
+            {"id": next_id(), "text": "Learn Vue"},
+        ]
+    )
 
     def add_todo(event):
         todos.value.append({"id": next_id(), "text": new_todo})
@@ -25,7 +27,9 @@ def setup(props, context):
     return locals()
 
 
-component = define_component(setup=setup, template=r"""
+component = define_component(
+    setup=setup,
+    template=r"""
   <form @submit.prevent="add_todo">
     <input v-model="new_todo">
     <button>Add Todo</button>
@@ -36,4 +40,5 @@ component = define_component(setup=setup, template=r"""
       <button @click="remove_todo(todo)">X</button>
     </li>
   </ul>
-""")
+""",
+)

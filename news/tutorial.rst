@@ -3,6 +3,7 @@
 * Added equivalent implementations to the official vuejs.org [tutorial](https://vuejs.org/tutorial/) to `examples/`.
 * Added function to expose lifecycle hooks, such as `on_mounted`, to the Python pyodide API.
 * Added function to expose `reactive()` to the Python pyodide API.
+* Added `String`, `Number`, `Boolean`, `Array`, `Object`, `Date`, `Function`, `Symbol` to `ipymuvue.pyodide.vue` and support for type constraints in props.
 
 **Fixed:**
 

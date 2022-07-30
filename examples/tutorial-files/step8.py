@@ -5,17 +5,20 @@ def setup(props, context):
     id = 0
 
     new_todo = ref("")
+
     def next_id():
         nonlocal id
         id += 1
         return id
 
     hide_completed = ref(False)
-    todos = ref([
-        {"id": next_id(), "text": "Learn HTML", "done": True},
-        {"id": next_id(), "text": "Learn Python", "done": True},
-        {"id": next_id(), "text": "Learn Vue", "done": False},
-    ])
+    todos = ref(
+        [
+            {"id": next_id(), "text": "Learn HTML", "done": True},
+            {"id": next_id(), "text": "Learn Python", "done": True},
+            {"id": next_id(), "text": "Learn Vue", "done": False},
+        ]
+    )
 
     @computed
     def filtered_todos():
@@ -36,7 +39,9 @@ def setup(props, context):
     return locals()
 
 
-component = define_component(setup=setup, template=r"""
+component = define_component(
+    setup=setup,
+    template=r"""
     <form @submit.prevent="add_todo">
         <input v-model="new_todo" />
         <button>Add Todo</button>
@@ -51,4 +56,5 @@ component = define_component(setup=setup, template=r"""
     <button @click="toggle()">
         {{ hide_completed ? 'Show all' : 'Hide completed' }}
     </button>
-""")
+""",
+)

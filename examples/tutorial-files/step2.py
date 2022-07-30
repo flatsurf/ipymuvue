@@ -14,7 +14,10 @@ def setup(props, context):
     return locals()
 
 
-component = define_component(setup=setup, template=r"""
-<h4>{{ message }}</h4>
-<p>Count is: {{ counter.count }}</p>
-""")
+component = define_component(
+    setup=setup,
+    template=r"""
+    <h4>{{ message }}</h4>
+    <p>Count is: {{ counter.count }}</p>
+""",
+)

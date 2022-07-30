@@ -13,7 +13,10 @@ def setup(props, context):
     return locals()
 
 
-component = define_component(setup=setup, template=r"""
+component = define_component(
+    setup=setup,
+    template=r"""
     <p ref="p">hello</p>
     <p ref="q">hello</p>
-""")
+""",
+)

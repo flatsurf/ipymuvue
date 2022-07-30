@@ -22,11 +22,15 @@ def setup(props, context):
             todo_data.value = None
 
             import pyodide
-            res = await pyodide.http.pyfetch(f"https://jsonplaceholder.typicode.com/todos/{todo_id.value}")
+
+            res = await pyodide.http.pyfetch(
+                f"https://jsonplaceholder.typicode.com/todos/{todo_id.value}"
+            )
 
             todo_data.value = await res.json()
 
         import asyncio
+
         asyncio.create_task(_fetch_data())
 
     fetch_data()
@@ -36,10 +40,13 @@ def setup(props, context):
     return locals()
 
 
-component = define_component(setup=setup, template=r"""
+component = define_component(
+    setup=setup,
+    template=r"""
   <p>Todo id: {{ todo_id }}</p>
   <button @click="increment()">Fetch next todo</button>
   <button @click="fetch_data()">Refetch same todo</button>
   <p v-if="!todo_data">Loading...</p>
   <pre v-else>{{ todo_data }}</pre>
-""")
+""",
+)

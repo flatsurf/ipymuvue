@@ -110,7 +110,7 @@ widget
 ```
 
 # Importing Remote Subcomponents
-Note that such components (like anything that's happening in the Jupyter notebook frontend) can run arbitrary code in the notebook, therefore have full access to the kernel, i.e., Python, on your local system. Please only load remote code that you trust.
+Note the <span style="color:red">security implications</span>: such external JavaScript code (as any JavaScript code that other widgets use) could in principle send arbitrary commands to the running kernel, i.e., it could run arbitrary commands on your host machine. By using such external resources, you are entrusting the system to the external package author and the CDN from which you are downloading the package. The latter can be fixed by providing the package bundled with your widget and provisioning it as an asset.
 
 ```{code-cell} ipython3
 from ipymuvue.widgets import VueWidget

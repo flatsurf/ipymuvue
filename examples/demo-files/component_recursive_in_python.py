@@ -9,4 +9,5 @@ component = define_component(
         </span>
     """,
     props=["depth"],
-    name="component-recursive-in-python")
+    name="component-recursive-in-python",
+)

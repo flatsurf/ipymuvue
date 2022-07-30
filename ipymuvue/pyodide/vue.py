@@ -58,6 +58,7 @@ is easier.
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
+import js
 from ipymuvue_utils import Vue, withArity, cloneDeep, clone, asVueCompatibleFunction
 from collections.abc import MutableMapping, MutableSequence
 
@@ -72,8 +73,8 @@ def define_component(*, setup=None, template=None, components=None, name=None, p
     Currently, we only support the composition API, i.e., defining a setup()
     function instead of defining computed(), methods(), ...
 
-    Digressing from the official API, the values of `components` can be
-    filenames. The component is then loaded from the file at runtime.
+    Digressing from the official API, the values of `components` can be open
+    files. The component is then loaded from the file at runtime.
     """
     import js
     component = js.Object.new()
@@ -94,8 +95,6 @@ def define_component(*, setup=None, template=None, components=None, name=None, p
         component.components = prepare_components(components)
 
     if props is not None:
-        if not isinstance(props, list) or not all(isinstance(prop, str) for prop in props):
-            raise TypeError("props must be a list of strings")
         component.props = vue_compatible(props, reference=False)
 
     if emits is not None:
@@ -608,3 +607,14 @@ def on_deactivated(callback):
     from the DOM as part of a tree cached by ``<KeepAlive>``.
     """
     Vue.onDeactivated(vue_compatible(callback))
+
+
+# Make types for Runtime Type Checks of props available
+String = js.String
+Number = js.Number
+Boolean = js.Boolean
+Array = js.Array
+Object = js.Object
+Date = js.Date
+Function = js.Function
+Symbol = js.Symbol
