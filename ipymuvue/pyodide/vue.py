@@ -226,7 +226,10 @@ class ObjectWrapper(MutableMapping):
         if not object.typeof == "object":
             raise TypeError("object must be a JavaScript object")
 
-        self._object = object
+        super().__setattr__("_object", object)
+
+    def _vue_compatible(self, object):
+        return vue_compatible(object)
 
     def __delitem__(self, key):
         raise Exception("not implemented __delitem__")
@@ -234,11 +237,14 @@ class ObjectWrapper(MutableMapping):
     def __getattr__(self, key):
         return self.__getitem__(key)
 
+    def __setattr__(self, key, value):
+        self[key] = value
+
     def __setitem__(self, key, value):
         if not isinstance(key, (int, str)):
             raise TypeError(f"key must be int or str but was {type(key)}")
 
-        setattr(self._object, str(key), vue_compatible(value))
+        setattr(self._object, str(key), self._vue_compatible(value))
 
     def __iter__(self):
         import js
@@ -266,11 +272,8 @@ class ProxyDict(ObjectWrapper):
 
         super().__init__(proxy)
 
-    def __setitem__(self, key, value):
-        if not isinstance(key, (int, str)):
-            raise TypeError(f"key must be int or str but was {type(key)}")
-
-        setattr(self._object, str(key), vue_compatible(value, reference=False))
+    def _vue_compatible(self, object):
+        return vue_compatible(object, reference=False)
 
 
 class ArrayWrapper(MutableSequence):
