@@ -543,8 +543,68 @@ def computed(getter):
     """
     import pyodide
 
-    @pyodide.ffi.ceate_proxy
+    @pyodide.ffi.create_proxy
     def _getter():
         return vue_compatible(getter(), reference=None)
 
     return create_pyproxy(Vue.computed(_getter))
+
+
+def on_mounted(callback):
+    r"""
+    Register ``callback`` to be called after the component has been mounted.
+    """
+    Vue.onMounted(vue_compatible(callback))
+
+
+def on_updated(callback):
+    r"""
+    Register ``callback`` to be called after the component has updated its DOM
+    tree due to a reactive state change.
+    """
+    Vue.onUpdated(vue_compatible(callback))
+
+
+def on_unmounted(callback):
+    r"""
+    Register ``callback`` to be called atfer the component has been unmounted.
+    """
+    Vue.onUnmounted(vue_compatible(callback))
+
+
+def on_before_mount(callback):
+    r"""
+    Register ``callback`` to be called right before the component is to be mounted.
+    """
+    Vue.noBeforeMount(vue_compatible(callback))
+
+
+def on_before_update(callback):
+    r"""
+    Register ``callback`` to be called right before the component is about to update.
+    """
+    Vue.onBeforeUpdate(vue_compatible(callback))
+
+
+def on_before_unmount(callback):
+    r"""
+    Register ``callback`` to be called right before a component instance is to
+    be unmounted.
+    """
+    Vue.onBeforeUnmount(vue_compatible(callback))
+
+
+def on_activated(callback):
+    r"""
+    Register ``callback`` to be called after the component instance is inserted
+    into the DOM as part of a tree cache by ``<KeepAlive>``.
+    """
+    Vue.onActivated(vue_compatible(callback))
+
+
+def on_deactivated(callback):
+    r"""
+    Register ``callback`` to be called after the component instance is removed
+    from the DOM as part of a tree cached by ``<KeepAlive>``.
+    """
+    Vue.onDeactivated(vue_compatible(callback))
