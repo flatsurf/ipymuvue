@@ -51,7 +51,7 @@ Enable the extension in the notebook:
     jupyter nbextension install --py --symlink --overwrite --sys-prefix ipymuvue
     jupyter nbextension enable --py --sys-prefix ipymuvue
 
-Or, enable it in JupyterLab (see #8):
+Or, enable it in JupyterLab:
 
     (cd js && yarn build:labextension)
     jupyter labextension develop --overwrite ipymuvue
