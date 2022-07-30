@@ -418,6 +418,10 @@ def vue_compatible(x, reference=True, shallow=False):
         if isinstance(x, pyodide.ffi.JsProxy):
             return x
 
+        import asyncio
+        if asyncio.iscoroutine(x):
+            raise NotImplementedError("coroutines cannot be export by setup() yet, see ")
+
         return asVueCompatibleFunction(pyodide.ffi.create_proxy(x), pyodide.ffi.create_proxy(create_pyproxy), pyodide.ffi.create_proxy(vue_compatible))
 
     if isinstance(x, pyodide.ffi.JsProxy):
