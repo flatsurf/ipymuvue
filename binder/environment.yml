@@ -1,0 +1,11 @@
+name: ipymuvue
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - sagelib
+  - jupytext
+  - myst-nb
+  - pip
+  - pip:
+    - ipymuvue
