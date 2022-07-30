@@ -14,6 +14,10 @@ kernelspec:
 
 # Interactive Graph Editor
 
+At [Sage Days 114](https://wiki.sagemath.org/days114), we presented a graph editor written with ipyμvue. There is a recording of the talk [here](https://www.youtube.com/watch?v=kTYgZSRxpEE); note that some details of the API have changed since then.
+
+---
+
 We're going to build an interactive editor for a SageMath graph. The graph will be displayed as an SVG, roughly like the following.
 
 ```{code-cell} ipython3
@@ -33,6 +37,8 @@ svg
 ```
 
 ## Displaying a Graph
+
+Given a SageMath graph, we display its vertices and edges.
 
 ```{code-cell} ipython3
 from ipymuvue.widgets import VueWidget
@@ -188,7 +194,7 @@ class GraphEditor2(GraphEditor1):
     """
     
     components = {
-        "interactive-graph": open("interactive-graph.vue")
+        "interactive-graph": open("graph-editor-files/InteractiveGraph.vue")
     }
 
 
@@ -217,7 +223,7 @@ class GraphEditor2(GraphEditor1):
     """
     
     components = {
-        "interactive-graph": open("interactive-graph.py")
+        "interactive-graph": open("graph-editor-files/interactive_graph.py")
     }
     
     @VueWidget.callback
@@ -258,11 +264,11 @@ class GraphEditor3(GraphEditor1):
     """
     
     components = {
-        "interactive-graph": open("interactive-graph-animated.vue")
+        "interactive-graph": open("graph-editor-files/InteractiveGraphAnimated.vue")
     }
     
     assets = {
-        "interactive-graph-animated.py": open("interactive-graph-animated.py"),
+        "interactive_graph_animated.py": open("graph-editor-files/interactive_graph_animated.py"),
     }
 
 

@@ -88,20 +88,20 @@ class Widget(VueWidget):
             </div>
         """, components={
             "component-from-string": "<template><div>Component from String</div></template>",
-            "component-from-file": open("component-from-file.vue"),
-            "component-from-asset-string": "component-from-asset-string.vue",
-            "component-from-asset-file":"component-from-asset-file.vue",
-            "component-with-python-script": open("component-with-python-script.vue"),
-            "component-recursive-with-python": open("component-recursive-with-python.vue"),
-            "component-recursive-in-python": open("component_recursive_in_python.py"),
+            "component-from-file": open("demo-files/ComponentFromFile.vue"),
+            "component-from-asset-string": "ComponentFromAssetString.vue",
+            "component-from-asset-file":"ComponentFromAssetFile.vue",
+            "component-with-python-script": open("demo-files/ComponentWithPythonScript.vue"),
+            "component-recursive-with-python": open("demo-files/ComponentRecursiveWithPython.vue"),
+            "component-recursive-in-python": open("demo-files/component_recursive_in_python.py"),
         }, assets={
-            "component-from-asset-string.vue": "<template><div>Component from an Asset String</div></template>",
-            "component-from-asset-file.vue": open("component-from-file.vue"),
-            "component_with_python_script.py": open("component_with_python_script.py"),
-            "subcomponent-with-python-script.vue": open("subcomponent-with-python-script.vue"),
-            "subcomponent_with_python_script.py": open("subcomponent_with_python_script.py"),
-            "subcomponent_pure_python.py": open("subcomponent_pure_python.py"),
-            "component_recursive_with_python.py": open("component_recursive_with_python.py")
+            "ComponentFromAssetString.vue": "<template><div>Component from an Asset String</div></template>",
+            "ComponentFromAssetFile.vue": open("demo-files/ComponentFromFile.vue"),
+            "component_with_python_script.py": open("demo-files/component_with_python_script.py"),
+            "SubcomponentWithPythonScript.vue": open("demo-files/SubcomponentWithPythonScript.vue"),
+            "subcomponent_with_python_script.py": open("demo-files/subcomponent_with_python_script.py"),
+            "subcomponent_pure_python.py": open("demo-files/subcomponent_pure_python.py"),
+            "component_recursive_with_python.py": open("demo-files/component_recursive_with_python.py")
         })
         
     
@@ -123,7 +123,7 @@ class Widget(VueWidget):
                 <remote-network-graph :nodes="nodes" :edges="edges" />
             </div>
         """, components={
-            "remote-network-graph": open("remote-network-graph.vue"),
+            "remote-network-graph": open("demo-files/RemoteNetworkGraph.vue"),
         })
         
     nodes = Dict({
