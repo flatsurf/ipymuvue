@@ -499,21 +499,30 @@ def ref(value):
 
 def watch(watched, on_change):
     r"""
-    Watch the result of ``watched`` which must produce a Vue Ref or a Vue Proxy.
+    Watch the result of ``watched`` which must be or produce a Vue Ref or a Vue
+    Proxy.
+
+    Note the difference between watching ``a.b`` and watching ``lambda: a.b``.
+    The former watches ``b`` for changes, but won't notice when be gets
+    replaced completely as in ``a.b = None``. The later also captures such
+    changes (and is usually what you want.)
 
     When it changes, run ``on_change``.
     """
-    if not callable(watched):
-        raise TypeError("first argument to watch must be callable")
-
     import pyodide
 
-    @pyodide.ffi.create_proxy
-    def _watched():
-        reactive = vue_compatible(watched(), shallow=True)
-        if not _is_vue_ref(reactive) and not _is_vue_proxy(reactive):
+    if callable(watched):
+        @pyodide.ffi.create_proxy
+        def _watched():
+            reactive = vue_compatible(watched(), shallow=True)
+            if not _is_vue_ref(reactive) and not _is_vue_proxy(reactive):
+                raise TypeError("watched object must be Vue Ref or a reactive Vue Proxy")
+            return reactive
+    else:
+        watched = vue_compatible(watched, shallow=True)
+        if not _is_vue_ref(watched) and not _is_vue_proxy(watched):
             raise TypeError("watched object must be Vue Ref or a reactive Vue Proxy")
-        return reactive
+        _watched = watched
 
     @pyodide.ffi.create_proxy
     def _on_change(current, previous, on_cleanup):
