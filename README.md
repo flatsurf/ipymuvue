@@ -63,3 +63,9 @@ Any changes you make to the Python code should be picked up automatically. Chang
 When working with the classic notebook, any changes to the TypeScript/Javascript code, get picked up automatically and become effective once refreshing your browser. In JupyterLab, you need to rebuild the prebuilt extension and refresh the browser:
 
     (cd js && yarn build:labextension)
+
+
+Related Projects
+----------------
+
+* [ipyvue](https://github.com/widgetti/ipyvue) heavily inspired this package; ipyvue builds on Vue 2, it does not ship a full SFC compiler, it does not have support for external packages and it does not support defining components that completely run on the client. However, it has quite some extra features for the actual widget such as allowing replacement of templates, attaching to lifecycle hooks, defining `<style>` blocks, …
