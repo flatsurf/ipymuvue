@@ -15,5 +15,5 @@
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-version_info = (0, 0, 5)
-__version__ = "0.0.5"
+version_info = (0, 0, 6)
+__version__ = "0.0.6"
