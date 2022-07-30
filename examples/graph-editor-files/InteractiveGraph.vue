@@ -6,8 +6,8 @@
       />
       <g v-for="vertex of vertices" :key="vertex"
           style="cursor: pointer"
-          @mousedown="startdrag(vertex)"
-          @mouseup="stopdrag()"
+          @mousedown.left="startdrag(vertex)"
+          @mouseup.left="stopdrag()"
           @click.right.prevent.stop="vertex_rclick(vertex)">
           {{ typeof(pos[vertex]) }}
           <circle r="6"

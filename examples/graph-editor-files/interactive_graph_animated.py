@@ -39,6 +39,16 @@ def create_setup(gsap):
 
         def stopdrag():
             nonlocal dragged
+            # Emit should remove reactive wrappers. Somehow this goes wrong
+            # without the [0], [1] here. We send an empty {} corresponding to a
+            # proxy dict somehow. We don't also seem to be able to send
+            # list(.values()) instead. See #12.
+            context.emit(
+                "dragged",
+                dragged.value,
+                pos.value[dragged.value][0],
+                pos.value[dragged.value][1],
+            )
             dragged.value = None
 
         def drag(event):

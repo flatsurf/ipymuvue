@@ -94,10 +94,10 @@ class GraphEditor0(VueWidget):
             [min(ys), max(ys)]
         ]
 
-        bbox[0][0] -= (bbox[0][1] - bbox[0][0]) / 64
-        bbox[0][1] += (bbox[0][1] - bbox[0][0]) / 64
-        bbox[1][0] -= (bbox[1][1] - bbox[1][0]) / 64
-        bbox[1][1] += (bbox[1][1] - bbox[1][0]) / 64
+        bbox[0][0] -= (bbox[0][1] - bbox[0][0]) / 32
+        bbox[0][1] += (bbox[0][1] - bbox[0][0]) / 32
+        bbox[1][0] -= (bbox[1][1] - bbox[1][0]) / 32
+        bbox[1][1] += (bbox[1][1] - bbox[1][0]) / 32
 
         return bbox
 
@@ -254,7 +254,7 @@ Note the <span style="color:red">security implications</span>: such external Jav
 from ipymuvue.widgets import VueWidget
 from traitlets import Unicode, Dict, Int, List, Float, Tuple
 
-class GraphEditor3(GraphEditor1):
+class GraphEditor3(GraphEditor2):
     def __init__(self, graph):
         VueWidget.__init__(self, self.template, components=self.components, assets=self.assets)
         self.graph = graph
@@ -262,7 +262,8 @@ class GraphEditor3(GraphEditor1):
     template = r"""
         <interactive-graph :vertices="vertices" :edges="edges" :positions="positions" :width="width" :height="height"
             @vertex-rclick="erase_vertex"
-            @rclick="relayout(null)" />
+            @rclick="relayout(null)"
+            @dragged="dragged" />
     """
     
     components = {
