@@ -7,6 +7,12 @@ Installation
 
     pip install ipymuvue
 
+Getting Started
+---------------
+
+There is no proper documentation for this project yet, but there are some
+[examples/](examples/).
+
 Development
 -----------
 
