@@ -473,6 +473,18 @@ def vue_compatible(x, reference=True, shallow=False):
     raise NotImplementedError(f"cannot wrap this {type(x)} yet")
 
 
+def reactive(value):
+    r"""
+    Create a reactive proxy of ``value``.
+    """
+    if _is_vue_ref(value) or _is_vue_proxy(value):
+        pass
+    else:
+        value = vue_compatible(value, reference=True)
+
+    return create_pyproxy(Vue.reactive(value))
+
+
 def ref(value):
     r"""
     Create a Vue Ref with initial ``value``.
