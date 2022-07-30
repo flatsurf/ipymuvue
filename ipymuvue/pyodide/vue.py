@@ -288,17 +288,38 @@ class ArrayWrapper(MutableSequence):
 
         self._array = array
 
+    def _vue_compatible(self, object):
+        return vue_compatible(object)
+
     def insert(self, index, object):
-        raise NotImplementedError("writing to a list proxy is not implemented yet")
+        if index < 0:
+            index = 0
+        if index >= len(self):
+            index = len(self)
+        self._array.splice(index, 0, self._vue_compatible(object))
 
     def __getitem__(self, index):
         return create_pyproxy(self._array[index])
 
     def __setitem__(self, index, value):
-        raise NotImplementedError("writing to a list proxy is not implemented yet")
+        if index < 0:
+            index = len(self) + index
+        if index < 0:
+            raise IndexError("assignment index out of range")
+        if index >= len(self):
+            raise IndexError("assignment index out of range")
+
+        self._array[index] = self._vue_compatible(object)
 
     def __delitem__(self, index):
-        raise NotImplementedError("writing to a list proxy is not implemented yet")
+        if index < 0:
+            index = len(self) + index
+        if index < 0:
+            raise IndexError("deletion index out of range")
+        if index >= len(self):
+            raise IndexError("deletion index out of range")
+
+        self._array.splice(index, 1)
 
     def __len__(self):
         return self._array.length
@@ -313,6 +334,9 @@ class ProxyList(ArrayWrapper):
         if not _is_vue_proxy(proxy):
             raise TypeError("proxy must be a Vue proxy")
         super().__init__(proxy)
+
+    def _vue_compatible(self, object):
+        return vue_compatible(object, reference=False)
 
 
 class ProxyRef:
