@@ -36,6 +36,7 @@ class ArrayWrapper(MutableSequence):
 
     def __init__(self, array):
         import js
+
         if not js.Array.isArray(array):
             raise TypeError("array must be a JavaScript array")
 

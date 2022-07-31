@@ -49,7 +49,9 @@ def python_compatible(x):
         return x
 
     if callable(x):
-        assert isinstance(x, pyodide.ffi.JsProxy), "received a function from Vue that is not defined in JavaScript"
+        assert isinstance(
+            x, pyodide.ffi.JsProxy
+        ), "received a function from Vue that is not defined in JavaScript"
         raise NotImplementedError("cannot properly wrap functions from the Vue API yet")
 
     if is_vue_ref(x):
@@ -102,12 +104,20 @@ def vue_compatible(x, reference=True, shallow=False):
             return x
 
         import asyncio
+
         if asyncio.iscoroutine(x):
-            raise NotImplementedError("coroutines cannot be export by setup() yet, see ")
+            raise NotImplementedError(
+                "coroutines cannot be export by setup() yet, see "
+            )
 
         # Load helper implemented in TypeScript in ipymuvue_js.ts
         from ipymuvue_js import asVueCompatibleFunction
-        return asVueCompatibleFunction(pyodide.ffi.create_proxy(x), pyodide.ffi.create_proxy(python_compatible), pyodide.ffi.create_proxy(vue_compatible))
+
+        return asVueCompatibleFunction(
+            pyodide.ffi.create_proxy(x),
+            pyodide.ffi.create_proxy(python_compatible),
+            pyodide.ffi.create_proxy(vue_compatible),
+        )
 
     if isinstance(x, pyodide.ffi.JsProxy):
         if reference is not False:
@@ -117,6 +127,7 @@ def vue_compatible(x, reference=True, shallow=False):
         else:
             # Load helper implemented in TypeScript in ipymuvue_js.ts
             from ipymuvue_js import clone, cloneDeep
+
             return clone(x) if shallow else cloneDeep(x)
 
     if isinstance(x, ProxyRef):
@@ -130,9 +141,12 @@ def vue_compatible(x, reference=True, shallow=False):
         return vue_compatible(x._array, reference=reference, shallow=shallow)
 
     from collections.abc import Sequence
+
     if isinstance(x, Sequence):
         if reference is True:
-            raise TypeError("cannot call Vue API with this Python sequence; use vue_compatible(..., reference=False) to create a deep clone that can be consumed by thue Vue API")
+            raise TypeError(
+                "cannot call Vue API with this Python sequence; use vue_compatible(..., reference=False) to create a deep clone that can be consumed by thue Vue API"
+            )
         else:
             y = js.Array.new()
             for item in x:
@@ -140,9 +154,12 @@ def vue_compatible(x, reference=True, shallow=False):
             return y
 
     from collections.abc import Mapping
+
     if isinstance(x, Mapping):
         if reference is True:
-            raise TypeError("cannot call Vue API with this Python mapping; use vue_compatible(..., reference=False) to create a deep clone that can be consumed by the Vue API")
+            raise TypeError(
+                "cannot call Vue API with this Python mapping; use vue_compatible(..., reference=False) to create a deep clone that can be consumed by the Vue API"
+            )
         else:
             o = js.Object.new()
             for key in x.keys():
@@ -151,7 +168,9 @@ def vue_compatible(x, reference=True, shallow=False):
                 strkey = str(key)
                 if hasattr(o, strkey):
                     raise ValueError("duplicate key in dict after conversion to str")
-                setattr(o, strkey, vue_compatible(x[key], reference=None, shallow=shallow))
+                setattr(
+                    o, strkey, vue_compatible(x[key], reference=None, shallow=shallow)
+                )
 
             return o
 

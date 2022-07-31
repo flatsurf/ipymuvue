@@ -26,10 +26,12 @@ def _jupyter_labextension_paths():
     # labextension/, see jupyterlab.outputDir in js/package.json
     # These files are copied to extensions/ipymuvue/ in
     # JupyterLab when this package is pip-installed.
-    return [{
-        'src': 'labextension',
-        'dest': 'ipymuvue',
-    }]
+    return [
+        {
+            "src": "labextension",
+            "dest": "ipymuvue",
+        }
+    ]
 
 
 def _jupyter_nbextension_paths():
@@ -40,9 +42,11 @@ def _jupyter_nbextension_paths():
     # These files need to be copied to the nbextensions/ipymuvue/
     # directory in Jupyter Notebook. The entrypoint in these files is
     # extension.js.
-    return [{
-        'section': 'notebook',
-        'src': 'nbextension',
-        'dest': 'ipymuvue',
-        'require': 'ipymuvue/extension'
-    }]
+    return [
+        {
+            "section": "notebook",
+            "src": "nbextension",
+            "dest": "ipymuvue",
+            "require": "ipymuvue/extension",
+        }
+    ]

@@ -148,6 +148,7 @@ def prepare_setup(setup):
             raise TypeError("setup() must return a dict, e.g., locals()")
 
         import js
+
         js_exports = js.Object.new()
 
         for name in exports:
@@ -199,6 +200,7 @@ def prepare_components(components):
                 content = open(fname, "rb").read()
 
                 import js
+
                 buffer = js.ArrayBuffer.new(len(content))
 
                 buffer.assign(content)

@@ -40,6 +40,7 @@ class ObjectWrapper(MutableMapping):
 
     def _vue_compatible(self, object):
         from ipymuvue.pyodide.proxies import vue_compatible
+
         return vue_compatible(object)
 
     def __delitem__(self, key):
@@ -59,6 +60,7 @@ class ObjectWrapper(MutableMapping):
 
     def __iter__(self):
         import js
+
         for key in js.Object.keys(self._object):
             yield key
 
@@ -70,6 +72,7 @@ class ObjectWrapper(MutableMapping):
             raise TypeError(f"key must be int or str but was {type(key)}")
 
         from ipymuvue.pyodide.proxies import python_compatible
+
         return python_compatible(getattr(self._object, str(key)))
 
 
@@ -80,6 +83,7 @@ class ProxyDict(ObjectWrapper):
 
     def __init__(self, proxy):
         from ipymuvue.pyodide.types import is_vue_proxy
+
         if not is_vue_proxy(proxy):
             raise TypeError("proxy must be a Vue proxy")
 
@@ -87,4 +91,5 @@ class ProxyDict(ObjectWrapper):
 
     def _vue_compatible(self, object):
         from ipymuvue.pyodide.proxies import vue_compatible
+
         return vue_compatible(object, reference=False)

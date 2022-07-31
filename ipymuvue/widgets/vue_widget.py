@@ -42,7 +42,9 @@ class VueWidget(DOMWidget):
 
     """
 
-    def __init__(self, template, components=None, assets=None, capture_output=True, watch=True):
+    def __init__(
+        self, template, components=None, assets=None, capture_output=True, watch=True
+    ):
         super().__init__()
 
         components = components or {}
@@ -56,13 +58,17 @@ class VueWidget(DOMWidget):
 
         # Wire up callbacks that can be called from Vue component
         import inspect
+
         self.__methods = [
-            name for (name, method) in inspect.getmembers(self, predicate=inspect.ismethod)
-            if hasattr(method, '_VueWidget__is_callback') and method.__is_callback]
+            name
+            for (name, method) in inspect.getmembers(self, predicate=inspect.ismethod)
+            if hasattr(method, "_VueWidget__is_callback") and method.__is_callback
+        ]
         self.on_msg(self._handle_event)
 
         # Create output area for stdout, stderr, and tracebacks
         from ipywidgets import Output
+
         self.__output = Output() if capture_output else None
 
     def _initialize_components(self, components, assets):
@@ -76,20 +82,24 @@ class VueWidget(DOMWidget):
             if definition in assets:
                 continue
 
-            if hasattr(definition, 'read') or isinstance(definition, str):
+            if hasattr(definition, "read") or isinstance(definition, str):
                 # Move this component's definition to the assets.
                 if hasattr(definition, "name"):
                     import pathlib
+
                     asset = pathlib.Path(definition.name).name
                 else:
                     from uuid import uuid4
+
                     asset = f"{uuid4()}.vue"
 
                 assets[asset] = definition
                 components[component] = asset
                 continue
 
-            raise NotImplementedError("cannot process this kind of component definition yet")
+            raise NotImplementedError(
+                "cannot process this kind of component definition yet"
+            )
 
         self.__components = components
 
@@ -101,21 +111,31 @@ class VueWidget(DOMWidget):
         import glob
 
         # Ship ipymuvue to the client (they probably only need the things that are in pyodide/
-        for fname in glob.glob(os.path.join(os.path.dirname(os.path.dirname(__file__)), "**/*.py"), recursive=True):
+        for fname in glob.glob(
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "**/*.py"),
+            recursive=True,
+        ):
             if fname in assets:
-                raise ValueError(f"assets must not contain {fname} as it is shipped with ipymuvue")
-            assets[os.path.relpath(fname, start=os.path.dirname(os.path.dirname(os.path.dirname(__file__))))] = open(fname, 'rb').read()
+                raise ValueError(
+                    f"assets must not contain {fname} as it is shipped with ipymuvue"
+                )
+            assets[
+                os.path.relpath(
+                    fname,
+                    start=os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                )
+            ] = open(fname, "rb").read()
 
         for (fname, content) in assets.items():
             if not isinstance(fname, str):
                 raise TypeError("file name must be a string")
 
-            if hasattr(content, 'read'):
+            if hasattr(content, "read"):
                 # Resolve files to their actual content.
                 content = content.read()
 
             if isinstance(content, str):
-                content = content.encode('utf-8')
+                content = content.encode("utf-8")
 
             if not isinstance(content, bytes):
                 raise NotImplementedError("assets must be convertible to bytes")
@@ -139,14 +159,16 @@ class VueWidget(DOMWidget):
     def _ipython_display_(self):
         if self.__output is not None:
             from IPython.display import display
+
             display(self.__output)
 
         return super()._ipython_display_()
 
     def _handle_event(self, _, content, __):
         from contextlib import nullcontext
+
         with (self.__output or nullcontext()):
-            if 'method' in content:
+            if "method" in content:
                 self._handle_callback(**content)
                 return
 
@@ -177,4 +199,6 @@ class VueWidget(DOMWidget):
     __methods = List([]).tag(sync=True)
     __components = Dict().tag(sync=True)
     __assets = Dict().tag(sync=True)
-    __children = Dict(Instance(DOMWidget), key_trait=Unicode()).tag(sync=True, **widget_serialization)
+    __children = Dict(Instance(DOMWidget), key_trait=Unicode()).tag(
+        sync=True, **widget_serialization
+    )

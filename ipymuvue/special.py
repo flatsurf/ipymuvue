@@ -18,19 +18,51 @@ Names of special functions in the Vue API.
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-options = ['data', 'props', 'computed', 'methods', 'watch', 'emits', 'expose', 'template', 'render', 'provide', 'inject', 'setup', 'name', 'inheritAttrs', 'components', 'directives']
+options = [
+    "data",
+    "props",
+    "computed",
+    "methods",
+    "watch",
+    "emits",
+    "expose",
+    "template",
+    "render",
+    "provide",
+    "inject",
+    "setup",
+    "name",
+    "inheritAttrs",
+    "components",
+    "directives",
+]
 
-lifecycle = ['beforeCreate', 'created', 'beforeMount', 'mounted', 'beforeUpdate', 'updated', 'beforeUnmount', 'unmounted', 'errorCaptured', 'renderTracked', 'renderTriggered', 'activated', 'deactivated', 'serverPrefetch']
+lifecycle = [
+    "beforeCreate",
+    "created",
+    "beforeMount",
+    "mounted",
+    "beforeUpdate",
+    "updated",
+    "beforeUnmount",
+    "unmounted",
+    "errorCaptured",
+    "renderTracked",
+    "renderTriggered",
+    "activated",
+    "deactivated",
+    "serverPrefetch",
+]
 
 
 def is_special(name):
     r"""
     Return whether `name` has a special meaning in a Vue component.
     """
-    if name.startswith('_'):
+    if name.startswith("_"):
         return True
 
-    if name.startswith('$'):
+    if name.startswith("$"):
         return True
 
     if name in options:

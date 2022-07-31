@@ -30,6 +30,7 @@ class ProxyRef:
 
     def __init__(self, ref):
         from ipymuvue.pyodide.types import is_vue_ref
+
         if not is_vue_ref(ref):
             raise TypeError("ref must be a Vue ref")
         self._ref = ref
@@ -42,9 +43,11 @@ class ProxyRef:
 
         # Load Vue from ipymuvue_js.ts implemented in TypeScript
         from ipymuvue_js import Vue
+
         return python_compatible(Vue.unref(self._ref))
 
     @value.setter
     def value(self, value):
         from ipymuvue.pyodide.proxies import vue_compatible
+
         self._ref.value = vue_compatible(value, reference=False)
