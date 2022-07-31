@@ -22,7 +22,7 @@ import type { loadPyodide, PyodideInterface, PyProxy } from "pyodide";
 import { AssetProvisioner } from "./Assets";
 
 import { JavaScriptLoader } from "./JavaScriptLoader";
-import * as ipymuvue_utils from "./Utils";
+import * as ipymuvue_js from "./ipymuvue_js";
 
 const PYODIDE_CDN = "https://cdn.jsdelivr.net/pyodide/v0.21.0a3/full";
 
@@ -117,7 +117,7 @@ export class PythonInterpreter {
           indexURL: `${PYODIDE_CDN}/`,
         });
 
-        instance.registerJsModule("ipymuvue_utils", ipymuvue_utils);
+        instance.registerJsModule("ipymuvue_js", ipymuvue_js);
 
         return instance;
       })();
