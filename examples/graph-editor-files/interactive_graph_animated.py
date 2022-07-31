@@ -64,5 +64,5 @@ def create_component(gsap):
     return define_component(
         setup=create_setup(gsap),
         props=["vertices", "edges", "positions", "width", "height"],
-        emits=["vertex-rclick", "rclick"],
+        emits=["vertex-rclick", "rclick", "dragged"],
     )
