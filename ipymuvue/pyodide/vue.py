@@ -92,39 +92,41 @@ def define_component(
     files. The component is then loaded from the file at runtime.
     """
     import js
-
     component = js.Object.new()
 
-    if setup is not None:
-        if not callable(setup):
-            raise TypeError("setup must be a function")
-        component.setup = prepare_setup(setup)
+    from ipymuvue.pyodide.proxies import owner
 
-    if template is not None:
-        if not isinstance(template, str):
-            raise TypeError("template must be a string")
-        component.template = template
+    with owner(component):
+        if setup is not None:
+            if not callable(setup):
+                raise TypeError("setup must be a function")
+            component.setup = prepare_setup(setup)
 
-    if components is not None:
-        if not isinstance(components, dict):
-            raise TypeError("components must be a dict")
-        component.components = prepare_components(components)
+        if template is not None:
+            if not isinstance(template, str):
+                raise TypeError("template must be a string")
+            component.template = template
 
-    if props is not None:
-        component.props = vue_compatible(props, reference=False)
+        if components is not None:
+            if not isinstance(components, dict):
+                raise TypeError("components must be a dict")
+            component.components = prepare_components(components)
 
-    if emits is not None:
-        if not isinstance(emits, list) or not all(
-            isinstance(prop, str) for prop in emits
-        ):
-            raise TypeError("emits must be a list of strings")
+        if props is not None:
+            component.props = vue_compatible(props, reference=False)
 
-        component.emits = vue_compatible(emits, reference=False)
+        if emits is not None:
+            if not isinstance(emits, list) or not all(
+                isinstance(prop, str) for prop in emits
+            ):
+                raise TypeError("emits must be a list of strings")
 
-    if name is not None:
-        if not isinstance(name, str):
-            raise TypeError("name must be a string")
-        component.name = name
+            component.emits = vue_compatible(emits, reference=False)
+
+        if name is not None:
+            if not isinstance(name, str):
+                raise TypeError("name must be a string")
+            component.name = name
 
     return component
 
@@ -134,38 +136,42 @@ def prepare_setup(setup):
     Wraps a setup function to make it compatible with the Vue API.
     """
 
-    @pyodide.ffi.create_proxy
+    from ipymuvue.pyodide.proxies import create_proxy
+
+    @create_proxy
     def prepared_setup(props, context):
-        assert is_vue_proxy(props)
-
-        # The props are a Vue proxy. Wrap it so that it behaves like a Python
-        # object, e.g., so its entries appear to be dicts and lists.
-        props = python_compatible(props)
-
-        exports = setup(props, context)
-
-        if not isinstance(exports, dict):
-            raise TypeError("setup() must return a dict, e.g., locals()")
-
         import js
-
         js_exports = js.Object.new()
 
-        for name in exports:
-            from ipymuvue.special import is_special
+        from ipymuvue.pyodide.proxies import owner
 
-            if is_special(name):
-                # Should we write a warning to the console? See #6.
-                continue
+        with owner(js_exports):
+            assert is_vue_proxy(props)
 
-            try:
-                export = vue_compatible(exports[name])
-            except Exception:
-                raise TypeError(
-                    f"could not convert {name} returned by setup() to be used in the component template"
-                )
+            # The props are a Vue proxy. Wrap it so that it behaves like a Python
+            # object, e.g., so its entries appear to be dicts and lists.
+            props = python_compatible(props)
 
-            setattr(js_exports, name, export)
+            exports = setup(props, context)
+
+            if not isinstance(exports, dict):
+                raise TypeError("setup() must return a dict, e.g., locals()")
+
+            for name in exports:
+                from ipymuvue.special import is_special
+
+                if is_special(name):
+                    # Should we write a warning to the console? See #6.
+                    continue
+
+                try:
+                    export = vue_compatible(exports[name])
+                except Exception:
+                    raise TypeError(
+                        f"could not convert {name} returned by setup() to be used in the component template"
+                    )
+
+                setattr(js_exports, name, export)
 
         return js_exports
 
@@ -195,7 +201,9 @@ def prepare_components(components):
 
             fname = component.name if hasattr(component, "name") else None
 
-            @pyodide.ffi.create_proxy
+            from ipymuvue.pyodide.proxies import create_proxy
+
+            @create_proxy
             def read_file_from_wasm(fname):
                 content = open(fname, "rb").read()
 
@@ -273,7 +281,9 @@ def watch(watched, on_change):
     """
     if callable(watched):
 
-        @pyodide.ffi.create_proxy
+        from ipymuvue.pyodide.proxies import create_proxy
+
+        @create_proxy
         def _watched():
             reactive = vue_compatible(watched(), shallow=True)
             if not is_vue_ref(reactive) and not is_vue_proxy(reactive):
@@ -288,7 +298,9 @@ def watch(watched, on_change):
             raise TypeError("watched object must be Vue Ref or a reactive Vue Proxy")
         _watched = watched
 
-    @pyodide.ffi.create_proxy
+    from ipymuvue.pyodide.proxies import create_proxy
+
+    @create_proxy
     def _on_change(current, previous, on_cleanup):
         on_change(python_compatible(current), python_compatible(previous), on_cleanup)
 
@@ -305,7 +317,9 @@ def computed(getter):
     explicitly inside the getter to make the value compatible.
     """
 
-    @pyodide.ffi.create_proxy
+    from ipymuvue.pyodide.proxies import create_proxy
+
+    @create_proxy
     def _getter():
         return vue_compatible(getter(), reference=None)
 
