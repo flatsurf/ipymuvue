@@ -47,16 +47,21 @@ class ObjectWrapper(MutableMapping):
         raise Exception("not implemented __delitem__")
 
     def __getattr__(self, key):
-        return self.__getitem__(key)
+        if not isinstance(key, (int, str)):
+            raise TypeError(f"key must be int or str but was {type(key)}")
+
+        from ipymuvue.pyodide.proxies import python_compatible
+
+        return python_compatible(getattr(self._object, str(key)))
 
     def __setattr__(self, key, value):
-        self[key] = value
-
-    def __setitem__(self, key, value):
         if not isinstance(key, (int, str)):
             raise TypeError(f"key must be int or str but was {type(key)}")
 
         setattr(self._object, str(key), self._vue_compatible(value))
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
 
     def __iter__(self):
         import js
@@ -68,12 +73,10 @@ class ObjectWrapper(MutableMapping):
         return len(self._object)
 
     def __getitem__(self, key):
-        if not isinstance(key, (int, str)):
-            raise TypeError(f"key must be int or str but was {type(key)}")
-
-        from ipymuvue.pyodide.proxies import python_compatible
-
-        return python_compatible(getattr(self._object, str(key)))
+        try:
+            return self.__getattr__(key)
+        except AttributeError:
+            raise KeyError(key)
 
 
 class ProxyDict(ObjectWrapper):
