@@ -4,6 +4,15 @@ ipymuvue Change Log
 
 .. current developments
 
+v0.0.7
+====================
+
+**Changed:**
+
+* Split ipymuvue.pyodide into smaller modules. Does not change the ipymuvue.pyodide.vue module.
+
+
+
 v0.0.6
 ====================
 
