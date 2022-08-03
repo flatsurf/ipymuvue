@@ -226,13 +226,16 @@ def create_proxy(x, owner=None):
     variable. See :meth:`owner` for details.
     """
     import pyodide
+
     proxy = pyodide.ffi.create_proxy(x)
 
     if owner is None:
         owner = _owner.get()
 
     if owner is None:
-        js.console.warn(f"No owner set when creating proxy of {x}. Memory will be leaked. Wrap your code in a `with ipymuvue.pyodide.proxies.owner(...)` context to avoid this warning.")
+        js.console.warn(
+            f"No owner set when creating proxy of {x}. Memory will be leaked. Wrap your code in a `with ipymuvue.pyodide.proxies.owner(...)` context to avoid this warning."
+        )
 
     elif callable(owner):
         owner(proxy)
@@ -252,6 +255,7 @@ def release_proxy(proxy):
     # print("releasing proxy", proxy)
 
     import pyodide
+
     pyodide.ffi.destroy_proxies(js.Array.new([proxy]))
 
 

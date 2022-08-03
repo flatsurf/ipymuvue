@@ -92,6 +92,7 @@ def define_component(
     files. The component is then loaded from the file at runtime.
     """
     import js
+
     component = js.Object.new()
 
     from ipymuvue.pyodide.proxies import owner
@@ -141,6 +142,7 @@ def prepare_setup(setup):
     @create_proxy
     def prepared_setup(props, context):
         import js
+
         js_exports = js.Object.new()
 
         from ipymuvue.pyodide.proxies import owner

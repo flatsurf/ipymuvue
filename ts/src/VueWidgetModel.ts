@@ -16,6 +16,7 @@
  * ******************************************************************************/
 
 import { DOMWidgetModel } from "@jupyter-widgets/base";
+import { Handler } from "./Invocation";
 
 const version = require('../package.json').version;
 
@@ -44,6 +45,15 @@ export class VueWidgetModel extends DOMWidgetModel {
             /* widgets for the (named) slots of the component */
             _VueWidget__children: {},
         };
+    }
+
+    constructor(...args: any[]) {
+        super(...args);
+
+        this.on("msg:custom", (message: any) => {
+            if ("target" in message)
+              new Handler(this, message).run();
+        });
     }
 
     /*

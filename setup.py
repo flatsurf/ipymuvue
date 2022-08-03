@@ -58,6 +58,7 @@ setup_args = dict(
     include_package_data=True,
     install_requires=[
         'ipywidgets>=7,<9',
+        'jupyter-ui-poll>=0.2.1,<0.3',
     ],
     packages=find_packages(),
     zip_safe=False,

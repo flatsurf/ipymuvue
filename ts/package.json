@@ -39,6 +39,7 @@
     "@vue/compiler-sfc": "^3.2.37",
     "cross-env": "^7.0.3",
     "crypto": "1.0.1",
+    "is-promise": "^4.0.0",
     "minimist": "^1.2.6",
     "pyodide": "^0.21.0-alpha.3",
     "rollup": "^2.77.0",

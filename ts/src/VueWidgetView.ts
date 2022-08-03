@@ -19,7 +19,7 @@ import { DOMWidgetView, JupyterPhosphorWidget } from "@jupyter-widgets/base";
 import { VueWidgetModel } from "./VueWidgetModel";
 import { VueComponentCompiler } from "./VueComponentCompiler";
 import { createApp, defineComponent, h } from "vue";
-import type { App, Component } from "vue";
+import type { App, Component, ComponentPublicInstance } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import mapValues from "lodash-es/mapValues";
 
@@ -35,6 +35,9 @@ import mapValues from "lodash-es/mapValues";
 export class VueWidgetView extends DOMWidgetView {
     // The Vue App rendering this View (there is one app per view)
     private app?: App;
+
+    // The vnode representing the component.
+    public vnode?: ComponentPublicInstance;
 
     /*
      * Create a Vue App for this view and display it.
@@ -87,6 +90,7 @@ export class VueWidgetView extends DOMWidgetView {
             return cloneDeep(model.reactiveState);
           },
           created() {
+            self.vnode = this;
             for (const key of Object.keys(model.reactiveState)) {
               // Watch the model: when it changes, update Vue state.
               // Note that the listener is automatically removed when this view is destroyed.

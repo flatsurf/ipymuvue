@@ -16,6 +16,7 @@
 # ******************************************************************************
 
 
+import contextlib
 from ipywidgets import DOMWidget, widget_serialization
 from ipymuvue.version import __version__ as version
 from traitlets import Unicode, List, Dict, Instance
@@ -64,7 +65,7 @@ class VueWidget(DOMWidget):
             for (name, method) in inspect.getmembers(self, predicate=inspect.ismethod)
             if hasattr(method, "_VueWidget__is_callback") and method.__is_callback
         ]
-        self.on_msg(self._handle_event)
+        self._on_msg(self._handle_message)
 
         # Create output area for stdout, stderr, and tracebacks
         from ipywidgets import Output
@@ -144,6 +145,15 @@ class VueWidget(DOMWidget):
 
         self.__assets = assets
 
+    def __getitem__(self, name):
+        r"""
+        Return a handle for the elements in the frontend marked with
+        ``ref="name"`` in the template.
+        """
+        from ipymuvue.widgets.references import Subcomponent
+
+        return Subcomponent(self, name)
+
     def slot(self, name, content=None):
         if content is None:
             content = name
@@ -164,11 +174,29 @@ class VueWidget(DOMWidget):
 
         return super()._ipython_display_()
 
-    def _handle_event(self, _, content, __):
-        from contextlib import nullcontext
+    @contextlib.contextmanager
+    def _on_msg(self, handler):
+        r"""
+        Register ``handler`` for custom messages from the frontend.
 
-        with (self.__output or nullcontext()):
-            if "method" in content:
+        The handler is unregistered when the context is released.
+        """
+        with (self.__output or contextlib.nullcontext):
+
+            def logging_handler(*args, **kwargs):
+                with (self.__output or contextlib.nullcontext):
+                    handler(*args, **kwargs)
+
+            self.on_msg(logging_handler)
+            yield
+            self.on_msg(logging_handler, remove=True)
+
+    def _handle_message(self, _, content, __):
+        r"""
+        Handle a message coming in on the comm from the frontend model.
+        """
+        if "method" in content:
+            with (self.__output or contextlib.nullcontext()):
                 self._handle_callback(**content)
                 return
 

@@ -7,11 +7,12 @@ channels:
   - defaults
 dependencies:
   - aiohttp
-  - sage
-  - jupytext
-  - jupyterlab
   - jupyter-packaging
+  - jupyter-ui-poll
+  - jupyterlab
+  - jupytext
   - myst-nb
   - pip
   - rever
+  - sage
   - twine
