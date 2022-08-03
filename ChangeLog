@@ -4,6 +4,16 @@ ipymuvue Change Log
 
 .. current developments
 
+v0.2.0
+====================
+
+**Added:**
+
+* Added support for calling exposed methods on components, i.e., the
+  ipyvue-async functionality. See examples/RPC.md for examples.
+
+
+
 v0.1.0
 ====================
 
