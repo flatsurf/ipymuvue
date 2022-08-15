@@ -57,6 +57,11 @@ class VueWidget(DOMWidget):
         self._initialize_components(components, assets)
         self._initialize_assets(assets)
 
+        # Create output area for stdout, stderr, and tracebacks
+        from ipywidgets import Output
+
+        self.__output = Output() if capture_output else None
+
         # Wire up callbacks that can be called from Vue component
         import inspect
 
@@ -65,12 +70,7 @@ class VueWidget(DOMWidget):
             for (name, method) in inspect.getmembers(self, predicate=inspect.ismethod)
             if hasattr(method, "_VueWidget__is_callback") and method.__is_callback
         ]
-        self._on_msg(self._handle_message)
-
-        # Create output area for stdout, stderr, and tracebacks
-        from ipywidgets import Output
-
-        self.__output = Output() if capture_output else None
+        self.__on_msg(self._handle_message)
 
     def _initialize_components(self, components, assets):
         r"""
@@ -181,15 +181,23 @@ class VueWidget(DOMWidget):
 
         The handler is unregistered when the context is released.
         """
-        with (self.__output or contextlib.nullcontext):
+        logging_handler = self.__on_msg(handler)
+        try:
+            yield
+        finally:
+            self.on_msg(logging_handler, remove=True)
 
+    def __on_msg(self, handler):
+        r"""
+        Register ``handler`` for custom messages from the frontend.
+        """
+        with (self.__output or contextlib.nullcontext):
             def logging_handler(*args, **kwargs):
                 with (self.__output or contextlib.nullcontext):
                     handler(*args, **kwargs)
 
             self.on_msg(logging_handler)
-            yield
-            self.on_msg(logging_handler, remove=True)
+            return logging_handler
 
     def _handle_message(self, _, content, __):
         r"""
