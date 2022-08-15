@@ -143,6 +143,87 @@ widget = Widget()
 widget
 ```
 
+```{code-cell} ipython3
+from ipymuvue.widgets import VueWidget
+from traitlets import Dict, Unicode, Integer
+
+class Widget(VueWidget):
+    def __init__(self, render, xmin=0, ymin=0, xmax=1, ymax=1):
+        super().__init__(template=r"""
+            <draggable-plot :current="plot" @refresh="refresh" />
+        """, components={
+            "draggable-plot": open("demo-files/DraggablePlot.vue"),
+        }, assets={
+            "Plot.vue": open("demo-files/Plot.vue"),
+        })
+        
+        self._render = render
+        
+        self.refresh(dict(
+            xmin=xmin,
+            xmax=xmax,
+            ymin=ymin,
+            ymax=ymax,
+        ))
+        
+    plot = Dict().tag(sync=True)
+        
+    @VueWidget.callback
+    def refresh(self, bounds):
+        import matplotlib
+        import matplotlib.pyplot
+        backend = matplotlib.get_backend()
+        matplotlib.use('agg')
+        try:
+            figure=matplotlib.pyplot.figure(dpi=96)
+            self._render(bounds).matplotlib(figure=figure, **bounds)
+            figure.tight_layout()
+            figure.canvas.draw()
+            canvas = figure.canvas
+
+            from io import BytesIO
+            raw = BytesIO()
+
+            canvas.print_png(raw)
+            raw.seek(0)
+            
+            bbox = figure.axes[0].get_window_extent(figure.canvas.get_renderer()).get_points()
+            width, height = figure.canvas.get_width_height()
+            
+            from sage.all import matrix, vector
+            A = matrix([
+                [(bbox[1][0] - bbox[0][0]) / (bounds["xmax"] - bounds["xmin"]), 0, bbox[0][0]],
+                [0, -(bbox[1][1] - bbox[0][1]) / (bounds["ymax"] - bounds["ymin"]), bbox[1][1]],
+                [0, 0, 1]
+            ]) * matrix([
+                [1, 0, -bounds["xmin"]],
+                [0, 1, -bounds["ymin"]],
+                [0, 0, 1]
+            ])
+
+            B = ~A
+            
+            xmin, ymin, _ = B * vector([0, height, 1])
+            xmax, ymax, _ = B * vector([width, 0, 1])
+            
+            import base64
+            self.plot = dict(
+                png=base64.b64encode(raw.read()).decode('utf-8'),
+                bounds=dict(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax))
+
+            matplotlib.pyplot.close(figure)            
+        finally:
+            matplotlib.use(backend)
+            
+def render(bounds):
+    from sage.all import plot, var, sin
+    x = var('x')
+    return plot(sin(x) + x**2/64, **bounds)
+            
+widget = Widget(render)
+widget
+```
+
 # Nested Widgets
 
 ```{code-cell} ipython3
