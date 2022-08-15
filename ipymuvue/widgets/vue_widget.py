@@ -65,12 +65,12 @@ class VueWidget(DOMWidget):
             for (name, method) in inspect.getmembers(self, predicate=inspect.ismethod)
             if hasattr(method, "_VueWidget__is_callback") and method.__is_callback
         ]
-        self._on_msg(self._handle_message)
-
         # Create output area for stdout, stderr, and tracebacks
         from ipywidgets import Output
 
         self.__output = Output() if capture_output else None
+
+        with self._on_msg(self._handle_message, keep=True): pass
 
     def _initialize_components(self, components, assets):
         r"""
@@ -175,7 +175,7 @@ class VueWidget(DOMWidget):
         return super()._ipython_display_()
 
     @contextlib.contextmanager
-    def _on_msg(self, handler):
+    def _on_msg(self, handler, keep=False):
         r"""
         Register ``handler`` for custom messages from the frontend.
 
@@ -189,7 +189,8 @@ class VueWidget(DOMWidget):
 
             self.on_msg(logging_handler)
             yield
-            self.on_msg(logging_handler, remove=True)
+            if not keep:
+                self.on_msg(logging_handler, remove=True)
 
     def _handle_message(self, _, content, __):
         r"""
