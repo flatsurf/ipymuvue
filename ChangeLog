@@ -4,6 +4,15 @@ ipymuvue Change Log
 
 .. current developments
 
+v0.2.2
+====================
+
+**Fixed:**
+
+* Fixed compatibility with latest IPython and ipywidgets.
+
+
+
 v0.2.1
 ====================
 
