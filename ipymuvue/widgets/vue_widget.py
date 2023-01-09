@@ -67,10 +67,62 @@ class VueWidget(DOMWidget):
 
         self.__methods = [
             name
-            for (name, method) in inspect.getmembers(self, predicate=inspect.ismethod)
+            for (name, method) in type(self)._getmembers(self, predicate=inspect.ismethod)
             if hasattr(method, "_VueWidget__is_callback") and method.__is_callback
         ]
         self.__on_msg(self._handle_message)
+
+    @classmethod
+    def _getmembers(cls, object, predicate=None):
+        r"""
+        Return the members of ``object``.
+
+        This code is copied from inspect.getmembers() but adds handling for
+        assertion errors. A ipywidget Widget does not like its static methods
+        to be inspected from a non-static context so we hack around this
+        problem here by ignoring assertions.
+        """
+        from inspect import isclass
+        if isclass(object):
+            mro = (object,) + getmro(object)
+        else:
+            mro = ()
+        results = []
+        processed = set()
+        names = dir(object)
+        # :dd any DynamicClassAttributes to the list of names if object is a class;
+        # this may result in duplicate entries if, for example, a virtual
+        # attribute with the same name as a DynamicClassAttribute exists
+        try:
+            for base in object.__bases__:
+                for k, v in base.__dict__.items():
+                    if isinstance(v, types.DynamicClassAttribute):
+                        names.append(k)
+        except AttributeError:
+            pass
+        for key in names:
+            # First try to get the value via getattr.  Some descriptors don't
+            # like calling their __get__ (see bug #1785), so fall back to
+            # looking in the __dict__.
+            try:
+                value = getattr(object, key)
+                # handle the duplicate key
+                if key in processed:
+                    raise AttributeError
+            except (AttributeError, AssertionError):
+                for base in mro:
+                    if key in base.__dict__:
+                        value = base.__dict__[key]
+                        break
+                else:
+                    # could be a (currently) missing slot member, or a buggy
+                    # __dir__; discard and move on
+                    continue
+            if not predicate or predicate(value):
+                results.append((key, value))
+            processed.add(key)
+        results.sort(key=lambda pair: pair[0])
+        return results
 
     def _initialize_components(self, components, assets):
         r"""
@@ -166,13 +218,16 @@ class VueWidget(DOMWidget):
         children[name] = content
         self.__children = children
 
-    def _ipython_display_(self):
+    def _repr_mimebundle_(self, **kwargs):
         if self.__output is not None:
             from IPython.display import display
 
+            # This is a hack. We should not call display() in
+            # _repr_mimebundle_ but handle everything with _repr_mimebundle_
+            # instead (and wrap the output somehow ourselves in the frontend.)
             display(self.__output)
 
-        return super()._ipython_display_()
+        return super()._repr_mimebundle_(**kwargs)
 
     @contextlib.contextmanager
     def _on_msg(self, handler):
