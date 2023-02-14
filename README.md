@@ -6,6 +6,8 @@ Installation
 ------------
 
     pip install ipymuvue
+    jupyter nbextension enable --py --sys-prefix ipyvue
+
 
 Getting Started
 ---------------
