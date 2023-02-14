@@ -1,6 +1,8 @@
 # Widgets made with ipyμvue
 
-To open these notebooks, written in MarkDown, you need to have `jupytext` and `myst-nb` installed.
+❗ To open these notebooks, written in MarkDown, you need to have `jupytext` and `myst-nb` installed.
+
+❗ Some of these notebooks attempt to load other files from this `examples/` directory. Make sure to have these files available with the notebooks. (The easiest is probably to just clone the repository, cd into `examples/` and start the Jupyter notebook there.)
 
 * [**Demo**](./Demo.md), some of the features of ipyμvue,
   
