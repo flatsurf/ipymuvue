@@ -23,7 +23,6 @@ from os.path import join as pjoin
 from jupyter_packaging import (
     create_cmdclass,
     install_npm,
-    ensure_targets,
     combine_commands,
 )
 
@@ -33,11 +32,6 @@ here = os.path.dirname(os.path.abspath(__file__))
 # The ts/ files are compiled automatically by the js/ prepublish command.
 js_dir = pjoin(here, 'js')
 
-# Representative files that should exist after a successful build
-jstargets = [
-    pjoin(js_dir, 'dist', 'index.js'),
-]
-
 data_files_spec = [
     ('share/jupyter/nbextensions/ipymuvue', 'ipymuvue/nbextension', '*.*'),
     ('share/jupyter/labextensions/ipymuvue', 'ipymuvue/labextension', "**"),
@@ -46,9 +40,7 @@ data_files_spec = [
 ]
 
 cmdclass = create_cmdclass('jsdeps', data_files_spec=data_files_spec)
-cmdclass['jsdeps'] = combine_commands(
-    install_npm(js_dir, npm=['yarn'], build_cmd='build:prod'), ensure_targets(jstargets),
-)
+cmdclass['jsdeps'] = install_npm(js_dir, npm=['yarn'], build_cmd='build:prod')
 
 setup_args = dict(
     name='ipymuvue',
