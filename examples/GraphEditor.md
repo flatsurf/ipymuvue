@@ -82,7 +82,7 @@ class GraphEditor0(VueWidget):
                 self.height * (pos[v][1] - bbox[1][0]) / (bbox[1][1] - bbox[1][0])
                 ) for v in pos}
 
-            self.edges = [(source, target) for (source, target, label) in value.edges()]
+            self.edges = [(source, target) for (source, target, label) in value.edges(sort=True)]
         
     def bbox(self):
         pos = self.graph.get_pos()
