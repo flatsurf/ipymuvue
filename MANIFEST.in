@@ -1,4 +1,3 @@
-graft ipymuvue/nbextension
 graft ipymuvue/labextension
 
 graft js

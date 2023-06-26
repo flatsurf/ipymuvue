@@ -17,11 +17,10 @@
     "jupyterlab-extension"
   ],
   "files": [
-    "src/**/*.js",
-    "dist/*.js"
+    "src/**/*.js"
   ],
   "scripts": {
-    "clean": "rimraf dist/ && rimraf ../ipymuvue/labextension/",
+    "clean": "rimraf ../ipymuvue/labextension/",
     "prepublish": "yarn run clean && (cd ../ts && yarn run build:prod) && yarn run build:prod",
     "build": "jupyter labextension build --development True .",
     "build:prod": "jupyter labextension build ."
