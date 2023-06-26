@@ -21,20 +21,16 @@
     "dist/*.js"
   ],
   "scripts": {
-    "clean": "rimraf dist/ && rimraf ../ipymuvue/labextension/ && rimraf ../ipymuvue/nbextension",
+    "clean": "rimraf dist/ && rimraf ../ipymuvue/labextension/",
     "prepublish": "yarn run clean && (cd ../ts && yarn run build:prod) && yarn run build:prod",
-    "build": "yarn run build:nbextension && yarn run build:labextension",
-    "build:prod": "yarn run build:nbextension:prod && yarn run build:labextension:prod",
-    "build:nbextension": "webpack --mode=development",
-    "build:nbextension:prod": "webpack --mode=production",
-    "build:labextension": "jupyter labextension build --development True .",
-    "build:labextension:prod": "jupyter labextension build .",
-    "dev": "webpack --watch --mode=development"
+    "build": "jupyter labextension build --development True .",
+    "build:prod": "jupyter labextension build ."
   },
   "devDependencies": {
-    "@jupyterlab/builder": "^3.0.0",
+    "@jupyterlab/builder": "^4.0.2",
     "rimraf": "^2.6.1",
-    "webpack": "^5"
+    "webpack": "^5",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
