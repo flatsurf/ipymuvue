@@ -4,6 +4,19 @@ ipymuvue Change Log
 
 .. current developments
 
+v0.3.0
+====================
+
+**Removed:**
+
+* Removed support for the classic notebook prior to version 7.
+
+**Fixed:**
+
+* Fixed deprecation warnings in the Graph editor examples.
+
+
+
 v0.2.2
 ====================
 
