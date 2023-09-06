@@ -6,14 +6,43 @@ Installation
 ------------
 
     pip install ipymuvue
-    jupyter nbextension enable --py --sys-prefix ipymuvue
-
 
 Getting Started
 ---------------
 
 There is no proper documentation for this project yet, but there are some
 [examples/](examples/).
+
+To verify that your installation works correctly, open a Jupyter notebook and execute the following example:
+
+```py
+from ipymuvue.widgets import VueWidget
+from traitlets import Unicode
+
+class Widget(VueWidget):
+    def __init__(self):
+        super().__init__(template=r"""
+            <div>
+                <h1 @click="audience += '!'" @click.right.prevent.stop="rclick()" style="border: solid 1px blue; text-align: center; padding: 20px; user-select: none">
+                    Hello {{ audience }}!
+                </h1>
+            </div>
+        """)
+        
+    audience = Unicode("World").tag(sync=True)
+    
+    @VueWidget.callback
+    def rclick(self):
+        self.audience = '¡' + self.audience
+        
+    
+widget = Widget()
+widget
+```
+
+If you see a `Hello World` message, then things have been setup correctly.
+
+Note that the **classic** Jupyter notebook (i.e., version <7) is not supported by this extension. If in doubt, use `jupyter lab` to launch your notebooks.
 
 Development
 -----------
@@ -57,7 +86,7 @@ Now, start a `jupyter` notebook or `jupyter lab` and verify that the notebooks i
 
 Any changes you make to the Python code should be picked up automatically. Changes to `ipymuvue.pyodide` become effective by re-creating a widget (all the modules are reloaded in pyodide when a change to these files happens.) Other changes require a kernel restart as usual.
 
-When working with the classic notebook, any changes to the TypeScript/Javascript code, get picked up automatically and become effective once refreshing your browser. In JupyterLab, you need to rebuild the prebuilt extension and refresh the browser:
+Any changes to the TypeScript/Javascript code become effective after you rebuild the prebuilt extension and refresh the browser:
 
     (cd js && yarn build)
 
