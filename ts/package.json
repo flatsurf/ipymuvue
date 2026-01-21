@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "is-callable": "^1.2.4",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.23",
     "vue": "^3.2.37",
     "vue3-sfc-loader": "^0.8.4"
   },
