@@ -34,7 +34,7 @@
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
     "ipymuvueimplementation": "../ts",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "jupyterlab": {
     "extension": "src/labplugin",
