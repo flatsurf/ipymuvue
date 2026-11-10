@@ -26,7 +26,7 @@
     "build:lib": "tsc --sourceMap",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
-    "clean": "rimraf lib tsconfig.tsbuildinfo ../ipymuvue/labextension",
+    "clean": "rimraf lib tsconfig.tsbuildinfo ../ipymuvue/labextensions",
     "watch": "run-p watch:lib watch:labextension",
     "watch:lib": "tsc --sourceMap --watch --preserveWatchOutput",
     "watch:labextension": "jupyter labextension watch ."
@@ -49,7 +49,7 @@
   },
   "jupyterlab": {
     "extension": "lib/plugin",
-    "outputDir": "../ipymuvue/labextension",
+    "outputDir": "../ipymuvue/labextensions/ipymuvue",
     "webpackConfig": "./webpack.config.js",
     "sharedPackages": {
       "@jupyter-widgets/base": {

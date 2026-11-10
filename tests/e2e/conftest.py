@@ -23,6 +23,7 @@ with a headless browser through playwright.
 
 import json
 import os
+import pathlib
 import secrets
 import socket
 import subprocess
@@ -118,6 +119,9 @@ def jupyter_lab(tmp_path_factory):
             f"--ServerApp.root_dir={root}",
             # Make window.jupyterapp available so we can drive JupyterLab.
             "--LabApp.expose_app_in_browser=True",
+            # Use the frontend built in this repository (and not the copy
+            # that was installed into the environment with ipymuvue.)
+            f"--LabApp.extra_labextensions_path={pathlib.Path(__file__).parents[2] / 'ipymuvue' / 'labextensions'}",
         ],
         cwd=root,
         env=env,

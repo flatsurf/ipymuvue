@@ -41,26 +41,26 @@ path = "ipymuvue/version.py"
 skip-excluded-dirs = true
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["ipymuvue/labextension"]
+artifacts = ["ipymuvue/labextensions"]
 exclude = [".github", "*.ipynb"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["ipymuvue"]
 # The labextension is installed as shared-data below, there is no need to
 # also ship it inside the Python package.
-exclude = ["ipymuvue/labextension"]
+exclude = ["ipymuvue/labextensions"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"ipymuvue/labextension" = "share/jupyter/labextensions/ipymuvue"
+"ipymuvue/labextensions/ipymuvue" = "share/jupyter/labextensions/ipymuvue"
 "install.json" = "share/jupyter/labextensions/ipymuvue/install.json"
 
 # Build the frontend in js/ when building a wheel. The resulting prebuilt
-# JupyterLab extension ends up in ipymuvue/labextension.
+# JupyterLab extension ends up in ipymuvue/labextensions/ipymuvue.
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.8"]
 build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["ipymuvue/labextension/package.json"]
-skip-if-exists = ["ipymuvue/labextension/package.json"]
+ensured-targets = ["ipymuvue/labextensions/ipymuvue/package.json"]
+skip-if-exists = ["ipymuvue/labextensions/ipymuvue/package.json"]
 # Editable installs do not need to build the frontend, see the README for how
 # to set up a development version of the extension.
 optional-editable-build = true

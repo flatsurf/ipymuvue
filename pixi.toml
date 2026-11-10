@@ -24,9 +24,12 @@ no-build-isolation = ["ipymuvue"]
 
 [tasks]
 build-js = { cmd = "jlpm install && jlpm build", cwd = "js" }
-develop = { cmd = "jupyter labextension develop --overwrite .", depends-on = ["build-js"] }
-watch = { cmd = "jlpm watch", cwd = "js", depends-on = ["develop"] }
-lab = { cmd = "jupyter lab", depends-on = ["develop"], cwd = "examples" }
+watch = { cmd = "jlpm watch", cwd = "js", depends-on = ["build-js"] }
+# We tell JupyterLab to load the frontend from ipymuvue/labextensions directly
+# so that it picks up the latest build (and the changes made by `watch`.) Note
+# that we cannot use `jupyter labextension develop` here since its symlink
+# breaks reinstalling ipymuvue into the pixi environment.
+lab = { cmd = "jupyter lab --LabApp.extra_labextensions_path=$PIXI_PROJECT_ROOT/ipymuvue/labextensions", depends-on = ["build-js"], cwd = "examples" }
 
 [feature.dist.dependencies]
 python-build = "*"
@@ -55,15 +58,13 @@ pytest-playwright = "*"
 [feature.test.tasks]
 install-browser = "playwright install chromium"
 test = "pytest"
-test-e2e = { cmd = "pytest tests/e2e", depends-on = ["install-browser", "develop"] }
+test-e2e = { cmd = "pytest tests/e2e", depends-on = ["install-browser", "build-js"] }
 
 # The oldest versions of our dependencies that we support.
 [feature.oldest.dependencies]
 python = "3.9.*"
 ipywidgets = "8.0.*"
 jupyterlab = "4.0.*"
-# Needed by `jupyter labextension develop` in JupyterLab 4.0.
-setuptools = "*"
 
 # SageMath for the examples that need a SageMath kernel, e.g., GraphEditor.md.
 # Note that the SageMath kernel only works when JupyterLab runs in the same
