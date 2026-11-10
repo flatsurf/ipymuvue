@@ -116,10 +116,8 @@ export class PythonInterpreter {
   public get pyodide(): Promise<PyodideInterface> {
     if (PythonInterpreter.instance == null)
       PythonInterpreter.instance = (async () => {
-        const pyodide = await new JavaScriptLoader(
-          "pyodide",
-          `${PYODIDE_CDN}/pyodide.js`,
-        ).object;
+        const pyodide = await new JavaScriptLoader(`${PYODIDE_CDN}/pyodide.js`)
+          .object;
 
         const loadPyodideBrowser: typeof loadPyodide = pyodide.loadPyodide;
 

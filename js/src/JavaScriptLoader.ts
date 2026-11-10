@@ -16,57 +16,24 @@
  * ******************************************************************************/
 
 export class JavaScriptLoader {
-  constructor(name: string, url: string, integrity?: string) {
-    this.name = name;
+  constructor(url: string, integrity?: string) {
     this.url = url;
     this.integrity = integrity;
   }
 
-  private readonly name;
   private readonly url;
   private readonly integrity;
 
+  /*
+   * Load the script with a <script> tag and return the global object that the
+   * script populated.
+   *
+   * Note that we do not load scripts through RequireJS even if it is
+   * present, e.g., when widgets are embedded in static HTML, since the
+   * scripts we load (pyodide.js) are not AMD modules.
+   */
   public get object(): Promise<any> {
-    return (async () => {
-      const globals = window as any;
-      if (typeof globals.requirejs == "function") {
-        return await this.loadRequireJS(globals.requirejs);
-      } else {
-        return await this.loadBrowser();
-      }
-    })();
-  }
-
-  private async loadRequireJS(requirejs: any) {
-    if (!this.url.endsWith(".js"))
-      throw Error("url must end with .js to be loaded through RequireJS");
-    requirejs.config({
-      paths: {
-        [this.name]: this.url.substring(0, this.url.length - 3),
-      },
-      onNodeCreated: function (
-        node: HTMLScriptElement,
-        _config: any,
-        moduleName: string,
-        _url: string,
-      ) {
-        if (moduleName === this.name) {
-          if (this.integrity) node.integrity = this.integrity;
-          node.crossOrigin = "anonymous";
-        }
-      },
-    });
-    return await new Promise((resolve, reject) => {
-      requirejs(
-        [this.name],
-        function (module: any) {
-          resolve(module);
-        },
-        function (err: any) {
-          reject(err);
-        },
-      );
-    });
+    return this.loadBrowser();
   }
 
   private async loadBrowser() {
