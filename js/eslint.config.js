@@ -5,7 +5,7 @@ const tseslint = require("typescript-eslint");
 const prettier = require("eslint-config-prettier");
 
 module.exports = defineConfig(
-  { ignores: ["lib/", "node_modules/", ".yarn/"] },
+  { ignores: ["lib/", "dist/", "node_modules/", ".yarn/"] },
   js.configs.recommended,
   tseslint.configs.recommended,
   // Turn off rules that conflict with prettier which formats our code.
@@ -14,7 +14,11 @@ module.exports = defineConfig(
     files: ["*.js"],
     languageOptions: {
       sourceType: "commonjs",
-      globals: { require: "readonly", module: "writable" },
+      globals: {
+        require: "readonly",
+        module: "writable",
+        __dirname: "readonly",
+      },
     },
     rules: { "@typescript-eslint/no-require-imports": "off" },
   },
