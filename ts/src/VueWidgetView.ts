@@ -151,6 +151,28 @@ export class VueWidgetView extends DOMWidgetView {
     private get modelRenderer() {
       const self = this;
 
+      /*
+       * A component that attaches a DOMWidgetView to the DOM and removes the
+       * view when it gets unmounted.
+       */
+      const viewAttacher = defineComponent({
+        name: "ViewAttacher",
+        props: {
+          view: { type: Object, required: true },
+        },
+        mounted() {
+          JupyterPhosphorWidget.attach((this.view as DOMWidgetView).pWidget, this.$el);
+        },
+        beforeUnmount() {
+          // The view must be removed while it is still in the DOM, otherwise
+          // detaching it fails.
+          (this.view as DOMWidgetView).remove();
+        },
+        render() {
+          return h("div");
+        },
+      });
+
       return defineComponent({
         name: "ModelRenderer",
         props: {
@@ -159,14 +181,12 @@ export class VueWidgetView extends DOMWidgetView {
         data() {
           return {
             widget: null as { view: DOMWidgetView } | null,
-            trash: Object.freeze({ views: [] as DOMWidgetView[] }),
           }
         },
         watch: {
           modelId: {
             /*
              * Create a new DOMWidgetView when the model changes.
-             * Schedule the previous view for destruction.
              */
             async handler(current: string, previous: string) {
               if (current === previous)
@@ -179,43 +199,27 @@ export class VueWidgetView extends DOMWidgetView {
                 return null;
               }
 
-              if (this.widget != null)
-                this.trash.views.push(this.widget.view);
-
               this.widget = Object.freeze({ view: await self.create_child_view(model) });
             },
             immediate: true,
           }
         },
         render() {
-          const self = this;
           const widget = this.widget;
 
-          if (widget == null) {
-            this.cleanup();
+          if (widget == null)
             return;
-          }
 
-          return h(defineComponent({
-            mounted() {
-              JupyterPhosphorWidget.attach((widget.view as DOMWidgetView).pWidget, this.$el);
-
-              self.cleanup();
-            },
-            render() {
-              return h("div");
-            }
-          }));
+          // Mount a new ViewAttacher (and unmount the previous one) when the
+          // view changes. Note that the ModelRenderer also renders when its
+          // modelId changes but before its widget has been updated. The
+          // ViewAttacher must not be mounted again then since the view is
+          // already attached.
+          return h(viewAttacher, {
+            key: widget.view.cid,
+            view: widget.view,
+          });
         },
-        destroyed() {
-          this.cleanup();
-        },
-        methods: {
-          cleanup() {
-            while (this.trash.views.length)
-              this.trash.views.pop()!.remove();
-          }
-        }
       })
     }
 

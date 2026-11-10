@@ -124,3 +124,8 @@ widget
 
     expect(cell.get_by_role("button", name="default button")).to_be_visible()
     expect(cell.get_by_role("button", name="named button")).to_be_visible()
+
+    # Slots can be replaced.
+    notebook.run('widget.slot(ipywidgets.Button(description="replaced button"))')
+    expect(cell.get_by_role("button", name="replaced button")).to_be_visible()
+    expect(cell.get_by_role("button", name="default button")).to_have_count(0)
