@@ -6,9 +6,9 @@ build/
 node_modules/
 
 # Frontend build artifacts and yarn state
-js/lib/
-js/tsconfig.tsbuildinfo
-js/.yarn/
+ts/lib/
+ts/tsconfig.tsbuildinfo
+ts/.yarn/
 yarn-error.log
 
 # OS X
@@ -16,11 +16,6 @@ yarn-error.log
 
 # pixi environments
 .pixi/
-
-# Documentation build (the examples are copied there by docs/conf.py)
-docs/_build/
-docs/examples/
-docs/jupyter_execute/
 
 # ruff
 .ruff_cache/

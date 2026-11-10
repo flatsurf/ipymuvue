@@ -26,8 +26,7 @@
     "build:lib": "tsc --sourceMap",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
-    "build:embed": "jlpm build:lib && webpack --config webpack.embed.config.js",
-    "clean": "rimraf lib dist tsconfig.tsbuildinfo ../ipymuvue/labextensions",
+    "clean": "rimraf lib tsconfig.tsbuildinfo ../ipymuvue/labextensions",
     "watch": "run-p watch:lib watch:labextension",
     "watch:lib": "tsc --sourceMap --watch --preserveWatchOutput",
     "watch:labextension": "jupyter labextension watch .",
@@ -54,10 +53,7 @@
     "pyodide": "314.0.7",
     "rimraf": "^6",
     "typescript": "~5.9",
-    "typescript-eslint": "^8.72",
-    "webpack": "^5",
-    "webpack-cli": "^6",
-    "webpack-merge": "^6"
+    "typescript-eslint": "^8.72"
   },
   "jupyterlab": {
     "extension": "lib/plugin",

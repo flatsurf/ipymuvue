@@ -25,7 +25,7 @@ def _jupyter_labextension_paths():
     Called by JupyterLab to find out which JavaScript assets need to be copied.
     """
     # The command `jupyter labextension build` creates a package in
-    # labextensions/ipymuvue/, see jupyterlab.outputDir in js/package.json
+    # labextensions/ipymuvue/, see jupyterlab.outputDir in ts/package.json
     # These files are copied to extensions/ipymuvue/ in
     # JupyterLab when this package is pip-installed.
     return [

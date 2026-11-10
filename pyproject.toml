@@ -32,7 +32,6 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/flatsurf/ipymuvue"
-Documentation = "https://flatsurf.github.io/ipymuvue/"
 
 [tool.hatch.version]
 path = "ipymuvue/version.py"
@@ -55,7 +54,7 @@ exclude = ["ipymuvue/labextensions"]
 "ipymuvue/labextensions/ipymuvue" = "share/jupyter/labextensions/ipymuvue"
 "install.json" = "share/jupyter/labextensions/ipymuvue/install.json"
 
-# Build the frontend in js/ when building a wheel. The resulting prebuilt
+# Build the frontend in ts/ when building a wheel. The resulting prebuilt
 # JupyterLab extension ends up in ipymuvue/labextensions/ipymuvue.
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.8"]
@@ -67,7 +66,7 @@ skip-if-exists = ["ipymuvue/labextensions/ipymuvue/package.json"]
 optional-editable-build = true
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-path = "js"
+path = "ts"
 build_cmd = "build:prod"
 npm = ["jlpm"]
 
@@ -123,7 +122,7 @@ search = '__version__ = "{current_version}"'
 replace = '__version__ = "{new_version}"'
 
 [[tool.bumpversion.files]]
-filename = "js/package.json"
+filename = "ts/package.json"
 search = '"version": "{current_version}"'
 replace = '"version": "{new_version}"'
 
