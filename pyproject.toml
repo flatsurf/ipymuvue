@@ -24,7 +24,9 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "ipywidgets>=7,<9",
+    "ipywidgets>=8,<9",
+    # jupyter-ui-poll 1.x does not process widget messages with ipykernel 7
+    # so awaiting calls into the frontend never finishes.
     "jupyter-ui-poll>=0.2.1,<0.3",
 ]
 
