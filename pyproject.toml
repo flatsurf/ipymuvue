@@ -68,3 +68,9 @@ optional-editable-build = true
 path = "js"
 build_cmd = "build:prod"
 npm = ["yarn"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+timeout = 300

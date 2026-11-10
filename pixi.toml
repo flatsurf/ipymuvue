@@ -38,6 +38,20 @@ build = "python -m build --no-isolation"
 jupytext = "*"
 myst-nb = "*"
 
+[feature.test.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+pytest-timeout = "*"
+
+[feature.test.tasks]
+test = "pytest"
+
+# The oldest versions of our dependencies that we support.
+[feature.oldest.dependencies]
+python = "3.9.*"
+ipywidgets = "8.0.*"
+jupyterlab = "4.0.*"
+
 [feature.release.dependencies]
 rever = "*"
 # rever imports distutils which was removed in Python 3.12.
@@ -47,5 +61,7 @@ python = "3.11.*"
 release = "rever"
 
 [environments]
-default = ["examples", "dist"]
+default = ["examples", "dist", "test"]
+test = ["test"]
+test-oldest = ["test", "oldest"]
 release = { features = ["release"], no-default-feature = true }
