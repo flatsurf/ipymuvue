@@ -52,35 +52,17 @@ Get a local copy of this package:
     git clone https://github.com/flatsurf/ipymuvue.git
     cd ipymuvue
 
-Install development dependencies:
-
-    cd ts
-    yarn
-    yarn link
-    cd ../js
-    yarn link ipymuvueimplementation
-    yarn
-    cd ..
-
-Start the rollup/typescript build:
-
-    cd ts
-    yarn dev
-
-In another console, start the webpack bundling:
-
-    cd js
-    yarn dev
-
-If you had not done so before, install a development version of ipymuvue:
+You need Python, JupyterLab 4, `node` and `yarn` (version 1). Install a
+development version of ipymuvue:
 
     pip uninstall ipymuvue  # if you had a regular ipymuvue installed
     pip install -e .
 
-Enable the extension in JupyterLab and the notebook (version 7 required):
+Build the frontend (this builds `ts/` and then `js/`) and enable the extension
+in JupyterLab and the notebook (version 7 required):
 
-    (cd js && yarn build)
-    jupyter labextension develop --overwrite ipymuvue
+    (cd js && yarn && yarn build)
+    jupyter labextension develop --overwrite .
 
 Now, start a `jupyter` notebook or `jupyter lab` and verify that the notebooks in `examples/` work correctly.
 

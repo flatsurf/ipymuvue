@@ -1173,13 +1173,9 @@ interpret@^3.1.1:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-3.1.1.tgz#5be0ceed67ca79c6c4bc5cf0d7ee843dcea110c4"
   integrity sha512-6xwYfHbajpoF0xLW+iwLkhwgvLoZDfjYfoFNu8ftMoXINzwuymNLd9u/KmwtdT2GbR+/Cz66otEGEVVUHX9QLQ==
 
-ipymuvueimplementation@../ts:
-  version "0.3.0"
-  dependencies:
-    is-callable "^1.2.4"
-    lodash-es "^4.18.1"
-    vue "^3.2.37"
-    vue3-sfc-loader "^0.8.4"
+"ipymuvueimplementation@link:../ts":
+  version "0.0.0"
+  uid ""
 
 is-callable@^1.2.4:
   version "1.2.4"

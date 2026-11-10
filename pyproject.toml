@@ -1,3 +1,70 @@
 [build-system]
-requires = ["jupyter_packaging~=0.7.9", "jupyterlab>=3.0.0,==3.*", "setuptools>=40.8.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.27", "hatch-jupyter-builder>=0.8", "jupyterlab>=4,<5"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ipymuvue"
+dynamic = ["version"]
+description = "Reactive Jupyter Widgets"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["COPYING"]
+authors = [{ name = "Julian Rüth", email = "julian.rueth@fsfe.org" }]
+keywords = ["ipython", "jupyter", "widgets"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: IPython",
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "ipywidgets>=7,<9",
+    "jupyter-ui-poll>=0.2.1,<0.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/flatsurf/ipymuvue"
+
+[tool.hatch.version]
+path = "ipymuvue/version.py"
+
+[tool.hatch.build]
+# Do not descend into node_modules/. Besides being slow, js/node_modules
+# contains a symlink to ts/ which makes hatch skip the actual ts/ directory.
+skip-excluded-dirs = true
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["ipymuvue/labextension"]
+exclude = [".github", "ts/dist", "*.ipynb"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ipymuvue"]
+# The labextension is installed as shared-data below, there is no need to
+# also ship it inside the Python package.
+exclude = ["ipymuvue/labextension"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"ipymuvue/labextension" = "share/jupyter/labextensions/ipymuvue"
+"install.json" = "share/jupyter/labextensions/ipymuvue/install.json"
+
+# Build the frontend (ts/ and then js/) with yarn when building a wheel. The
+# resulting prebuilt JupyterLab extension ends up in ipymuvue/labextension.
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.8"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = ["ipymuvue/labextension/package.json"]
+skip-if-exists = ["ipymuvue/labextension/package.json"]
+# Editable installs do not need to build the frontend, see the README for how
+# to set up a development version of the extension.
+optional-editable-build = true
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+path = "js"
+build_cmd = "build:prod"
+npm = ["yarn"]

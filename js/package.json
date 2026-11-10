@@ -21,9 +21,10 @@
   ],
   "scripts": {
     "clean": "rimraf ../ipymuvue/labextension/",
-    "prepublish": "yarn run clean && (cd ../ts && yarn run build:prod) && yarn run build:prod",
-    "build": "jupyter labextension build --development True .",
-    "build:prod": "jupyter labextension build ."
+    "build:lib": "cd ../ts && yarn install --frozen-lockfile && yarn run build",
+    "build:lib:prod": "cd ../ts && yarn install --frozen-lockfile && yarn run build:prod",
+    "build": "yarn run build:lib && jupyter labextension build --development True .",
+    "build:prod": "yarn run clean && yarn run build:lib:prod && jupyter labextension build ."
   },
   "devDependencies": {
     "@jupyterlab/builder": "^4.0.2",
@@ -33,7 +34,7 @@
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
-    "ipymuvueimplementation": "../ts",
+    "ipymuvueimplementation": "link:../ts",
     "lodash": "^4.18.1"
   },
   "jupyterlab": {
