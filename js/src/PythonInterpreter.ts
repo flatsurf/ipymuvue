@@ -18,13 +18,14 @@
 // Currently, the pyodide package only works from Node but not in the browser.
 // We load the full pyodide distribution from their CDN servers and only use
 // the typings of the pyodide NPM package.
-import type { loadPyodide, PyodideInterface, PyProxy } from "pyodide";
+import type { loadPyodide, PyodideInterface } from "pyodide";
+import type { PyProxy } from "pyodide/ffi";
 import { AssetProvisioner } from "./Assets";
 
 import { JavaScriptLoader } from "./JavaScriptLoader";
 import * as ipymuvue_js from "./ipymuvue_js";
 
-const PYODIDE_CDN = "https://cdn.jsdelivr.net/pyodide/v0.21.0a3/full";
+const PYODIDE_CDN = "https://cdn.jsdelivr.net/pyodide/v314.0.7/full";
 
 /*
  * A Python interpreter powered by pyodide.

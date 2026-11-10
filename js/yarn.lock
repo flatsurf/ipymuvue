@@ -1080,6 +1080,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/emscripten@npm:^1.41.4":
+  version: 1.41.6
+  resolution: "@types/emscripten@npm:1.41.6"
+  checksum: bf85ab15c8d931b38b46b38261258ba0fbec099ab25bc387e96f7eacadf4cd01e4f1f90e3b4f9454b651273c5d7f367826fe7be4f07321658a0056bf5390cfda
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:^1.0.8":
   version: 1.0.10
   resolution: "@types/estree@npm:1.0.10"
@@ -1739,13 +1746,6 @@ __metadata:
   version: 4.0.4
   resolution: "balanced-match@npm:4.0.4"
   checksum: fb07bb66a0959c2843fc055838047e2a95ccebb837c519614afb067ebfdf2fa967ca8d712c35ced07f2cd26fc6f07964230b094891315ad74f11eba3d53178a0
-  languageName: node
-  linkType: hard
-
-"base-64@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "base-64@npm:1.0.0"
-  checksum: d10b64a1fc9b2c5a5f39f1ce1e6c9d1c5b249222bbfa3a0604c592d90623caf74419983feadd8a170f27dc0c3389704f72faafa3e645aeb56bfc030c93ff074a
   languageName: node
   linkType: hard
 
@@ -2433,7 +2433,7 @@ __metadata:
     is-promise: ^4.0.0
     lodash-es: ^4.18.1
     npm-run-all2: ^9
-    pyodide: 0.21.0-alpha.3
+    pyodide: 314.0.7
     rimraf: ^6
     typescript: ~5.9
     vue: ^3.5
@@ -2891,20 +2891,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.1":
-  version: 2.7.0
-  resolution: "node-fetch@npm:2.7.0"
-  dependencies:
-    whatwg-url: ^5.0.0
-  peerDependencies:
-    encoding: ^0.1.0
-  peerDependenciesMeta:
-    encoding:
-      optional: true
-  checksum: d76d2f5edb451a3f05b15115ec89fc6be39de37c6089f1b6368df03b91e1633fd379a7e01b7ab05089a25034b2023d959b47e59759cb38d88341b2459e89d6e5
-  languageName: node
-  linkType: hard
-
 "node-releases@npm:^2.0.60":
   version: 2.0.63
   resolution: "node-releases@npm:2.0.63"
@@ -3210,14 +3196,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pyodide@npm:0.21.0-alpha.3":
-  version: 0.21.0-alpha.3
-  resolution: "pyodide@npm:0.21.0-alpha.3"
+"pyodide@npm:314.0.7":
+  version: 314.0.7
+  resolution: "pyodide@npm:314.0.7"
   dependencies:
-    base-64: ^1.0.0
-    node-fetch: ^2.6.1
+    "@types/emscripten": ^1.41.4
     ws: ^8.5.0
-  checksum: b9e72f443c22ad2a5e9f4835fbf31b3ff47213f72295f69f3ab414dafff2c86fd595927a10c7f3faa08555c7f6344eef7d95480916cc434bac58c226dec358af
+  checksum: c4e95c7b2d7ce757cecba76912efa031f713651d1eb3c9d872fc43de8624aaac15d4ae4571ac84b201d5f0be380bea3d453315a718ca9b96ba1b0a70de592140
   languageName: node
   linkType: hard
 
@@ -3654,13 +3639,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tr46@npm:~0.0.3":
-  version: 0.0.3
-  resolution: "tr46@npm:0.0.3"
-  checksum: 726321c5eaf41b5002e17ffbd1fb7245999a073e8979085dacd47c4b4e8068ff5777142fc6726d6ca1fd2ff16921b48788b87225cbc57c72636f6efa8efbffe3
-  languageName: node
-  linkType: hard
-
 "tslib@npm:^1.13.0":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
@@ -3870,13 +3848,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webidl-conversions@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "webidl-conversions@npm:3.0.1"
-  checksum: c92a0a6ab95314bde9c32e1d0a6dfac83b578f8fa5f21e675bc2706ed6981bc26b7eb7e6a1fab158e5ce4adf9caa4a0aee49a52505d4d13c7be545f15021b17c
-  languageName: node
-  linkType: hard
-
 "webidl-conversions@npm:^6.1.0":
   version: 6.1.0
   resolution: "webidl-conversions@npm:6.1.0"
@@ -3968,16 +3939,6 @@ __metadata:
   version: 2.3.0
   resolution: "whatwg-mimetype@npm:2.3.0"
   checksum: 23eb885940bcbcca4ff841c40a78e9cbb893ec42743993a42bf7aed16085b048b44b06f3402018931687153550f9a32d259dfa524e4f03577ab898b6965e5383
-  languageName: node
-  linkType: hard
-
-"whatwg-url@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "whatwg-url@npm:5.0.0"
-  dependencies:
-    tr46: ~0.0.3
-    webidl-conversions: ^3.0.0
-  checksum: b8daed4ad3356cc4899048a15b2c143a9aed0dfae1f611ebd55073310c7b910f522ad75d727346ad64203d7e6c79ef25eafd465f4d12775ca44b90fa82ed9e2c
   languageName: node
   linkType: hard
 

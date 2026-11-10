@@ -58,7 +58,7 @@ is easier.
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-import pyodide
+import pyodide.ffi
 from ipymuvue.pyodide.types import (
     String,
     Number,

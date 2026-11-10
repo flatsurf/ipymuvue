@@ -40,7 +40,7 @@ def python_compatible(x):
     r"""
     Wrap ``x`` that came out of a Vue API for use in Python.
     """
-    import pyodide
+    import pyodide.ffi
 
     from ipymuvue.pyodide.proxies.object_wrapper import ObjectWrapper, ProxyDict
     from ipymuvue.pyodide.proxies.array_wrapper import ArrayWrapper, ProxyList
@@ -94,7 +94,7 @@ def vue_compatible(x, reference=True, shallow=False, owner=None):
     If a proxy of a callable gets created, its lifetime is tied to ``owner``,
     see :meth:`owner` for details.
     """
-    import pyodide
+    import pyodide.ffi
 
     from ipymuvue.pyodide.proxies.object_wrapper import ObjectWrapper
     from ipymuvue.pyodide.proxies.array_wrapper import ArrayWrapper
@@ -198,13 +198,13 @@ def owner(owner):
     If ``owner`` is any other JavaScript object, we register it with a
     ``FinalizationRegistry`` in JavaScript.
     """
-    import pyodide
+    import pyodide.ffi
 
     if owner is None:
         pass
     elif callable(owner):
         pass
-    elif isinstance(owner, pyodide.JsProxy):
+    elif isinstance(owner, pyodide.ffi.JsProxy):
         pass
     else:
         raise TypeError("owner must be None, a callable, or a JsProxy")
@@ -225,7 +225,7 @@ def create_proxy(x, owner=None):
     If ``owner`` is ``None``, we try to deduce the ownership from a context
     variable. See :meth:`owner` for details.
     """
-    import pyodide
+    import pyodide.ffi
 
     proxy = pyodide.ffi.create_proxy(x)
 
@@ -239,7 +239,7 @@ def create_proxy(x, owner=None):
 
     elif callable(owner):
         owner(proxy)
-    elif isinstance(owner, pyodide.JsProxy):
+    elif isinstance(owner, pyodide.ffi.JsProxy):
         _registry.register(owner, proxy)
     else:
         raise NotImplementedError("cannot handle this kind of owner yet")
@@ -254,7 +254,7 @@ def release_proxy(proxy):
     # Enable to understand memory leaks.
     # print("releasing proxy", proxy)
 
-    import pyodide
+    import pyodide.ffi
 
     pyodide.ffi.destroy_proxies(js.Array.new([proxy]))
 

@@ -26,7 +26,7 @@ def is_vue_proxy(x):
     r"""
     Return whether ``x`` is a un unwrapped reactive Vue Proxy.
     """
-    import pyodide
+    import pyodide.ffi
     from ipymuvue_js import Vue
 
     return isinstance(x, pyodide.ffi.JsProxy) and Vue.isProxy(x)
@@ -36,7 +36,7 @@ def is_vue_ref(x):
     r"""
     Return whether ``x`` is a un unwrapped reactive Vue Ref.
     """
-    import pyodide
+    import pyodide.ffi
     from ipymuvue_js import Vue
 
     return isinstance(x, pyodide.ffi.JsProxy) and Vue.isRef(x)

@@ -37,14 +37,16 @@ export class AssetProvisioner {
         abspath: stat.path,
       };
 
+      const bytes = new Uint8Array(content.buffer, content.byteOffset, content.byteLength);
+
       if (stat.exists) {
-        if (AssetProvisioner.equal(this.FS.readFile(name), content.buffer as ArrayBuffer))
+        if (AssetProvisioner.equal(this.FS.readFile(name), bytes))
           return provisioned;
 
         provisioned.replaced = true;
       }
 
-      this.FS.writeFile(name, new Uint8Array(content.buffer), { encoding: "binary" });
+      this.FS.writeFile(name, bytes);
 
       return provisioned;
   }
@@ -60,13 +62,10 @@ export class AssetProvisioner {
       await this.FS.mkdir(name);
   }
 
-  private static equal(lhs: ArrayBuffer, rhs: ArrayBuffer) {
+  private static equal(lhs: Uint8Array, rhs: Uint8Array) {
     if (lhs.byteLength !== rhs.byteLength)
       return false;
 
-    const a = new Uint8Array(lhs);
-    const b = new Uint8Array(rhs);
-
-    return a.every((x, i) => x === b[i]);
+    return lhs.every((x, i) => x === rhs[i]);
   }
 }
