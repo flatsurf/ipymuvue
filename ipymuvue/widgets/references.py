@@ -82,7 +82,7 @@ class Subcomponent:
     @staticmethod
     def _set_single_result(result, content, *, identify):
         if len(content) != 1:
-            raise ValueError(f"Expected exactly one result but found {results}")
+            raise ValueError(f"Expected exactly one result but found {content}")
 
         content = content[0]
 
@@ -161,22 +161,24 @@ class Subcomponent:
         result = asyncio.get_running_loop().create_future()
 
         def on_msg(_, content, __):
+            if content.get("identifier", None) != identifier:
+                return
+
             try:
-                if content.get("identifier", None) == identifier:
-                    assert return_when != "IGNORE"
-                    assert "results" in content
+                assert return_when != "IGNORE"
+                assert "results" in content
 
-                    Subcomponent._set_result(
-                        result,
-                        content["results"],
-                        return_when=return_when,
-                        views=views,
-                        identify=identify,
-                    )
-
-            except Exception:
-                result.cancel()
-                raise
+                Subcomponent._set_result(
+                    result,
+                    content["results"],
+                    return_when=return_when,
+                    views=views,
+                    identify=identify,
+                )
+            except Exception as e:
+                # Report the error, e.g., an InvocationError, to the caller.
+                if not result.done():
+                    result.set_exception(e)
 
         with widget._on_msg(on_msg):
             widget.send(

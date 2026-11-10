@@ -47,5 +47,6 @@ async def run(future, poll=True):
                 # people, https://stackoverflow.com/a/44755058/812379.
                 delay = min(2 * delay, 0.25)
 
-    assert future.done()
+        assert future.done()
+
     return await future
