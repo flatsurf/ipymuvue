@@ -58,6 +58,10 @@ JupyterLab with a development version of ipymuvue in the `examples/` directory:
 
     pixi run lab
 
+Some examples, such as the graph editor, need a SageMath kernel. Since the
+SageMath kernel only works when JupyterLab runs in the same environment as
+SageMath, use `pixi run -e sage lab` for these (not available on Windows.)
+
 Any changes you make to the Python code should be picked up automatically. Changes to `ipymuvue.pyodide` become effective by re-creating a widget (all the modules are reloaded in pyodide when a change to these files happens.) Other changes require a kernel restart as usual.
 
 Any changes to the TypeScript/Javascript code become effective after you rebuild the prebuilt extension and refresh the browser:

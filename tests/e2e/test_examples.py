@@ -37,7 +37,10 @@ def example(page, jupyter_lab, request):
     """
     notebooks = []
 
-    def open(name):
+    def open(name, kernel="python3"):
+        if kernel not in jupyter_lab.api("GET", "kernelspecs")["kernelspecs"]:
+            pytest.skip(f"{name} needs a {kernel} kernel")
+
         import jupytext
 
         examples = jupyter_lab.root / "examples"
@@ -45,9 +48,8 @@ def example(page, jupyter_lab, request):
             shutil.copytree(EXAMPLES, examples)
 
         notebook = jupytext.read(EXAMPLES / name)
-        notebook.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
 
-        notebook = Notebook(page, jupyter_lab, f"examples/{pathlib.Path(name).stem}.ipynb", cells=notebook.cells)
+        notebook = Notebook(page, jupyter_lab, f"examples/{pathlib.Path(name).stem}.ipynb", cells=notebook.cells, kernel=kernel)
         notebooks.append(notebook)
         return notebook
 
@@ -72,3 +74,12 @@ def test_demo(example):
 
     expect(notebook.panel.get_by_text("Hello Jupyter!")).to_be_visible()
     expect(notebook.panel.get_by_text("Component from an Asset String")).to_be_visible()
+
+
+def test_graph_editor(example):
+    notebook = example("GraphEditor.md", kernel="sagemath")
+    notebook.execute_all()
+
+    # The static example graph has 3 vertices and each of the 3 editors
+    # renders the 60 vertices of a BuckyBall.
+    expect(notebook.panel.locator("svg circle[fill='cornflowerblue']")).to_have_count(3 + 3 * 60)

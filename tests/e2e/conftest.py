@@ -163,10 +163,10 @@ class Notebook:
     A notebook opened in JupyterLab with a running kernel.
 
     The notebook is created with the given ``cells``, a list of cells in the
-    nbformat 4 format.
+    nbformat 4 format, and runs on the ``kernel`` with that name.
     """
 
-    def __init__(self, page, lab, name, cells=()):
+    def __init__(self, page, lab, name, cells=(), kernel="python3"):
         self.page = page
         self.lab = lab
         self.name = name
@@ -187,9 +187,8 @@ class Notebook:
                     "cells": list(cells),
                     "metadata": {
                         "kernelspec": {
-                            "name": "python3",
-                            "display_name": "Python 3",
-                            "language": "python",
+                            "name": kernel,
+                            "display_name": kernel,
                         }
                     },
                     "nbformat": 4,

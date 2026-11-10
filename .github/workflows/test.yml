@@ -13,8 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The latest versions of our dependencies and the oldest ones we support.
-        environment: [ "test", "test-oldest" ]
+        # The latest versions of our dependencies, the oldest ones we
+        # support, and an environment with SageMath for the examples that
+        # need it.
+        environment: [ "test", "test-oldest", "test-sage" ]
     steps:
       - uses: actions/checkout@v7
       - uses: prefix-dev/setup-pixi@v0.11.3

@@ -65,6 +65,15 @@ jupyterlab = "4.0.*"
 # Needed by `jupyter labextension develop` in JupyterLab 4.0.
 setuptools = "*"
 
+# SageMath for the examples that need a SageMath kernel, e.g., GraphEditor.md.
+# Note that the SageMath kernel only works when JupyterLab runs in the same
+# environment, i.e., run `pixi run -e sage lab`.
+[feature.sage]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[feature.sage.dependencies]
+sage = ">=10.10"
+
 [feature.release.dependencies]
 rever = "*"
 # rever imports distutils which was removed in Python 3.12.
@@ -77,4 +86,6 @@ release = "rever"
 default = ["examples", "dist", "test"]
 test = ["test"]
 test-oldest = ["test", "oldest"]
+sage = ["examples", "sage"]
+test-sage = ["test", "sage"]
 release = { features = ["release"], no-default-feature = true }
