@@ -293,12 +293,14 @@ class Notebook:
     def errors(self):
         r"""
         Return the errors that showed up in the browser console, i.e., uncaught
-        exceptions and warnings from Vue.
+        exceptions, warnings from Vue, and Python exceptions in Pyodide.
         """
         return [
             message
             for message in self.console
-            if message.startswith("pageerror:") or "[Vue warn]" in message
+            if message.startswith("pageerror:")
+            or "[Vue warn]" in message
+            or "Traceback (most recent call last)" in message
         ]
 
     def close(self):

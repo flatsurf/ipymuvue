@@ -21,7 +21,7 @@ def setup(props, context):
         async def _fetch_data():
             todo_data.value = None
 
-            import pyodide
+            import pyodide.http
 
             res = await pyodide.http.pyfetch(
                 f"https://jsonplaceholder.typicode.com/todos/{todo_id.value}"
