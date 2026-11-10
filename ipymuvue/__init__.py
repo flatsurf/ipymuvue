@@ -32,21 +32,3 @@ def _jupyter_labextension_paths():
             "dest": "ipymuvue",
         }
     ]
-
-
-def _jupyter_nbextension_paths():
-    r"""
-    Called by Jupyter Notebook to find out which JavaScript assets need to be copied.
-    """
-    # The command `yarn build:prod` creates JavaScript assets in nbextension/.
-    # These files need to be copied to the nbextensions/ipymuvue/
-    # directory in Jupyter Notebook. The entrypoint in these files is
-    # extension.js.
-    return [
-        {
-            "section": "notebook",
-            "src": "nbextension",
-            "dest": "ipymuvue",
-            "require": "ipymuvue/extension",
-        }
-    ]
