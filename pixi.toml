@@ -75,6 +75,22 @@ platforms = ["linux-64", "osx-64", "osx-arm64"]
 [feature.sage.dependencies]
 sage = ">=10.10"
 
+[feature.docs.dependencies]
+sphinx = "*"
+myst-nb = "*"
+furo = "*"
+jupytext = "*"
+ipykernel = "*"
+
+[feature.docs.tasks]
+build-embed = { cmd = "jlpm install && jlpm build:embed", cwd = "js" }
+# Executes the examples and renders them with their widgets to docs/_build/html.
+# We always rebuild everything (-E) since sphinx does not notice when an asset
+# that a notebook loads changed.
+docs = { cmd = "sphinx-build -W -E -b html . _build/html", cwd = "docs", depends-on = ["build-embed"] }
+# Checks that the widgets on the pages built by `docs` render in a browser.
+test-docs = { cmd = "pytest tests/docs", depends-on = ["install-browser"] }
+
 [feature.lint.dependencies]
 ruff = "*"
 pre-commit = "*"
@@ -104,3 +120,5 @@ sage = ["examples", "sage"]
 test-sage = ["test", "sage"]
 release = { features = ["release"], no-default-feature = true }
 lint = ["lint"]
+# The documentation runs GraphEditor.md which needs a SageMath kernel.
+docs = ["docs", "sage", "test"]

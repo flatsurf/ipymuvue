@@ -32,6 +32,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/flatsurf/ipymuvue"
+Documentation = "https://flatsurf.github.io/ipymuvue/"
 
 [tool.hatch.version]
 path = "ipymuvue/version.py"
