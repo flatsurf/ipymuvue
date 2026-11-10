@@ -59,9 +59,7 @@ JupyterLab with a development version of ipymuvue in the `examples/` directory:
 
     pixi run lab
 
-Some examples, such as the graph editor, need a SageMath kernel. Since the
-SageMath kernel only works when JupyterLab runs in the same environment as
-SageMath, use `pixi run -e sage lab` for these (not available on Windows.)
+Some examples, such as the graph editor, need a SageMath kernel. Use `pixi run -e sage lab` for these.
 
 Any changes you make to the Python code should be picked up automatically. Changes to `ipymuvue.pyodide` become effective by re-creating a widget (all the modules are reloaded in pyodide when a change to these files happens.) Other changes require a kernel restart as usual.
 
@@ -127,35 +125,12 @@ release towncrier build --draft --version next`.
 Releasing
 ---------
 
-To release a new version of ipymuvue, say 1.2.3:
-
-1. Make sure that your copy of the master branch is identical to the master
-   branch on GitHub and that all the tests passed on GitHub.
-
-2. Run `pixi run release-prepare 1.2.3`. This writes the `news/` into the
-   `ChangeLog`, updates the version number everywhere, commits these changes
-   as "Release 1.2.3" and creates a tag 1.2.3. (Nothing is pushed yet. If
-   something looks wrong, delete the tag with `git tag -d 1.2.3`, drop the
-   commit with `git reset --hard HEAD~1`, and start over.)
-
-3. Push the master branch and then the tag: `git push origin master` and `git
-   push origin 1.2.3`.
-
-Once GitHub sees the tag, the "Build and publish to PyPI" workflow builds
-ipymuvue, uploads it to [PyPI](https://pypi.org/project/ipymuvue/), and
-creates a [release on GitHub](https://github.com/flatsurf/ipymuvue/releases)
-with the new section of the `ChangeLog`. The workflow refuses to publish if
-the tag does not match the version of ipymuvue or if the tag is not on the
-master branch.
-
-Note that version 0.6.0 was released to PyPI from a commit that never made it
-to the master branch, so the next release has to be at least 0.7.0.
-
-If you do not want to use pixi, you need Python, JupyterLab 4 (which comes
-with `jlpm`), and `node`. Then `pip install -e .` builds and installs ipymuvue,
-`(cd js && jlpm build)` rebuilds the frontend, and `jupyter labextension
-develop --overwrite .` makes JupyterLab use your build of the frontend.
-
+```
+pixi run release-prepare 1.2.3
+git commit -m 'Release 1.2.3'
+git push origin master
+git push origin 1.2.3
+```
 
 Related Projects
 ----------------
