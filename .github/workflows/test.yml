@@ -1,0 +1,34 @@
+name: Test
+on:
+  push: { branches: [ "master" ] }
+  pull_request: { branches: [ "master" ] }
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # The latest versions of our dependencies and the oldest ones we support.
+        environment: [ "test", "test-oldest" ]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: prefix-dev/setup-pixi@v0.11.3
+        with:
+          environments: ${{ matrix.environment }}
+      - name: Run unit tests
+        run: pixi run -e ${{ matrix.environment }} test
+      - name: Install browser and its system dependencies
+        run: pixi run -e ${{ matrix.environment }} playwright install --with-deps chromium
+      - name: Run end-to-end tests
+        run: pixi run -e ${{ matrix.environment }} test-e2e --tracing retain-on-failure --output test-results
+      - name: Upload playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-traces-${{ matrix.environment }}
+          path: test-results

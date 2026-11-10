@@ -1,0 +1,44 @@
+name: Build and publish to PyPI
+on:
+  push: { branches: [ "master" ], tags: [ "*" ] }
+  pull_request: { branches: [ "master" ] }
+
+concurrency:
+  group: dist-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: prefix-dev/setup-pixi@v0.11.3
+      - name: Build wheel and sdist
+        run: pixi run build
+      - name: Check that the wheel ships the JupyterLab extension
+        run: |
+          pixi run python -m zipfile -l dist/*.whl | grep share/jupyter/labextensions/ipymuvue/package.json
+          pixi run python -m zipfile -l dist/*.whl | grep share/jupyter/labextensions/ipymuvue/install.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist
+
+  publish:
+    # Publish releases tagged by rever, see rever.xsh.
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-24.04
+    # This requires a trusted publisher to be configured on PyPI, see
+    # https://docs.pypi.org/trusted-publishers/
+    environment:
+      name: pypi
+      url: https://pypi.org/p/ipymuvue
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@v1.14.3
