@@ -79,20 +79,29 @@ async def test_invocation_message(widget):
 
 
 async def test_first_exception(widget):
-    Frontend(widget, lambda content: [
-        {"view": "v1", "result": 1},
-        {"view": "v2", "result": 2},
-    ])
+    Frontend(
+        widget,
+        lambda content: [
+            {"view": "v1", "result": 1},
+            {"view": "v2", "result": 2},
+        ],
+    )
 
     assert await widget["ref"].method(poll=False) == [1, 2]
-    assert await widget["ref"].method(poll=False, identify=True) == [(1, "v1"), (2, "v2")]
+    assert await widget["ref"].method(poll=False, identify=True) == [
+        (1, "v1"),
+        (2, "v2"),
+    ]
 
 
 async def test_first_exception_with_error(widget):
-    Frontend(widget, lambda content: [
-        {"view": "v1", "result": 1},
-        {"view": "v2", "error": "boom"},
-    ])
+    Frontend(
+        widget,
+        lambda content: [
+            {"view": "v1", "result": 1},
+            {"view": "v2", "error": "boom"},
+        ],
+    )
 
     with pytest.raises(InvocationError) as error:
         await widget["ref"].method(poll=False)
@@ -104,7 +113,9 @@ async def test_first_completed(widget):
     Frontend(widget, lambda content: [{"view": "v1", "result": 1}])
 
     assert await widget["ref"].method(poll=False, return_when="FIRST_COMPLETED") == 1
-    assert await widget["ref"].method(poll=False, return_when="FIRST_COMPLETED", identify=True) == [1, "v1"]
+    assert await widget["ref"].method(
+        poll=False, return_when="FIRST_COMPLETED", identify=True
+    ) == [1, "v1"]
 
 
 async def test_single_view(widget):
@@ -122,10 +133,13 @@ async def test_single_view_with_error(widget):
 
 
 async def test_all_completed(widget):
-    Frontend(widget, lambda content: [
-        {"view": "v1", "result": 1},
-        {"view": "v2", "error": "boom"},
-    ])
+    Frontend(
+        widget,
+        lambda content: [
+            {"view": "v1", "result": 1},
+            {"view": "v2", "error": "boom"},
+        ],
+    )
 
     first, second = await widget["ref"].method(poll=False, return_when="ALL_COMPLETED")
 

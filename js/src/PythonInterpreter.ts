@@ -54,9 +54,9 @@ export class PythonInterpreter {
     const provisioner = new AssetProvisioner(pyodide.FS);
 
     let reload = false;
-    
+
     for (const [name, content] of Object.entries(assets)) {
-      const provisioned = await provisioner.provision(name, content)
+      const provisioned = await provisioner.provision(name, content);
 
       PythonInterpreter.provisioned.add(provisioned.abspath);
 
@@ -85,7 +85,7 @@ export class PythonInterpreter {
     // Since that time only has a resolution of one second, Python might not
     // see the files we just created, see
     // https://docs.python.org/3/library/importlib.html#importlib.invalidate_caches
-    pyodide.pyimport('importlib').invalidate_caches();
+    pyodide.pyimport("importlib").invalidate_caches();
 
     if (reload) {
       for (const [name, module] of Object.values(modules))
@@ -95,7 +95,7 @@ export class PythonInterpreter {
           // (bottom up). Looking around on stackoverflow, nobody has really
           // managed to get this to work, so we just reload everything instead.
           console.debug(`resetting ${module}`);
-          pyodide.pyimport('sys').modules.delete(name);
+          pyodide.pyimport("sys").modules.delete(name);
         }
     }
   }
@@ -104,7 +104,7 @@ export class PythonInterpreter {
     return (async () => {
       const modules: Record<string, [string, PyProxy]> = {};
 
-      const sys = (await this.pyodide).pyimport('sys');
+      const sys = (await this.pyodide).pyimport("sys");
       for (const [name, module] of sys.modules.items())
         if ("__file__" in module)
           modules[module.__file__ as string] = [name, module];
@@ -113,11 +113,13 @@ export class PythonInterpreter {
     })();
   }
 
-
   public get pyodide(): Promise<PyodideInterface> {
     if (PythonInterpreter.instance == null)
       PythonInterpreter.instance = (async () => {
-        const pyodide = await new JavaScriptLoader("pyodide", `${PYODIDE_CDN}/pyodide.js`).object;
+        const pyodide = await new JavaScriptLoader(
+          "pyodide",
+          `${PYODIDE_CDN}/pyodide.js`,
+        ).object;
 
         const loadPyodideBrowser: typeof loadPyodide = pyodide.loadPyodide;
 

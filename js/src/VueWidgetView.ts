@@ -23,7 +23,6 @@ import type { App, Component, ComponentPublicInstance } from "vue";
 import cloneDeep from "lodash-es/cloneDeep";
 import mapValues from "lodash-es/mapValues";
 
-
 /*
  * Renders a VueWidget at the client.
  * Namely, this creates a Vue App from the state stored in a VueWidgetModel.
@@ -33,211 +32,232 @@ import mapValues from "lodash-es/mapValues";
  * `data` is updated.
  */
 export class VueWidgetView extends DOMWidgetView {
-    // The Vue App rendering this View (there is one app per view)
-    private app?: App;
+  // The Vue App rendering this View (there is one app per view)
+  private app?: App;
 
-    // The vnode representing the component.
-    public vnode?: ComponentPublicInstance;
+  // The vnode representing the component.
+  public vnode?: ComponentPublicInstance;
 
-    /*
-     * Create a Vue App for this view and display it.
-     */
-    public override render() {
-        super.render();
+  /*
+   * Create a Vue App for this view and display it.
+   */
+  public override render() {
+    super.render();
 
-        (async () => {
-          await this.displayed;
+    (async () => {
+      await this.displayed;
 
-          // Currently, the tag emitted is not configurable, see #13.
-          const mountPoint = document.createElement('div');
-          this.el.appendChild(mountPoint);
+      // Currently, the tag emitted is not configurable, see #13.
+      const mountPoint = document.createElement("div");
+      this.el.appendChild(mountPoint);
 
-          if (!(this.model instanceof VueWidgetModel))
-            throw Error("VueWidgetView can only be created from a VueWidgetModel");
+      if (!(this.model instanceof VueWidgetModel))
+        throw Error("VueWidgetView can only be created from a VueWidgetModel");
 
-          const container = await this.container;
+      const container = await this.container;
 
-          const app = createApp(() => h(container));
-          app.mount(mountPoint);
-          this.app = app;
-        })();
-    }
+      const app = createApp(() => h(container));
+      app.mount(mountPoint);
+      this.app = app;
+    })();
+  }
 
-    /*
-     * Destroy the Vue App associated to this view.
-     */
-    public override remove() {
-        this.app?.unmount();
+  /*
+   * Destroy the Vue App associated to this view.
+   */
+  public override remove() {
+    this.app?.unmount();
 
-        return super.remove();
-    }
+    return super.remove();
+  }
 
-    /*
-     * Return a Vue component that renders the template defining this view.
-     * This is going to be wrapped in the `container` which adds rendering for
-     * the slots.
-     */
-    private get component() : Promise<Component> {
-      return (async () => {
-        const self = this;
-        const model = this.model as VueWidgetModel;
-        const components: Record<string, string> = this.model.get("_VueWidget__components");
-
-        return defineComponent({
-          name: model.get("_VueWidget__type"),
-          template: model.get("_VueWidget__template"),
-          data() {
-            return cloneDeep(model.reactiveState);
-          },
-          created() {
-            self.vnode = this;
-            for (const key of Object.keys(model.reactiveState)) {
-              // Watch the model: when it changes, update Vue state.
-              // Note that the listener is automatically removed when this view is destroyed.
-              self.listenTo(self.model, `change:${key}`, () => self.onModelChange(key, this));
-
-              // Watch the Vue state: when it changes, update the model.
-              this.$watch(key, () => self.onDataChange(key, this));
-            }
-          },
-          components: await new VueComponentCompiler(
-                              this.model.get('_VueWidget__assets')
-                            ).compileAsync(components),
-          methods: model.methods,
-        });
-      })();
-    }
-
-    /*
-     * Return a Vue component that renders this View.
-     *
-     * We need this additional wrapper to render slots into the component.
-     * The wrapper component holds the mapping slot-name -> model-id and
-     * creates ``modelRenderer`` components to render into these slots.
-     */
-    private get container() : Promise<Component> {
-      return (async () => {
-        const self = this;
-        const component = await this.component;
-        const modelRenderer = this.modelRenderer;
-
-        return defineComponent({
-          name: "VueWidgetContainer",
-          data() {
-            return {
-              // Maps slot name to a widget model id shown in that slot.
-              children: {} as Record<string, string>,
-            };
-          },
-          created() {
-            const onChange = () => self.onModelChange("_VueWidget__children", this, "children");
-            self.listenTo(self.model, "change:_VueWidget__children", onChange);
-            onChange();
-          },
-          render() {
-            return h(component, null, mapValues(this.children, (modelId) => {
-              return () => h(modelRenderer, {
-                modelId: modelId.substring("IPY_MODEL_".length)
-              });
-            }));
-          },
-        });
-      })();
-    }
-
-    /*
-     * Return a Vue component that renders a DOMWidgetModel.
-     */
-    private get modelRenderer() {
+  /*
+   * Return a Vue component that renders the template defining this view.
+   * This is going to be wrapped in the `container` which adds rendering for
+   * the slots.
+   */
+  private get component(): Promise<Component> {
+    return (async () => {
       const self = this;
-
-      /*
-       * A component that attaches a DOMWidgetView to the DOM and removes the
-       * view when it gets unmounted.
-       */
-      const viewAttacher = defineComponent({
-        name: "ViewAttacher",
-        props: {
-          view: { type: Object, required: true },
-        },
-        mounted() {
-          JupyterLuminoWidget.attach((this.view as DOMWidgetView).luminoWidget, this.$el);
-        },
-        beforeUnmount() {
-          // The view must be removed while it is still in the DOM, otherwise
-          // detaching it fails.
-          (this.view as DOMWidgetView).remove();
-        },
-        render() {
-          return h("div");
-        },
-      });
+      const model = this.model as VueWidgetModel;
+      const components: Record<string, string> = this.model.get(
+        "_VueWidget__components",
+      );
 
       return defineComponent({
-        name: "ModelRenderer",
-        props: {
-          modelId: String,
+        name: model.get("_VueWidget__type"),
+        template: model.get("_VueWidget__template"),
+        data() {
+          return cloneDeep(model.reactiveState);
         },
+        created() {
+          self.vnode = this;
+          for (const key of Object.keys(model.reactiveState)) {
+            // Watch the model: when it changes, update Vue state.
+            // Note that the listener is automatically removed when this view is destroyed.
+            self.listenTo(self.model, `change:${key}`, () =>
+              self.onModelChange(key, this),
+            );
+
+            // Watch the Vue state: when it changes, update the model.
+            this.$watch(key, () => self.onDataChange(key, this));
+          }
+        },
+        components: await new VueComponentCompiler(
+          this.model.get("_VueWidget__assets"),
+        ).compileAsync(components),
+        methods: model.methods,
+      });
+    })();
+  }
+
+  /*
+   * Return a Vue component that renders this View.
+   *
+   * We need this additional wrapper to render slots into the component.
+   * The wrapper component holds the mapping slot-name -> model-id and
+   * creates ``modelRenderer`` components to render into these slots.
+   */
+  private get container(): Promise<Component> {
+    return (async () => {
+      const self = this;
+      const component = await this.component;
+      const modelRenderer = this.modelRenderer;
+
+      return defineComponent({
+        name: "VueWidgetContainer",
         data() {
           return {
-            widget: null as { view: DOMWidgetView } | null,
-          }
+            // Maps slot name to a widget model id shown in that slot.
+            children: {} as Record<string, string>,
+          };
         },
-        watch: {
-          modelId: {
-            /*
-             * Create a new DOMWidgetView when the model changes.
-             */
-            async handler(current: string, previous: string) {
-              if (current === previous)
-                return;
-
-              const model = await self.model.widget_manager.get_model(current);
-
-              if (model === undefined) {
-                console.error(`ignoring child ${current} which has not active model`);
-                return null;
-              }
-
-              this.widget = Object.freeze({ view: await self.create_child_view(model) });
-            },
-            immediate: true,
-          }
+        created() {
+          const onChange = () =>
+            self.onModelChange("_VueWidget__children", this, "children");
+          self.listenTo(self.model, "change:_VueWidget__children", onChange);
+          onChange();
         },
         render() {
-          const widget = this.widget;
-
-          if (widget == null)
-            return;
-
-          // Mount a new ViewAttacher (and unmount the previous one) when the
-          // view changes. Note that the ModelRenderer also renders when its
-          // modelId changes but before its widget has been updated. The
-          // ViewAttacher must not be mounted again then since the view is
-          // already attached.
-          return h(viewAttacher, {
-            key: widget.view.cid,
-            view: widget.view,
-          });
+          return h(
+            component,
+            null,
+            mapValues(this.children, (modelId) => {
+              return () =>
+                h(modelRenderer, {
+                  modelId: modelId.substring("IPY_MODEL_".length),
+                });
+            }),
+          );
         },
-      })
-    }
+      });
+    })();
+  }
+
+  /*
+   * Return a Vue component that renders a DOMWidgetModel.
+   */
+  private get modelRenderer() {
+    const self = this;
 
     /*
-     * Update Vue's `data` because the widget's model has changed for the
-     * `modelAttribute` attribute.
+     * A component that attaches a DOMWidgetView to the DOM and removes the
+     * view when it gets unmounted.
      */
-    private onModelChange(modelAttribute: string, component: any, componentAttribute?: string) {
-      component[componentAttribute || modelAttribute] = cloneDeep(this.model.get(modelAttribute));
-    }
+    const viewAttacher = defineComponent({
+      name: "ViewAttacher",
+      props: {
+        view: { type: Object, required: true },
+      },
+      mounted() {
+        JupyterLuminoWidget.attach(
+          (this.view as DOMWidgetView).luminoWidget,
+          this.$el,
+        );
+      },
+      beforeUnmount() {
+        // The view must be removed while it is still in the DOM, otherwise
+        // detaching it fails.
+        (this.view as DOMWidgetView).remove();
+      },
+      render() {
+        return h("div");
+      },
+    });
 
-    /*
-     * Update the widget's model because Vue's `data` has changed for the `key`
-     * attribute.
-     */
-    private onDataChange(attribute: string, component: any) {
-      const value = component[attribute];
-      this.model.set(attribute, value === undefined ? null : cloneDeep(value));
-      this.model.save_changes();
-    }
+    return defineComponent({
+      name: "ModelRenderer",
+      props: {
+        modelId: String,
+      },
+      data() {
+        return {
+          widget: null as { view: DOMWidgetView } | null,
+        };
+      },
+      watch: {
+        modelId: {
+          /*
+           * Create a new DOMWidgetView when the model changes.
+           */
+          async handler(current: string, previous: string) {
+            if (current === previous) return;
+
+            const model = await self.model.widget_manager.get_model(current);
+
+            if (model === undefined) {
+              console.error(
+                `ignoring child ${current} which has not active model`,
+              );
+              return null;
+            }
+
+            this.widget = Object.freeze({
+              view: await self.create_child_view(model),
+            });
+          },
+          immediate: true,
+        },
+      },
+      render() {
+        const widget = this.widget;
+
+        if (widget == null) return;
+
+        // Mount a new ViewAttacher (and unmount the previous one) when the
+        // view changes. Note that the ModelRenderer also renders when its
+        // modelId changes but before its widget has been updated. The
+        // ViewAttacher must not be mounted again then since the view is
+        // already attached.
+        return h(viewAttacher, {
+          key: widget.view.cid,
+          view: widget.view,
+        });
+      },
+    });
+  }
+
+  /*
+   * Update Vue's `data` because the widget's model has changed for the
+   * `modelAttribute` attribute.
+   */
+  private onModelChange(
+    modelAttribute: string,
+    component: any,
+    componentAttribute?: string,
+  ) {
+    component[componentAttribute || modelAttribute] = cloneDeep(
+      this.model.get(modelAttribute),
+    );
+  }
+
+  /*
+   * Update the widget's model because Vue's `data` has changed for the `key`
+   * attribute.
+   */
+  private onDataChange(attribute: string, component: any) {
+    const value = component[attribute];
+    this.model.set(attribute, value === undefined ? null : cloneDeep(value));
+    this.model.save_changes();
+  }
 }

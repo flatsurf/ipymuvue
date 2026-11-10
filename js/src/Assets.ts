@@ -27,44 +27,46 @@ export class AssetProvisioner {
   private readonly FS;
 
   public async provision(name: string, content: DataView) {
-      if (name.lastIndexOf('/') != -1)
-        await this.mkdir(name.substring(0, name.lastIndexOf('/')));
+    if (name.lastIndexOf("/") != -1)
+      await this.mkdir(name.substring(0, name.lastIndexOf("/")));
 
-      const stat = this.FS.analyzePath(name, true);
+    const stat = this.FS.analyzePath(name, true);
 
-      const provisioned = {
-        replaced: false,
-        abspath: stat.path,
-      };
+    const provisioned = {
+      replaced: false,
+      abspath: stat.path,
+    };
 
-      const bytes = new Uint8Array(content.buffer, content.byteOffset, content.byteLength);
+    const bytes = new Uint8Array(
+      content.buffer,
+      content.byteOffset,
+      content.byteLength,
+    );
 
-      if (stat.exists) {
-        if (AssetProvisioner.equal(this.FS.readFile(name), bytes))
-          return provisioned;
+    if (stat.exists) {
+      if (AssetProvisioner.equal(this.FS.readFile(name), bytes))
+        return provisioned;
 
-        provisioned.replaced = true;
-      }
+      provisioned.replaced = true;
+    }
 
-      this.FS.writeFile(name, bytes);
+    this.FS.writeFile(name, bytes);
 
-      return provisioned;
+    return provisioned;
   }
 
   /*
    * Create directory `name` recursively.
    */
   private async mkdir(name: string) {
-    if (name.lastIndexOf('/') != -1)
-      await this.mkdir(name.substring(0, name.lastIndexOf('/')));
+    if (name.lastIndexOf("/") != -1)
+      await this.mkdir(name.substring(0, name.lastIndexOf("/")));
 
-    if (!this.FS.analyzePath(name, true).exists)
-      await this.FS.mkdir(name);
+    if (!this.FS.analyzePath(name, true).exists) await this.FS.mkdir(name);
   }
 
   private static equal(lhs: Uint8Array, rhs: Uint8Array) {
-    if (lhs.byteLength !== rhs.byteLength)
-      return false;
+    if (lhs.byteLength !== rhs.byteLength) return false;
 
     return lhs.every((x, i) => x === rhs[i]);
   }

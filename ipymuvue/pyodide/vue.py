@@ -193,7 +193,7 @@ def prepare_components(components):
     Rewrite the subcomponents dict to make it compatible with the Vue API.
     """
 
-    for (name, component) in components.items():
+    for name, component in components.items():
         if not isinstance(name, str):
             raise TypeError("name of component must be a string")
 
@@ -282,7 +282,6 @@ def watch(watched, on_change):
     When it changes, run ``on_change``.
     """
     if callable(watched):
-
         from ipymuvue.pyodide.proxies import create_proxy
 
         @create_proxy

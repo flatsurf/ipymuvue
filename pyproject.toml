@@ -126,6 +126,11 @@ filename = "js/package.json"
 search = '"version": "{current_version}"'
 replace = '"version": "{new_version}"'
 
+[tool.ruff]
+# Do not touch the code in the Markdown notebooks and the README. It is
+# formatted for readability.
+extend-exclude = ["*.md"]
+
 [tool.ruff.lint]
 # pyflakes, the error rules of pycodestyle that do not conflict with the
 # formatter, and flake8-bugbear.

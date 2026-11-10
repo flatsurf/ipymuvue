@@ -15,7 +15,10 @@
  * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-import type { JupyterFrontEnd, JupyterFrontEndPlugin } from "@jupyterlab/application";
+import type {
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin,
+} from "@jupyterlab/application";
 import { IJupyterWidgetRegistry } from "@jupyter-widgets/base";
 import { VueWidgetModel, VueWidgetView, version } from "./index";
 

@@ -49,7 +49,13 @@ def example(page, jupyter_lab, request):
 
         notebook = jupytext.read(EXAMPLES / name)
 
-        notebook = Notebook(page, jupyter_lab, f"examples/{pathlib.Path(name).stem}.ipynb", cells=notebook.cells, kernel=kernel)
+        notebook = Notebook(
+            page,
+            jupyter_lab,
+            f"examples/{pathlib.Path(name).stem}.ipynb",
+            cells=notebook.cells,
+            kernel=kernel,
+        )
         notebooks.append(notebook)
         return notebook
 
@@ -65,7 +71,9 @@ def test_tutorial(example):
 
     # The last step of the tutorial renders a heading with a component
     # written in JavaScript and with one written in Python.
-    expect(notebook.panel.get_by_role("heading", name="Congratulations!")).to_have_count(2, timeout=120_000)
+    expect(
+        notebook.panel.get_by_role("heading", name="Congratulations!")
+    ).to_have_count(2, timeout=120_000)
 
 
 def test_demo(example):
@@ -82,4 +90,6 @@ def test_graph_editor(example):
 
     # The static example graph has 3 vertices and each of the 3 editors
     # renders the 60 vertices of a BuckyBall.
-    expect(notebook.panel.locator("svg circle[fill='cornflowerblue']")).to_have_count(3 + 3 * 60)
+    expect(notebook.panel.locator("svg circle[fill='cornflowerblue']")).to_have_count(
+        3 + 3 * 60
+    )

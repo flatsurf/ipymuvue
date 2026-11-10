@@ -84,9 +84,12 @@ run the browser; on Debian and Ubuntu, `pixi run playwright install-deps
 chromium` installs them.
 
 We check the Python code with [ruff](https://docs.astral.sh/ruff/) and the
-TypeScript code with [ESLint](https://eslint.org/):
+TypeScript code with [ESLint](https://eslint.org/) and
+[Prettier](https://prettier.io/):
 
     pixi run lint
+
+To format all the code as these tools expect it, run `pixi run format`.
 
 To run these checks automatically before each commit, run `pixi run
 pre-commit install`.

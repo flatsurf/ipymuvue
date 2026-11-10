@@ -80,9 +80,12 @@ ruff = "*"
 pre-commit = "*"
 
 [feature.lint.tasks]
-lint-python = "ruff check"
+lint-python = "ruff check && ruff format --check"
 lint-js = { cmd = "jlpm install && jlpm lint", cwd = "js" }
 lint = { depends-on = ["lint-python", "lint-js"] }
+format-python = "ruff format && ruff check --fix"
+format-js = { cmd = "jlpm install && jlpm format", cwd = "js" }
+format = { depends-on = ["format-python", "format-js"] }
 
 [feature.release.dependencies]
 towncrier = "*"

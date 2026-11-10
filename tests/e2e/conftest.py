@@ -178,7 +178,10 @@ class Notebook:
         # Collect messages from the browser console so we can report them
         # when something goes wrong.
         self.console = []
-        page.on("console", lambda message: self.console.append(f"{message.type}: {message.text}"))
+        page.on(
+            "console",
+            lambda message: self.console.append(f"{message.type}: {message.text}"),
+        )
         page.on("pageerror", lambda error: self.console.append(f"pageerror: {error}"))
 
         lab.api(
@@ -268,7 +271,11 @@ class Notebook:
         if error is not None:
             raise CellError(error)
 
-        return self.panel.locator(".jp-Notebook .jp-Cell").nth(index).locator(".jp-Cell-outputArea")
+        return (
+            self.panel.locator(".jp-Notebook .jp-Cell")
+            .nth(index)
+            .locator(".jp-Cell-outputArea")
+        )
 
     def execute_all(self):
         r"""
@@ -276,7 +283,9 @@ class Notebook:
 
         Raises a :class:`CellError` if any cell produced an error.
         """
-        count = self.page.evaluate("() => window.jupyterapp.shell.currentWidget.content.model.cells.length")
+        count = self.page.evaluate(
+            "() => window.jupyterapp.shell.currentWidget.content.model.cells.length"
+        )
         for index in range(count):
             self.execute(index)
 
@@ -286,7 +295,11 @@ class Notebook:
         Return the errors that showed up in the browser console, i.e., uncaught
         exceptions and warnings from Vue.
         """
-        return [message for message in self.console if message.startswith("pageerror:") or "[Vue warn]" in message]
+        return [
+            message
+            for message in self.console
+            if message.startswith("pageerror:") or "[Vue warn]" in message
+        ]
 
     def close(self):
         r"""
@@ -307,7 +320,9 @@ def notebook(page, jupyter_lab, request):
     r"""
     A new notebook with a running Python kernel.
     """
-    notebook = Notebook(page, jupyter_lab, f"{request.node.name}-{uuid.uuid4().hex[:8]}.ipynb")
+    notebook = Notebook(
+        page, jupyter_lab, f"{request.node.name}-{uuid.uuid4().hex[:8]}.ipynb"
+    )
 
     yield notebook
 
@@ -324,7 +339,9 @@ def report(notebook, request):
 
     notebook.close()
 
-    assert not notebook.errors, "errors in the browser console:\n" + "\n".join(notebook.errors)
+    assert not notebook.errors, "errors in the browser console:\n" + "\n".join(
+        notebook.errors
+    )
 
 
 @pytest.hookimpl(wrapper=True)

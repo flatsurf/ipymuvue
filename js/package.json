@@ -30,8 +30,8 @@
     "watch": "run-p watch:lib watch:labextension",
     "watch:lib": "tsc --sourceMap --watch --preserveWatchOutput",
     "watch:labextension": "jupyter labextension watch .",
-    "lint": "eslint .",
-    "format": "eslint --fix ."
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write . && eslint --fix ."
   },
   "dependencies": {
     "@jupyter-widgets/base": "^6",
@@ -46,7 +46,9 @@
     "@jupyterlab/builder": "^4.0",
     "@types/lodash-es": "^4.17.12",
     "eslint": "^10",
+    "eslint-config-prettier": "^10",
     "npm-run-all2": "^9",
+    "prettier": "^3",
     "pyodide": "314.0.7",
     "rimraf": "^6",
     "typescript": "~5.9",

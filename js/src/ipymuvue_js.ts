@@ -17,23 +17,27 @@
 
 export * as Vue from "vue";
 
-export { default as cloneDeep } from "lodash-es/cloneDeep"
-export { default as clone } from "lodash-es/clone"
+export { default as cloneDeep } from "lodash-es/cloneDeep";
+export { default as clone } from "lodash-es/clone";
 
 export function withArity(f: (...args: any[]) => any, n: number) {
   if (n === 2) {
     function wrap(n0: any, n1: any) {
       return f(n0, n1);
     }
-    return wrap
+    return wrap;
   }
 
-  throw Error("not implemented")
+  throw Error("not implemented");
 }
 
-export function asVueCompatibleFunction(f: (...args: any) => any, createPyProxy: (obj: any) => any, vueCompatible: (obj: any) => any) {
+export function asVueCompatibleFunction(
+  f: (...args: any) => any,
+  createPyProxy: (obj: any) => any,
+  vueCompatible: (obj: any) => any,
+) {
   function g(...args: any[]) {
     return vueCompatible(f(...args.map((arg) => createPyProxy(arg))));
   }
-  return g
+  return g;
 }

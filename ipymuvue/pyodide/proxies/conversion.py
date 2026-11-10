@@ -51,9 +51,9 @@ def python_compatible(x):
         return x
 
     if callable(x):
-        assert isinstance(
-            x, pyodide.ffi.JsProxy
-        ), "received a function from Vue that is not defined in JavaScript"
+        assert isinstance(x, pyodide.ffi.JsProxy), (
+            "received a function from Vue that is not defined in JavaScript"
+        )
         raise NotImplementedError("cannot properly wrap functions from the Vue API yet")
 
     if is_vue_ref(x):

@@ -67,7 +67,9 @@ class VueWidget(DOMWidget):
 
         self.__methods = [
             name
-            for (name, method) in type(self)._getmembers(self, predicate=inspect.ismethod)
+            for (name, method) in type(self)._getmembers(
+                self, predicate=inspect.ismethod
+            )
             if hasattr(method, "_VueWidget__is_callback") and method.__is_callback
         ]
         self.__on_msg(self._handle_message)
@@ -84,6 +86,7 @@ class VueWidget(DOMWidget):
         """
         import types
         from inspect import getmro, isclass
+
         if isclass(object):
             mro = (object,) + getmro(object)
         else:
@@ -129,7 +132,7 @@ class VueWidget(DOMWidget):
         r"""
         Link components to file in assets.
         """
-        for (component, definition) in components.items():
+        for component, definition in components.items():
             if not isinstance(component, str):
                 raise TypeError("component name must be a string")
 
@@ -181,7 +184,7 @@ class VueWidget(DOMWidget):
                 )
             ] = pathlib.Path(fname).read_bytes()
 
-        for (fname, content) in assets.items():
+        for fname, content in assets.items():
             if not isinstance(fname, str):
                 raise TypeError("file name must be a string")
 
@@ -248,9 +251,10 @@ class VueWidget(DOMWidget):
         r"""
         Register ``handler`` for custom messages from the frontend.
         """
-        with (self.__output or contextlib.nullcontext()):
+        with self.__output or contextlib.nullcontext():
+
             def logging_handler(*args, **kwargs):
-                with (self.__output or contextlib.nullcontext()):
+                with self.__output or contextlib.nullcontext():
                     handler(*args, **kwargs)
 
             self.on_msg(logging_handler)
@@ -261,7 +265,7 @@ class VueWidget(DOMWidget):
         Handle a message coming in on the comm from the frontend model.
         """
         if "method" in content:
-            with (self.__output or contextlib.nullcontext()):
+            with self.__output or contextlib.nullcontext():
                 self._handle_callback(**content)
                 return
 

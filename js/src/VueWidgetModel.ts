@@ -19,68 +19,72 @@ import { DOMWidgetModel } from "@jupyter-widgets/base";
 import { Handler } from "./Invocation";
 import { version } from "./version";
 
-
 export class VueWidgetModel extends DOMWidgetModel {
-    defaults() {
-        return {
-            ...super.defaults(),
-            /* standard ipywidgets attributes */
-            _model_name: 'VueWidgetModel',
-            _view_name: 'VueWidgetView',
-            _model_module: 'ipymuvue',
-            _view_module: 'ipymuvue',
-            _model_module_version: `~${version}`,
-            _view_module_version: `~${version}`,
-            /* the name of the widget, useful for debugging */
-            _VueWidget__type: 'VueWidget',
-            /* the Vue template to render the widget */
-            _VueWidget__template: '<div>…</div>',
-            /* callbacks in Python that are `methods` on the Vue instance */
-            _VueWidget__methods: [],
-            /* child components that can be used in this component's template */
-            _VueWidget__components: {},
-            /* files that can be used to define child components */
-            _VueWidget__assets: {},
-            /* widgets for the (named) slots of the component */
-            _VueWidget__children: {},
-        };
-    }
+  defaults() {
+    return {
+      ...super.defaults(),
+      /* standard ipywidgets attributes */
+      _model_name: "VueWidgetModel",
+      _view_name: "VueWidgetView",
+      _model_module: "ipymuvue",
+      _view_module: "ipymuvue",
+      _model_module_version: `~${version}`,
+      _view_module_version: `~${version}`,
+      /* the name of the widget, useful for debugging */
+      _VueWidget__type: "VueWidget",
+      /* the Vue template to render the widget */
+      _VueWidget__template: "<div>…</div>",
+      /* callbacks in Python that are `methods` on the Vue instance */
+      _VueWidget__methods: [],
+      /* child components that can be used in this component's template */
+      _VueWidget__components: {},
+      /* files that can be used to define child components */
+      _VueWidget__assets: {},
+      /* widgets for the (named) slots of the component */
+      _VueWidget__children: {},
+    };
+  }
 
-    constructor(...args: any[]) {
-        super(...args);
+  constructor(...args: any[]) {
+    super(...args);
 
-        this.on("msg:custom", (message: any) => {
-            if ("target" in message)
-              new Handler(this, message).run();
-        });
-    }
+    this.on("msg:custom", (message: any) => {
+      if ("target" in message) new Handler(this, message).run();
+    });
+  }
 
-    /*
-     * Return the part of the model that defines its state, excluding bits that
-     * are not supposed to change once the model has been created.
-     */
-    public get reactiveState(): object {
-      const specialAttributes = ['layout', ...Object.keys(this.defaults())];
+  /*
+   * Return the part of the model that defines its state, excluding bits that
+   * are not supposed to change once the model has been created.
+   */
+  public get reactiveState(): object {
+    const specialAttributes = ["layout", ...Object.keys(this.defaults())];
 
-      return Object.fromEntries(
-        this.keys().filter((key) => !specialAttributes.includes(key)).
-          map((key) => [key, this.get(key)]));
-    }
+    return Object.fromEntries(
+      this.keys()
+        .filter((key) => !specialAttributes.includes(key))
+        .map((key) => [key, this.get(key)]),
+    );
+  }
 
-    /*
-     * Return the `methods` callbacks that can be invoked on each Vue app
-     * representing this model.
-     */
-    public get methods() {
-      const names = this.get('_VueWidget__methods') as string[];
-      return Object.fromEntries(names.map(method =>
-        [method, (...args: any[]) => this.callback(method, args || [])]));
-    }
+  /*
+   * Return the `methods` callbacks that can be invoked on each Vue app
+   * representing this model.
+   */
+  public get methods() {
+    const names = this.get("_VueWidget__methods") as string[];
+    return Object.fromEntries(
+      names.map((method) => [
+        method,
+        (...args: any[]) => this.callback(method, args || []),
+      ]),
+    );
+  }
 
-    /*
-     * Call `method` on the backend with `args`.
-     */
-    private callback(method: string, args: any[]) {
-      this.send({method, args}, this.callbacks());
-    }
+  /*
+   * Call `method` on the backend with `args`.
+   */
+  private callback(method: string, args: any[]) {
+    this.send({ method, args }, this.callbacks());
+  }
 }

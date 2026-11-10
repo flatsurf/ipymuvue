@@ -2,14 +2,20 @@
 const { defineConfig } = require("eslint/config");
 const js = require("@eslint/js");
 const tseslint = require("typescript-eslint");
+const prettier = require("eslint-config-prettier");
 
 module.exports = defineConfig(
   { ignores: ["lib/", "node_modules/", ".yarn/"] },
   js.configs.recommended,
   tseslint.configs.recommended,
+  // Turn off rules that conflict with prettier which formats our code.
+  prettier,
   {
     files: ["*.js"],
-    languageOptions: { sourceType: "commonjs", globals: { require: "readonly", module: "writable" } },
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: { require: "readonly", module: "writable" },
+    },
     rules: { "@typescript-eslint/no-require-imports": "off" },
   },
   {
@@ -20,7 +26,10 @@ module.exports = defineConfig(
       // Vue's Options API rebinds `this` so we need to capture the outer `this`.
       "@typescript-eslint/no-this-alias": "off",
       // Unused arguments are fine if their name says so.
-      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
     },
   },
 );

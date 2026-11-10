@@ -53,11 +53,11 @@ VueWidget(template='<counter label="clicks"/>', components={{"counter": r"""{COU
 def test_component_from_file(notebook):
     (notebook.lab.root / "Counter.vue").write_text(COUNTER)
 
-    cell = notebook.run('''
+    cell = notebook.run("""
 from ipymuvue.widgets import VueWidget
 
 VueWidget(template='<counter label="from file"/>', components={"counter": open("Counter.vue")})
-''')
+""")
 
     expect(cell.locator("button")).to_have_text("from file: 0")
 
@@ -129,11 +129,11 @@ component = define_component(
 )
 ''')
 
-    cell = notebook.run('''
+    cell = notebook.run("""
 from ipymuvue.widgets import VueWidget
 
 VueWidget(template='<counter label="python"/>', components={"counter": open("counter.py")})
-''')
+""")
 
     # Loading pyodide from the CDN can take a long time.
     button = cell.locator("button")
@@ -166,12 +166,12 @@ widget
     output = notebook.run("print(await widget['calculator'].add(1, 2))")
     expect(output.locator(STDOUT)).to_have_text("[3]\n")
 
-    output = notebook.run('''
+    output = notebook.run("""
 from ipymuvue.widgets.references import InvocationError
 
 try:
     await widget['calculator'].fail()
 except InvocationError as e:
     print(e)
-''')
+""")
     expect(output.locator(STDOUT)).to_have_text("failed in the browser\n")

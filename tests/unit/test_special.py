@@ -20,7 +20,9 @@ import pytest
 from ipymuvue.special import is_special
 
 
-@pytest.mark.parametrize("name", ["_private", "$el", "data", "setup", "mounted", "beforeUnmount"])
+@pytest.mark.parametrize(
+    "name", ["_private", "$el", "data", "setup", "mounted", "beforeUnmount"]
+)
 def test_special(name):
     assert is_special(name)
 

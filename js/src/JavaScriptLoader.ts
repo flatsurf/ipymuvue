@@ -29,7 +29,7 @@ export class JavaScriptLoader {
   public get object(): Promise<any> {
     return (async () => {
       const globals = window as any;
-      if (typeof globals.requirejs == 'function') {
+      if (typeof globals.requirejs == "function") {
         return await this.loadRequireJS(globals.requirejs);
       } else {
         return await this.loadBrowser();
@@ -38,26 +38,34 @@ export class JavaScriptLoader {
   }
 
   private async loadRequireJS(requirejs: any) {
-    if (!this.url.endsWith('.js'))
+    if (!this.url.endsWith(".js"))
       throw Error("url must end with .js to be loaded through RequireJS");
     requirejs.config({
       paths: {
-        [this.name]: this.url.substring(0, this.url.length - 3)
+        [this.name]: this.url.substring(0, this.url.length - 3),
       },
-      onNodeCreated: function(node: HTMLScriptElement, _config: any, moduleName: string, _url: string) {
+      onNodeCreated: function (
+        node: HTMLScriptElement,
+        _config: any,
+        moduleName: string,
+        _url: string,
+      ) {
         if (moduleName === this.name) {
-          if (this.integrity)
-            node.integrity = this.integrity;
+          if (this.integrity) node.integrity = this.integrity;
           node.crossOrigin = "anonymous";
         }
       },
     });
     return await new Promise((resolve, reject) => {
-      requirejs([this.name], function(module: any) {
-        resolve(module);
-      }, function(err: any) {
-        reject(err);
-      });
+      requirejs(
+        [this.name],
+        function (module: any) {
+          resolve(module);
+        },
+        function (err: any) {
+          reject(err);
+        },
+      );
     });
   }
 
@@ -70,8 +78,7 @@ export class JavaScriptLoader {
 
     script.async = true;
     script.src = this.url;
-    if (this.integrity)
-      script.integrity = this.integrity;
+    if (this.integrity) script.integrity = this.integrity;
     script.crossOrigin = "anonymous";
 
     document.head.appendChild(script);

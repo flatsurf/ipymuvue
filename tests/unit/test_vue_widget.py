@@ -108,7 +108,10 @@ def test_components_from_files_become_assets(tmp_path):
         widget = VueWidget(template="<child/>", components={"child": f})
 
     assert widget._VueWidget__components == {"child": "Child.vue"}
-    assert widget._VueWidget__assets["Child.vue"] == b"<template><div>child</div></template>"
+    assert (
+        widget._VueWidget__assets["Child.vue"]
+        == b"<template><div>child</div></template>"
+    )
 
 
 def test_components_from_assets():
@@ -119,7 +122,10 @@ def test_components_from_assets():
     )
 
     assert widget._VueWidget__components == {"child": "Child.vue"}
-    assert widget._VueWidget__assets["Child.vue"] == b"<template><div>child</div></template>"
+    assert (
+        widget._VueWidget__assets["Child.vue"]
+        == b"<template><div>child</div></template>"
+    )
 
 
 def test_ipymuvue_is_shipped_as_asset():

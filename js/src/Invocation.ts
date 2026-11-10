@@ -29,17 +29,18 @@ import isPromise from "is-promise";
  */
 export type InvocationMessage = {
   // The name of the method or property.
-  target: string,
+  target: string;
   // The sequence of refs to follow to get to the element defining the `target`.
-  path: string[],
+  path: string[];
   // Arguments to invoke the `target` with.
-  args: any[],
+  args: any[];
   // A unique identifier to report results back to Python.
-  identifier: string,
+  identifier: string;
   // Which widgets view to target; all if `null`.
-  views: null | string | string[],
+  views: null | string | string[];
   // When to report back to Python.
-  return_when: "FIRST_COMPLETED" | "FIRST_EXCEPTION" | "ALL_COMPLETED" | "IGNORE",
+  return_when:
+    "FIRST_COMPLETED" | "FIRST_EXCEPTION" | "ALL_COMPLETED" | "IGNORE";
 };
 
 /*
@@ -56,7 +57,6 @@ type WithView<T> = { view: string } & T;
  * The holder of methods or properties to invoke in a view.
  */
 type InvocationTarget = ComponentPublicInstance | HTMLElement;
-
 
 /*
  * Performs invocations of methods on all views of a `model`.
@@ -75,31 +75,35 @@ export class Handler {
    *   view name -> view
    * for all views representing this model.
    */
-  private get views(): Promise<{[view: string]: VueWidgetView}> {
+  private get views(): Promise<{ [view: string]: VueWidgetView }> {
     return (async () => {
-      const views = mapValues(await Handler.unwrapPromisedValues(this.model.views ?? {}),
+      const views = mapValues(
+        await Handler.unwrapPromisedValues(this.model.views ?? {}),
         (view) => {
           if (!(view instanceof VueWidgetView))
             throw Error("views of a VueWidgetModel must all be VueWidgetView");
           return view;
-        });
+        },
+      );
 
       // Target all views if targets has not been set.
       if (this.message.views == null) {
         return views;
       }
 
-      if (typeof(this.message.views) === "string") {
+      if (typeof this.message.views === "string") {
         if (!(this.message.views in views))
-          throw Error(`no view ${this.message.views} found`)
-        return {[this.message.views]: views[this.message.views]};
+          throw Error(`no view ${this.message.views} found`);
+        return { [this.message.views]: views[this.message.views] };
       }
 
-      return Object.fromEntries(this.message.views.map((view) => {
-        if (!(view in views))
-          throw Error(`no view ${this.message.views} found`)
-        return [view, views[view]];
-      }));
+      return Object.fromEntries(
+        this.message.views.map((view) => {
+          if (!(view in views))
+            throw Error(`no view ${this.message.views} found`);
+          return [view, views[view]];
+        }),
+      );
     })();
   }
 
@@ -114,7 +118,9 @@ export class Handler {
     let target: InvocationTarget | undefined = view.vnode;
 
     if (target === undefined) {
-      console.warn("cannot access into $refs of view which is not mounted; ignoring view");
+      console.warn(
+        "cannot access into $refs of view which is not mounted; ignoring view",
+      );
       return;
     }
 
@@ -125,7 +131,9 @@ export class Handler {
       target = target.$refs[fragment] as InvocationTarget | undefined;
 
       if (target === undefined) {
-        console.warn(`component has no (mounted) ref ${fragment}; ignoring view`);
+        console.warn(
+          `component has no (mounted) ref ${fragment}; ignoring view`,
+        );
         return;
       }
     }
@@ -134,13 +142,15 @@ export class Handler {
   }
 
   /*
-   * A mapping 
+   * A mapping
    *   view name -> component defining method to invoke
    * for all views representing this model.
    */
-  private get elements(): Promise<{[view: string]: InvocationTarget}> {
+  private get elements(): Promise<{ [view: string]: InvocationTarget }> {
     return (async () => {
-      const targets = await Handler.unwrapPromisedValues(mapValues(await this.views, (view) => this.resolveElement(view)));
+      const targets = await Handler.unwrapPromisedValues(
+        mapValues(await this.views, (view) => this.resolveElement(view)),
+      );
 
       // Ignore views that do not define the target.
       return pickBy(targets, (target) => target != null) as any;
@@ -150,9 +160,13 @@ export class Handler {
   /*
    * Turn a {key: Promise<T>} into a Promise<{key: T}>.
    */
-  private static async unwrapPromisedValues<T extends {[key:string]: any}>(object: T): Promise<{[key in keyof T]: Awaited<T[key]>}> {
-    const entries = Object.entries(object).map(
-      async ([key, promise]) => [key, await promise]);
+  private static async unwrapPromisedValues<T extends { [key: string]: any }>(
+    object: T,
+  ): Promise<{ [key in keyof T]: Awaited<T[key]> }> {
+    const entries = Object.entries(object).map(async ([key, promise]) => [
+      key,
+      await promise,
+    ]);
     return Object.fromEntries(await Promise.all(entries));
   }
 
@@ -163,7 +177,7 @@ export class Handler {
     const message = {
       identifier: this.message.identifier,
       results,
-    }
+    };
 
     this.model.send(message as any, {});
   }
@@ -177,20 +191,23 @@ export class Handler {
       let value = (target as any)[this.message.target];
 
       if (value === undefined)
-        throw Error(`no method or property ${this.message.target} exposed on target`);
+        throw Error(
+          `no method or property ${this.message.target} exposed on target`,
+        );
 
       if (value instanceof Function) {
         value = value.bind ? value.bind(target) : value;
         value = value(...this.message.args);
       } else if (this.message.args.length) {
-        throw Error(`cannot call ${this.message.target} with arguments since it is not a function`);
+        throw Error(
+          `cannot call ${this.message.target} with arguments since it is not a function`,
+        );
       }
 
       let cancel = () => {};
 
       if (isPromise(value)) {
-        if ("cancel" in value)
-            cancel = value["cancel"] as () => void;
+        if ("cancel" in value) cancel = value["cancel"] as () => void;
       } else {
         value = Promise.resolve(value);
       }
@@ -214,7 +231,7 @@ export class Handler {
           error: Handler.renderError(e),
         }),
         cancel: () => {},
-      }
+      };
     }
   }
 
@@ -245,43 +262,45 @@ export class Handler {
       // However, `result` actually resolves to the result of the computation
       // and the name of the view again so we can easily implement the
       // different return_when strategies below.
-      const invocations =
-        mapValues(elements, (target, view) => {
-          const {result, cancel} = this.invoke(target);
-          return {
-            result: (async () => ({
-              ...await result,
-              view,
-            }))(),
-            cancel,
-          };
-        });
+      const invocations = mapValues(elements, (target, view) => {
+        const { result, cancel } = this.invoke(target);
+        return {
+          result: (async () => ({
+            ...(await result),
+            view,
+          }))(),
+          cancel,
+        };
+      });
 
-      switch(this.message.return_when) {
+      switch (this.message.return_when) {
         case "IGNORE":
           return;
-        case "ALL_COMPLETED":
-        {
-          const promisedResults = Object.values(invocations).map((result) => result.result);
+        case "ALL_COMPLETED": {
+          const promisedResults = Object.values(invocations).map(
+            (result) => result.result,
+          );
           const results = await Promise.all(promisedResults);
           this.report(results);
           return;
         }
-        case "FIRST_COMPLETED":
-        {
-          const promisedResults = Object.values(invocations).map((result) => result.result);
+        case "FIRST_COMPLETED": {
+          const promisedResults = Object.values(invocations).map(
+            (result) => result.result,
+          );
           const first = await Promise.race(promisedResults);
           this.report([first]);
           delete invocations[first.view];
           mapValues(invocations, (invocation) => invocation.cancel());
           return;
         }
-        case "FIRST_EXCEPTION":
-        {
+        case "FIRST_EXCEPTION": {
           const results = [];
 
           while (!isEmpty(invocations)) {
-            const promisedResults = Object.values(invocations).map((result) => result.result);
+            const promisedResults = Object.values(invocations).map(
+              (result) => result.result,
+            );
             const first = await Promise.race(promisedResults);
             delete invocations[first.view];
 
@@ -298,14 +317,14 @@ export class Handler {
           return;
         }
         default:
-          throw Error(`not implemented: cannot handle return_when ${this.message.return_when} yet`);
+          throw Error(
+            `not implemented: cannot handle return_when ${this.message.return_when} yet`,
+          );
       }
     } catch (e) {
       console.info(e);
 
-      this.report([
-        { error: Handler.renderError(e), view: "unknown" },
-      ]);
+      this.report([{ error: Handler.renderError(e), view: "unknown" }]);
     }
   }
 }
