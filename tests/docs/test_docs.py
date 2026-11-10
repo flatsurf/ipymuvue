@@ -96,8 +96,12 @@ def test_tutorial(open_page):
 def test_demo(open_page):
     page = open_page("examples/Demo.html")
 
-    expect(page.get_by_text("Hello Jupyter!")).to_be_visible()
-    expect(page.get_by_text("Component from an Asset String")).to_be_visible()
+    # We match exactly since the source code of the notebook contains these
+    # strings as well.
+    expect(page.get_by_text("Hello Jupyter!", exact=True)).to_be_visible()
+    expect(
+        page.get_by_text("Component from an Asset String", exact=True)
+    ).to_be_visible()
 
 
 def test_graph_editor(open_page):

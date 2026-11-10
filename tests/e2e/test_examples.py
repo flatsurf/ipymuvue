@@ -80,8 +80,12 @@ def test_demo(example):
     notebook = example("Demo.md")
     notebook.execute_all()
 
-    expect(notebook.panel.get_by_text("Hello Jupyter!")).to_be_visible()
-    expect(notebook.panel.get_by_text("Component from an Asset String")).to_be_visible()
+    # We match exactly since the source code of the notebook contains these
+    # strings as well.
+    expect(notebook.panel.get_by_text("Hello Jupyter!", exact=True)).to_be_visible()
+    expect(
+        notebook.panel.get_by_text("Component from an Asset String", exact=True)
+    ).to_be_visible()
 
 
 def test_graph_editor(example):
