@@ -5,6 +5,12 @@ build/
 *.py[cod]
 node_modules/
 
+# Frontend build artifacts and yarn state
+js/lib/
+js/tsconfig.tsbuildinfo
+js/.yarn/
+yarn-error.log
+
 # OS X
 .DS_Store
 

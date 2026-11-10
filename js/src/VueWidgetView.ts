@@ -15,7 +15,7 @@
  * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-import { DOMWidgetView, JupyterPhosphorWidget } from "@jupyter-widgets/base";
+import { DOMWidgetView, JupyterLuminoWidget } from "@jupyter-widgets/base";
 import { VueWidgetModel } from "./VueWidgetModel";
 import { VueComponentCompiler } from "./VueComponentCompiler";
 import { createApp, defineComponent, h } from "vue";
@@ -161,7 +161,7 @@ export class VueWidgetView extends DOMWidgetView {
           view: { type: Object, required: true },
         },
         mounted() {
-          JupyterPhosphorWidget.attach((this.view as DOMWidgetView).pWidget, this.$el);
+          JupyterLuminoWidget.attach((this.view as DOMWidgetView).luminoWidget, this.$el);
         },
         beforeUnmount() {
           // The view must be removed while it is still in the DOM, otherwise

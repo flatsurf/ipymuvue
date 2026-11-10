@@ -15,12 +15,8 @@
  * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-const version = require('../package.json').version;
-
-const { VueWidgetModel, VueWidgetView } = require('ipymuvueimplementation')
-
-module.exports = {
-  VueWidgetModel,
-  VueWidgetView,
-  version,
-}
+// The version of this package which needs to match the version of the
+// Python package since the Python VueWidget requests this version of the
+// frontend.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+export const version: string = require("../package.json").version;

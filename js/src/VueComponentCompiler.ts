@@ -18,10 +18,9 @@
 import type { Component } from "vue";
 import { defineAsyncComponent } from "vue";
 import { loadModule } from 'vue3-sfc-loader';
-import type { Options, Resource, AbstractPath } from 'vue3-sfc-loader';
+import type { Options } from 'vue3-sfc-loader';
 import { PythonInterpreter } from './PythonInterpreter';
 import * as Vue from "vue";
-import isCallable from "is-callable";
 
 export class VueComponentCompiler {
   public constructor(assets?: (name: string) => DataView | null);
@@ -42,7 +41,9 @@ export class VueComponentCompiler {
   public async compileAsync(components: Record<string, string>): Promise<Record<string, Component>>;
   public async compileAsync(filename: string | Record<string, string>) {
     if (typeof filename === "string") {
-      const options: Options = {
+      // The type of Options declares some fields as required even though
+      // vue3-sfc-loader provides defaults for them.
+      const options: Partial<Options> = {
         moduleCache: {
           vue: Vue,
         },
@@ -51,7 +52,7 @@ export class VueComponentCompiler {
 
           return {
             getContentData: async (binary: Boolean) => {
-              const asset = isCallable(this.assets) ?
+              const asset = typeof this.assets === "function" ?
                 this.assets(path) :
                 this.assets[path];
               if (asset) {
@@ -102,19 +103,9 @@ export class VueComponentCompiler {
               return undefined as unknown as null;
           }
         },
-        getResource(_path, _options_): Resource {
-          throw Error("not implemented");
-        },
-        pathResolve(_path): AbstractPath {
-          throw Error("not implemented");
-        },
       };
 
-      // Work around typing errors in vue3-sfc-loader.
-      delete((options as any).getResource);
-      delete((options as any).pathResolve);
-
-      const module = await loadModule(filename, options);
+      const module = await loadModule(filename, options as Options);
 
       if (filename.toLowerCase().endsWith(".py"))
         return (module as any).component;

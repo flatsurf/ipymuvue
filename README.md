@@ -53,7 +53,7 @@ Get a local copy of this package:
     cd ipymuvue
 
 We use [pixi](https://pixi.sh) to manage all the dependencies needed for
-development, including `node` and `yarn`. Once you have installed pixi, start
+development, including `node`. Once you have installed pixi, start
 JupyterLab with a development version of ipymuvue in the `examples/` directory:
 
     pixi run lab
@@ -64,9 +64,13 @@ SageMath, use `pixi run -e sage lab` for these (not available on Windows.)
 
 Any changes you make to the Python code should be picked up automatically. Changes to `ipymuvue.pyodide` become effective by re-creating a widget (all the modules are reloaded in pyodide when a change to these files happens.) Other changes require a kernel restart as usual.
 
-Any changes to the TypeScript/Javascript code become effective after you rebuild the prebuilt extension and refresh the browser:
+The frontend is written in TypeScript in `js/src/`. To rebuild it
+automatically whenever you change a file, run in another terminal:
 
-    pixi run build-js
+    pixi run watch
+
+Changes become effective once the rebuild has finished and you refresh the
+page in the browser. (To build the frontend once, run `pixi run build-js`.)
 
 To run the unit tests and the end-to-end tests (which run the widgets in
 JupyterLab in a headless browser), run:
@@ -124,9 +128,10 @@ master branch.
 Note that version 0.6.0 was released to PyPI from a commit that never made it
 to the master branch, so the next release has to be at least 0.7.0.
 
-If you do not want to use pixi, you need Python, JupyterLab 4, `node`, and
-`yarn` (version 1). Then `pip install -e .` builds and installs ipymuvue and
-`(cd js && yarn build)` rebuilds the frontend.
+If you do not want to use pixi, you need Python, JupyterLab 4 (which comes
+with `jlpm`), and `node`. Then `pip install -e .` builds and installs ipymuvue,
+`(cd js && jlpm build)` rebuilds the frontend, and `jupyter labextension
+develop --overwrite .` makes JupyterLab use your build of the frontend.
 
 
 Related Projects

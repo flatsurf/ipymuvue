@@ -1,9 +1,8 @@
 {
   "name": "ipymuvue",
   "version": "0.3.0",
-  "description": "Reactive Jupyter Widgets (ipymuvue-implementation repackaged for Jupyter Notebooks, JupyterLab, …)",
+  "description": "Reactive Vue 3 widgets for Jupyter",
   "author": "Julian Rüth",
-  "main": "src/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -16,37 +15,49 @@
     "ipywidgets",
     "jupyterlab-extension"
   ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
-    "src/**/*.js"
+    "lib/**/*.{d.ts,js,js.map}"
   ],
   "scripts": {
-    "clean": "rimraf ../ipymuvue/labextension/",
-    "build:lib": "cd ../ts && yarn install --frozen-lockfile && yarn run build",
-    "build:lib:prod": "cd ../ts && yarn install --frozen-lockfile && yarn run build:prod",
-    "build": "yarn run build:lib && jupyter labextension build --development True .",
-    "build:prod": "yarn run clean && yarn run build:lib:prod && jupyter labextension build ."
-  },
-  "devDependencies": {
-    "@jupyterlab/builder": "^4.0.2",
-    "rimraf": "^2.6.1",
-    "webpack": "^5",
-    "webpack-cli": "^5.1.4"
+    "build": "jlpm build:lib && jlpm build:labextension:dev",
+    "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
+    "build:lib": "tsc --sourceMap",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "clean": "rimraf lib tsconfig.tsbuildinfo ../ipymuvue/labextension",
+    "watch": "run-p watch:lib watch:labextension",
+    "watch:lib": "tsc --sourceMap --watch --preserveWatchOutput",
+    "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4 || ^6",
-    "ipymuvueimplementation": "link:../ts",
-    "lodash": "^4.18.1"
+    "@jupyter-widgets/base": "^6",
+    "is-promise": "^4.0.0",
+    "lodash-es": "^4.18.1",
+    "vue": "^3.5",
+    "vue3-sfc-loader": "^0.9.5"
+  },
+  "devDependencies": {
+    "@jupyterlab/application": "^4",
+    "@jupyterlab/builder": "^4.0",
+    "@types/lodash-es": "^4.17.12",
+    "npm-run-all2": "^9",
+    "pyodide": "0.21.0-alpha.3",
+    "rimraf": "^6",
+    "typescript": "~5.9"
   },
   "jupyterlab": {
-    "extension": "src/labplugin",
+    "extension": "lib/plugin",
     "outputDir": "../ipymuvue/labextension",
+    "webpackConfig": "./webpack.config.js",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,
         "singleton": true
       },
-      "vue": {},
-      "vue/dist/vue.esm-bundler.js": {}
+      "vue": false,
+      "vue3-sfc-loader": false
     }
   }
 }

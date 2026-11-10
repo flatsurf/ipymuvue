@@ -15,6 +15,24 @@
  * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-const plugin = require('./plugin');
+import type { JupyterFrontEnd, JupyterFrontEndPlugin } from "@jupyterlab/application";
+import { IJupyterWidgetRegistry } from "@jupyter-widgets/base";
+import { VueWidgetModel, VueWidgetView, version } from "./index";
 
-module.exports = { ...plugin };
+/*
+ * The JupyterLab plugin that registers our widgets with ipywidgets.
+ */
+const plugin: JupyterFrontEndPlugin<void> = {
+  id: "ipymuvue:plugin",
+  requires: [IJupyterWidgetRegistry],
+  activate: (_app: JupyterFrontEnd, registry: IJupyterWidgetRegistry) => {
+    registry.registerWidget({
+      name: "ipymuvue",
+      version,
+      exports: { VueWidgetModel, VueWidgetView },
+    });
+  },
+  autoStart: true,
+};
+
+export default plugin;

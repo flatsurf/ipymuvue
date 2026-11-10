@@ -15,18 +15,6 @@
  * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-const plugin = require('./plugin');
-const base = require('@jupyter-widgets/base');
-
-module.exports = {
-  id: 'ipymuvue:plugin',
-  requires: [base.IJupyterWidgetRegistry],
-  activate: function(app, widgets) {
-      widgets.registerWidget({
-          name: 'ipymuvue',
-          version: plugin.version,
-          exports: plugin
-      });
-  },
-  autoStart: true
-};
+export { VueWidgetModel } from "./VueWidgetModel";
+export { VueWidgetView } from "./VueWidgetView";
+export { version } from "./version";

@@ -15,7 +15,5 @@
  * along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
  * ******************************************************************************/
 
-import { VueWidgetModel } from "./VueWidgetModel";
-import { VueWidgetView } from "./VueWidgetView";
-
-export { VueWidgetModel, VueWidgetView };
+// The require() that webpack provides, e.g., to read our package.json.
+declare function require(id: string): any;

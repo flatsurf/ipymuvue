@@ -37,13 +37,12 @@ Homepage = "https://github.com/flatsurf/ipymuvue"
 path = "ipymuvue/version.py"
 
 [tool.hatch.build]
-# Do not descend into node_modules/. Besides being slow, js/node_modules
-# contains a symlink to ts/ which makes hatch skip the actual ts/ directory.
+# Do not descend into node_modules/ which is slow.
 skip-excluded-dirs = true
 
 [tool.hatch.build.targets.sdist]
 artifacts = ["ipymuvue/labextension"]
-exclude = [".github", "ts/dist", "*.ipynb"]
+exclude = [".github", "*.ipynb"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["ipymuvue"]
@@ -55,8 +54,8 @@ exclude = ["ipymuvue/labextension"]
 "ipymuvue/labextension" = "share/jupyter/labextensions/ipymuvue"
 "install.json" = "share/jupyter/labextensions/ipymuvue/install.json"
 
-# Build the frontend (ts/ and then js/) with yarn when building a wheel. The
-# resulting prebuilt JupyterLab extension ends up in ipymuvue/labextension.
+# Build the frontend in js/ when building a wheel. The resulting prebuilt
+# JupyterLab extension ends up in ipymuvue/labextension.
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.8"]
 build-function = "hatch_jupyter_builder.npm_builder"
@@ -69,7 +68,7 @@ optional-editable-build = true
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 path = "js"
 build_cmd = "build:prod"
-npm = ["yarn"]
+npm = ["jlpm"]
 
 [tool.pytest.ini_options]
 # The end-to-end tests in tests/e2e cannot run in the same process as the
@@ -124,10 +123,5 @@ replace = '__version__ = "{new_version}"'
 
 [[tool.bumpversion.files]]
 filename = "js/package.json"
-search = '"version": "{current_version}"'
-replace = '"version": "{new_version}"'
-
-[[tool.bumpversion.files]]
-filename = "ts/package.json"
 search = '"version": "{current_version}"'
 replace = '"version": "{new_version}"'

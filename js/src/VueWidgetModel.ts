@@ -17,8 +17,7 @@
 
 import { DOMWidgetModel } from "@jupyter-widgets/base";
 import { Handler } from "./Invocation";
-
-const version = require('../package.json').version;
+import { version } from "./version";
 
 
 export class VueWidgetModel extends DOMWidgetModel {

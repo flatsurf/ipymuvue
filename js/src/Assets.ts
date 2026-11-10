@@ -38,7 +38,7 @@ export class AssetProvisioner {
       };
 
       if (stat.exists) {
-        if (AssetProvisioner.equal(this.FS.readFile(name), content.buffer))
+        if (AssetProvisioner.equal(this.FS.readFile(name), content.buffer as ArrayBuffer))
           return provisioned;
 
         provisioned.replaced = true;

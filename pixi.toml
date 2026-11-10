@@ -9,7 +9,6 @@ ipywidgets = ">=8,<9"
 jupyter-ui-poll = ">=0.2.1,<0.3"
 # To build the frontend when installing ipymuvue below.
 nodejs = "22.*"
-yarn = "1.*"
 jupyterlab = ">=4,<5"
 hatchling = ">=1.27"
 hatch-jupyter-builder = ">=0.8"
@@ -20,12 +19,13 @@ hatch-jupyter-builder = ">=0.8"
 ipymuvue = { path = ".", editable = true }
 
 [pypi-options]
-# Build ipymuvue with the nodejs, yarn, and jupyterlab from this environment.
+# Build ipymuvue with the nodejs and jupyterlab from this environment.
 no-build-isolation = ["ipymuvue"]
 
 [tasks]
-build-js = { cmd = "yarn install --frozen-lockfile && yarn run build", cwd = "js" }
+build-js = { cmd = "jlpm install && jlpm build", cwd = "js" }
 develop = { cmd = "jupyter labextension develop --overwrite .", depends-on = ["build-js"] }
+watch = { cmd = "jlpm watch", cwd = "js", depends-on = ["develop"] }
 lab = { cmd = "jupyter lab", depends-on = ["develop"], cwd = "examples" }
 
 [feature.dist.dependencies]

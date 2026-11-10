@@ -77,7 +77,7 @@ export class Handler {
    */
   private get views(): Promise<{[view: string]: VueWidgetView}> {
     return (async () => {
-      const views = mapValues(await Handler.unwrapPromisedValues(this.model.views),
+      const views = mapValues(await Handler.unwrapPromisedValues(this.model.views ?? {}),
         (view) => {
           if (!(view instanceof VueWidgetView))
             throw Error("views of a VueWidgetModel must all be VueWidgetView");
@@ -150,7 +150,7 @@ export class Handler {
   /*
    * Turn a {key: Promise<T>} into a Promise<{key: T}>.
    */
-  private static async unwrapPromisedValues<T = {[key:string]: Promise<any>}>(object: T): Promise<{[key in keyof T]: Awaited<T[key]>}> {
+  private static async unwrapPromisedValues<T extends {[key:string]: any}>(object: T): Promise<{[key in keyof T]: Awaited<T[key]>}> {
     const entries = Object.entries(object).map(
       async ([key, promise]) => [key, await promise]);
     return Object.fromEntries(await Promise.all(entries));
@@ -165,7 +165,7 @@ export class Handler {
       results,
     }
 
-    this.model.send(message, {});
+    this.model.send(message as any, {});
   }
 
   /*
@@ -190,7 +190,7 @@ export class Handler {
 
       if (isPromise(value)) {
         if ("cancel" in value)
-            cancel = value["cancel"];
+            cancel = value["cancel"] as () => void;
       } else {
         value = Promise.resolve(value);
       }
