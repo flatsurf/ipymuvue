@@ -79,6 +79,13 @@ export class PythonInterpreter {
       }
     }
 
+    // Python caches the contents of directories on sys.path and only
+    // notices new files when the modification time of the directory changes.
+    // Since that time only has a resolution of one second, Python might not
+    // see the files we just created, see
+    // https://docs.python.org/3/library/importlib.html#importlib.invalidate_caches
+    pyodide.pyimport('importlib').invalidate_caches();
+
     if (reload) {
       for (const [name, module] of Object.values(modules))
         if (PythonInterpreter.provisioned.has(module.__file__)) {

@@ -57,6 +57,15 @@ def example(page, jupyter_lab, request):
         report(notebook, request)
 
 
+def test_tutorial(example):
+    notebook = example("Tutorial.md")
+    notebook.execute_all()
+
+    # The last step of the tutorial renders a heading with a component
+    # written in JavaScript and with one written in Python.
+    expect(notebook.panel.get_by_role("heading", name="Congratulations!")).to_have_count(2, timeout=120_000)
+
+
 def test_demo(example):
     notebook = example("Demo.md")
     notebook.execute_all()
