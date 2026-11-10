@@ -52,25 +52,29 @@ Get a local copy of this package:
     git clone https://github.com/flatsurf/ipymuvue.git
     cd ipymuvue
 
-You need Python, JupyterLab 4, `node` and `yarn` (version 1). Install a
-development version of ipymuvue:
+We use [pixi](https://pixi.sh) to manage all the dependencies needed for
+development, including `node` and `yarn`. Once you have installed pixi, start
+JupyterLab with a development version of ipymuvue in the `examples/` directory:
 
-    pip uninstall ipymuvue  # if you had a regular ipymuvue installed
-    pip install -e .
-
-Build the frontend (this builds `ts/` and then `js/`) and enable the extension
-in JupyterLab and the notebook (version 7 required):
-
-    (cd js && yarn && yarn build)
-    jupyter labextension develop --overwrite .
-
-Now, start a `jupyter` notebook or `jupyter lab` and verify that the notebooks in `examples/` work correctly.
+    pixi run lab
 
 Any changes you make to the Python code should be picked up automatically. Changes to `ipymuvue.pyodide` become effective by re-creating a widget (all the modules are reloaded in pyodide when a change to these files happens.) Other changes require a kernel restart as usual.
 
 Any changes to the TypeScript/Javascript code become effective after you rebuild the prebuilt extension and refresh the browser:
 
-    (cd js && yarn build)
+    pixi run build-js
+
+To build the wheel and source distribution of ipymuvue, run:
+
+    pixi run build
+
+To create a new release, add a file describing your changes to `news/` and run:
+
+    pixi run release <version>
+
+If you do not want to use pixi, you need Python, JupyterLab 4, `node`, and
+`yarn` (version 1). Then `pip install -e .` builds and installs ipymuvue and
+`(cd js && yarn build)` rebuilds the frontend.
 
 
 Related Projects

@@ -1,0 +1,51 @@
+[workspace]
+name = "ipymuvue"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = ">=3.9"
+ipywidgets = ">=8,<9"
+jupyter-ui-poll = ">=0.2.1,<0.3"
+# To build the frontend when installing ipymuvue below.
+nodejs = "22.*"
+yarn = "1.*"
+jupyterlab = ">=4,<5"
+hatchling = ">=1.27"
+hatch-jupyter-builder = ">=0.8"
+
+[pypi-dependencies]
+# Installing ipymuvue builds the frontend once. Run `pixi run build-js` to
+# rebuild after making changes to the TypeScript/JavaScript code.
+ipymuvue = { path = ".", editable = true }
+
+[pypi-options]
+# Build ipymuvue with the nodejs, yarn, and jupyterlab from this environment.
+no-build-isolation = ["ipymuvue"]
+
+[tasks]
+build-js = { cmd = "yarn install --frozen-lockfile && yarn run build", cwd = "js" }
+develop = { cmd = "jupyter labextension develop --overwrite .", depends-on = ["build-js"] }
+lab = { cmd = "jupyter lab", depends-on = ["develop"], cwd = "examples" }
+
+[feature.dist.dependencies]
+python-build = "*"
+
+[feature.dist.tasks]
+build = "python -m build --no-isolation"
+
+[feature.examples.dependencies]
+jupytext = "*"
+myst-nb = "*"
+
+[feature.release.dependencies]
+rever = "*"
+# rever imports distutils which was removed in Python 3.12.
+python = "3.11.*"
+
+[feature.release.tasks]
+release = "rever"
+
+[environments]
+default = ["examples", "dist"]
+release = { features = ["release"], no-default-feature = true }
