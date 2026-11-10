@@ -75,12 +75,13 @@ platforms = ["linux-64", "osx-64", "osx-arm64"]
 sage = ">=10.10"
 
 [feature.release.dependencies]
-rever = "*"
-# rever imports distutils which was removed in Python 3.12.
-python = "3.11.*"
+towncrier = "*"
+bump-my-version = "*"
 
-[feature.release.tasks]
-release = "rever"
+[feature.release.tasks.release-prepare]
+description = "Update the ChangeLog and bump the version, then commit and tag the release"
+args = ["version"]
+cmd = "git diff --quiet HEAD && towncrier build --yes --version {{ version }} && bump-my-version bump --allow-dirty --new-version {{ version }}"
 
 [environments]
 default = ["examples", "dist", "test"]

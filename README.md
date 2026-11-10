@@ -83,9 +83,46 @@ To build the wheel and source distribution of ipymuvue, run:
 
     pixi run build
 
-To create a new release, add a file describing your changes to `news/` and run:
+Changelog
+---------
 
-    pixi run release <version>
+Every pull request that changes something users of ipymuvue might care about
+should add a file to `news/` describing the change. The name of the file is
+`<some-name>.<category>.rst` where the category is one of `added`, `changed`,
+`removed`, or `fixed`, e.g., `news/slots.fixed.rst`:
+
+    Fixed replacing the widget in a slot with `VueWidget.slot()`.
+
+These files are collected into the `ChangeLog` when making a release. To see
+what the next entry in the `ChangeLog` is going to look like, run `pixi run -e
+release towncrier build --draft --version next`.
+
+Releasing
+---------
+
+To release a new version of ipymuvue, say 1.2.3:
+
+1. Make sure that your copy of the master branch is identical to the master
+   branch on GitHub and that all the tests passed on GitHub.
+
+2. Run `pixi run release-prepare 1.2.3`. This writes the `news/` into the
+   `ChangeLog`, updates the version number everywhere, commits these changes
+   as "Release 1.2.3" and creates a tag 1.2.3. (Nothing is pushed yet. If
+   something looks wrong, delete the tag with `git tag -d 1.2.3`, drop the
+   commit with `git reset --hard HEAD~1`, and start over.)
+
+3. Push the master branch and then the tag: `git push origin master` and `git
+   push origin 1.2.3`.
+
+Once GitHub sees the tag, the "Build and publish to PyPI" workflow builds
+ipymuvue, uploads it to [PyPI](https://pypi.org/project/ipymuvue/), and
+creates a [release on GitHub](https://github.com/flatsurf/ipymuvue/releases)
+with the new section of the `ChangeLog`. The workflow refuses to publish if
+the tag does not match the version of ipymuvue or if the tag is not on the
+master branch.
+
+Note that version 0.6.0 was released to PyPI from a commit that never made it
+to the master branch, so the next release has to be at least 0.7.0.
 
 If you do not want to use pixi, you need Python, JupyterLab 4, `node`, and
 `yarn` (version 1). Then `pip install -e .` builds and installs ipymuvue and

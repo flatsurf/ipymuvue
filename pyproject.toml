@@ -78,3 +78,56 @@ testpaths = ["tests/unit"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 timeout = 300
+
+# Changes are described by files in news/, see the README for details.
+[tool.towncrier]
+directory = "news"
+filename = "ChangeLog"
+start_string = ".. current developments\n"
+template = "news/template.rst.j2"
+title_format = "v{version}"
+underlines = ["=", "", ""]
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+# Bump the version with `pixi run release-prepare`, see the README.
+[tool.bumpversion]
+current_version = "0.3.0"
+commit = true
+commit_args = "--all"
+message = "Release {new_version}"
+tag = true
+tag_name = "{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "ipymuvue/version.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "js/package.json"
+search = '"version": "{current_version}"'
+replace = '"version": "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "ts/package.json"
+search = '"version": "{current_version}"'
+replace = '"version": "{new_version}"'
