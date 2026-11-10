@@ -21,3 +21,6 @@ yarn-error.log
 docs/_build/
 docs/examples/
 docs/jupyter_execute/
+
+# ruff
+.ruff_cache/
