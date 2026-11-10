@@ -171,3 +171,21 @@ def test_slots():
 
     with pytest.raises(TypeError):
         widget.slot(1, Button())
+
+
+def test_assets_must_not_replace_ipymuvue():
+    with pytest.raises(ValueError, match="shipped with ipymuvue"):
+        VueWidget(template="<div/>", assets={"ipymuvue/pyodide/vue.py": "# replaced"})
+
+
+def test_arguments_are_not_modified():
+    components = {"child": "<template><div>child</div></template>"}
+    assets = {"Other.vue": "<template><div>other</div></template>"}
+
+    VueWidget(template="<child/>", components=components, assets=assets)
+
+    assert components == {"child": "<template><div>child</div></template>"}
+    assert assets == {"Other.vue": "<template><div>other</div></template>"}
+
+    # The same arguments can be used again for another widget.
+    VueWidget(template="<child/>", components=components, assets=assets)

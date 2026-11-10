@@ -48,8 +48,9 @@ class VueWidget(DOMWidget):
     ):
         super().__init__()
 
-        components = components or {}
-        assets = assets or {}
+        # Copy the arguments since we are going to modify them.
+        components = dict(components or {})
+        assets = dict(assets or {})
 
         self.__template = template
         self.__type = type(self).__name__
@@ -164,25 +165,18 @@ class VueWidget(DOMWidget):
         r"""
         Prepare virtual file system for assets.
         """
-        import os.path
-        import glob
         import pathlib
 
         # Ship ipymuvue to the client (they probably only need the things that are in pyodide/
-        for fname in glob.glob(
-            os.path.join(os.path.dirname(os.path.dirname(__file__)), "**/*.py"),
-            recursive=True,
-        ):
+        package = pathlib.Path(__file__).parent.parent
+        for path in package.glob("**/*.py"):
+            # The name of the file in the file system of the browser.
+            fname = path.relative_to(package.parent).as_posix()
             if fname in assets:
                 raise ValueError(
                     f"assets must not contain {fname} as it is shipped with ipymuvue"
                 )
-            assets[
-                os.path.relpath(
-                    fname,
-                    start=os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-                )
-            ] = pathlib.Path(fname).read_bytes()
+            assets[fname] = path.read_bytes()
 
         for fname, content in assets.items():
             if not isinstance(fname, str):
