@@ -75,6 +75,15 @@ platforms = ["linux-64", "osx-64", "osx-arm64"]
 [feature.sage.dependencies]
 sage = ">=10.10"
 
+[feature.lint.dependencies]
+ruff = "*"
+pre-commit = "*"
+
+[feature.lint.tasks]
+lint-python = "ruff check"
+lint-js = { cmd = "jlpm install && jlpm lint", cwd = "js" }
+lint = { depends-on = ["lint-python", "lint-js"] }
+
 [feature.release.dependencies]
 towncrier = "*"
 bump-my-version = "*"
@@ -91,3 +100,4 @@ test-oldest = ["test", "oldest"]
 sage = ["examples", "sage"]
 test-sage = ["test", "sage"]
 release = { features = ["release"], no-default-feature = true }
+lint = ["lint"]

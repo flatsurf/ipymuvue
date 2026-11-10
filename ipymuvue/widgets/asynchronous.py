@@ -35,9 +35,9 @@ async def run(future, poll=True):
 
         import jupyter_ui_poll
 
-        async with jupyter_ui_poll.ui_events() as poll:
+        async with jupyter_ui_poll.ui_events() as ui_poll:
             while not future.done():
-                await poll(events)
+                await ui_poll(events)
 
                 events = min(events + 1, 64)
 

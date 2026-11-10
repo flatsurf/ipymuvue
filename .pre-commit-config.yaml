@@ -1,0 +1,9 @@
+# Run the linters before each commit. Enable with `pixi run pre-commit install`.
+repos:
+  - repo: local
+    hooks:
+      - id: lint
+        name: lint
+        entry: pixi run lint
+        language: system
+        pass_filenames: false

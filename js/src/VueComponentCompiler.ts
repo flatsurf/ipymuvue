@@ -51,6 +51,8 @@ export class VueComponentCompiler {
           const path = path_.toString();
 
           return {
+            // vue3-sfc-loader declares this parameter as a Boolean.
+            // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
             getContentData: async (binary: Boolean) => {
               const asset = typeof this.assets === "function" ?
                 this.assets(path) :
@@ -82,7 +84,7 @@ export class VueComponentCompiler {
           const path = path_.toString();
 
           switch (type) {
-            case '.py':
+            case '.py': {
               const content = await getContentData(true);
               if (typeof content === "string")
                 throw Error("getContentData(true) should have returned binary data but found a literal string instead");
@@ -98,6 +100,7 @@ export class VueComponentCompiler {
 
               const pyodide = await this.pyodide.pyodide;
               return pyodide.pyimport(name);
+            }
             default:
               // Work around a typing error in vue3-sfc-loader.
               return undefined as unknown as null;

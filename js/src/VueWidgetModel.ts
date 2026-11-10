@@ -59,7 +59,7 @@ export class VueWidgetModel extends DOMWidgetModel {
      * Return the part of the model that defines its state, excluding bits that
      * are not supposed to change once the model has been created.
      */
-    public get reactiveState(): Object {
+    public get reactiveState(): object {
       const specialAttributes = ['layout', ...Object.keys(this.defaults())];
 
       return Object.fromEntries(

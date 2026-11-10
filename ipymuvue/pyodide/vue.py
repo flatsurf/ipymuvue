@@ -168,10 +168,10 @@ def prepare_setup(setup):
 
                 try:
                     export = vue_compatible(exports[name])
-                except Exception:
+                except Exception as e:
                     raise TypeError(
                         f"could not convert {name} returned by setup() to be used in the component template"
-                    )
+                    ) from e
 
                 setattr(js_exports, name, export)
 
@@ -229,7 +229,7 @@ def prepare_components(components):
             # Since Python files have no default export, we use the global
             # variable "component" instead.
             if Path(fname).suffix.lower() == ".py":
-                component = getattr(component, "component")
+                component = component.component
 
             # Cannot destroy because the component is async. See #9.
             # read_file.destroy()

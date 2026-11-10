@@ -17,6 +17,8 @@
 
 from ipymuvue.version import version_info, __version__
 
+__all__ = ["version_info", "__version__"]
+
 
 def _jupyter_labextension_paths():
     r"""

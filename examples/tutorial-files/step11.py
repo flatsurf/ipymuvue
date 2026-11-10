@@ -1,5 +1,3 @@
-import os.path
-
 from ipymuvue.pyodide.vue import define_component
 
 

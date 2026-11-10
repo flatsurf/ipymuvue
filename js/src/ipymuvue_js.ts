@@ -20,7 +20,7 @@ export * as Vue from "vue";
 export { default as cloneDeep } from "lodash-es/cloneDeep"
 export { default as clone } from "lodash-es/clone"
 
-export function withArity(f: Function, n: number) {
+export function withArity(f: (...args: any[]) => any, n: number) {
   if (n === 2) {
     function wrap(n0: any, n1: any) {
       return f(n0, n1);

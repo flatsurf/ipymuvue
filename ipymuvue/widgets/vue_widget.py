@@ -163,6 +163,7 @@ class VueWidget(DOMWidget):
         """
         import os.path
         import glob
+        import pathlib
 
         # Ship ipymuvue to the client (they probably only need the things that are in pyodide/
         for fname in glob.glob(
@@ -178,7 +179,7 @@ class VueWidget(DOMWidget):
                     fname,
                     start=os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
                 )
-            ] = open(fname, "rb").read()
+            ] = pathlib.Path(fname).read_bytes()
 
         for (fname, content) in assets.items():
             if not isinstance(fname, str):

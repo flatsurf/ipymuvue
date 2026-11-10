@@ -83,6 +83,14 @@ To see what the end-to-end tests are doing, run `pixi run test-e2e --headed
 run the browser; on Debian and Ubuntu, `pixi run playwright install-deps
 chromium` installs them.
 
+We check the Python code with [ruff](https://docs.astral.sh/ruff/) and the
+TypeScript code with [ESLint](https://eslint.org/):
+
+    pixi run lint
+
+To run these checks automatically before each commit, run `pixi run
+pre-commit install`.
+
 To build the wheel and source distribution of ipymuvue, run:
 
     pixi run build

@@ -125,3 +125,8 @@ replace = '__version__ = "{new_version}"'
 filename = "js/package.json"
 search = '"version": "{current_version}"'
 replace = '"version": "{new_version}"'
+
+[tool.ruff.lint]
+# pyflakes, the error rules of pycodestyle that do not conflict with the
+# formatter, and flake8-bugbear.
+select = ["E4", "E7", "E9", "F", "B"]
