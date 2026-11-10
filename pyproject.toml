@@ -109,7 +109,7 @@ showcontent = true
 
 # Bump the version with `pixi run release-prepare`, see the README.
 [tool.bumpversion]
-current_version = "0.3.0"
+current_version = "0.7.0"
 commit = true
 commit_args = "--all"
 message = "Release {new_version}"

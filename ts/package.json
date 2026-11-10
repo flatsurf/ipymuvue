@@ -1,6 +1,6 @@
 {
   "name": "ipymuvue",
-  "version": "0.3.0",
+  "version": "0.7.0",
   "description": "Reactive Vue 3 widgets for Jupyter",
   "author": "Julian Rüth",
   "license": "GPL-3.0-or-later",

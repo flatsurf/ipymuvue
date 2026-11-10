@@ -15,5 +15,5 @@
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-__version__ = "0.3.0"
+__version__ = "0.7.0"
 version_info = tuple(int(part) for part in __version__.split("."))
