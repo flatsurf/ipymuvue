@@ -82,7 +82,8 @@ class VueWidget(DOMWidget):
         to be inspected from a non-static context so we hack around this
         problem here by ignoring assertions.
         """
-        from inspect import isclass
+        import types
+        from inspect import getmro, isclass
         if isclass(object):
             mro = (object,) + getmro(object)
         else:
