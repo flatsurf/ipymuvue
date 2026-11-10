@@ -784,6 +784,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jupyterlab/core-meta@npm:^4.6":
+  version: 4.6.6
+  resolution: "@jupyterlab/core-meta@npm:4.6.6"
+  checksum: 8c880c86ce51b4529fd5adfcd4f3bb1aacaf07a6f99ac7188c1173bdb97410675fe6b2dc606e16b8d8f867a473704c864ba5cd3b012a7f95c353e5a85ea8dabe
+  languageName: node
+  linkType: hard
+
 "@jupyterlab/coreutils@npm:^6.6.6":
   version: 6.6.6
   resolution: "@jupyterlab/coreutils@npm:6.6.6"
@@ -2993,6 +3000,7 @@ __metadata:
     "@jupyter-widgets/base": ^6
     "@jupyterlab/application": ^4
     "@jupyterlab/builder": ^4.0
+    "@jupyterlab/core-meta": ^4.6
     "@types/lodash-es": ^4.17.12
     eslint: ^10
     eslint-config-prettier: ^10

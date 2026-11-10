@@ -44,6 +44,7 @@
     "@eslint/js": "^10",
     "@jupyterlab/application": "^4",
     "@jupyterlab/builder": "^4.0",
+    "@jupyterlab/core-meta": "^4.6",
     "@types/lodash-es": "^4.17.12",
     "eslint": "^10",
     "eslint-config-prettier": "^10",
