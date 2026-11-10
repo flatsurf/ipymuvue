@@ -6,9 +6,9 @@ build/
 node_modules/
 
 # Frontend build artifacts and yarn state
-js/lib/
-js/tsconfig.tsbuildinfo
-js/.yarn/
+ts/lib/
+ts/tsconfig.tsbuildinfo
+ts/.yarn/
 yarn-error.log
 
 # OS X

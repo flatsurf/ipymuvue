@@ -62,7 +62,7 @@ Some examples, such as the graph editor, need a SageMath kernel. Use `pixi run -
 
 Any changes you make to the Python code should be picked up automatically. Changes to `ipymuvue.pyodide` become effective by re-creating a widget (all the modules are reloaded in pyodide when a change to these files happens.) Other changes require a kernel restart as usual.
 
-The frontend is written in TypeScript in `js/src/`. To rebuild it
+The frontend is written in TypeScript in `ts/src/`. To rebuild it
 automatically whenever you change a file, run in another terminal:
 
     pixi run watch

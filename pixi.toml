@@ -23,8 +23,8 @@ ipymuvue = { path = ".", editable = true }
 no-build-isolation = ["ipymuvue"]
 
 [tasks]
-build-js = { cmd = "jlpm install && jlpm build", cwd = "js" }
-watch = { cmd = "jlpm watch", cwd = "js", depends-on = ["build-js"] }
+build-js = { cmd = "jlpm install && jlpm build", cwd = "ts" }
+watch = { cmd = "jlpm watch", cwd = "ts", depends-on = ["build-js"] }
 # We tell JupyterLab to load the frontend from ipymuvue/labextensions directly
 # so that it picks up the latest build (and the changes made by `watch`.) Note
 # that we cannot use `jupyter labextension develop` here since its symlink
@@ -81,10 +81,10 @@ pre-commit = "*"
 
 [feature.lint.tasks]
 lint-python = "ruff check && ruff format --check"
-lint-js = { cmd = "jlpm install && jlpm lint", cwd = "js" }
+lint-js = { cmd = "jlpm install && jlpm lint", cwd = "ts" }
 lint = { depends-on = ["lint-python", "lint-js"] }
 format-python = "ruff format && ruff check --fix"
-format-js = { cmd = "jlpm install && jlpm format", cwd = "js" }
+format-js = { cmd = "jlpm install && jlpm format", cwd = "ts" }
 format = { depends-on = ["format-python", "format-js"] }
 
 [feature.release.dependencies]
