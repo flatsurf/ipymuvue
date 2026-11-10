@@ -16,3 +16,5 @@
 # ******************************************************************************
 
 from ipymuvue.widgets.vue_widget import VueWidget
+
+__all__ = ["VueWidget"]

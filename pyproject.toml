@@ -1,3 +1,138 @@
 [build-system]
-requires = ["jupyter_packaging~=0.7.9", "jupyterlab>=3.0.0,==3.*", "setuptools>=40.8.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.27", "hatch-jupyter-builder>=0.8", "jupyterlab>=4,<5"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ipymuvue"
+dynamic = ["version"]
+description = "Reactive Jupyter Widgets"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["COPYING"]
+authors = [{ name = "Julian Rüth", email = "julian.rueth@fsfe.org" }]
+keywords = ["ipython", "jupyter", "widgets"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: IPython",
+    "Framework :: Jupyter",
+    "Framework :: Jupyter :: JupyterLab",
+    "Framework :: Jupyter :: JupyterLab :: 4",
+    "Framework :: Jupyter :: JupyterLab :: Extensions",
+    "Framework :: Jupyter :: JupyterLab :: Extensions :: Prebuilt",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "ipywidgets>=8,<9",
+    # jupyter-ui-poll 1.x does not process widget messages with ipykernel 7
+    # so awaiting calls into the frontend never finishes.
+    "jupyter-ui-poll>=0.2.1,<0.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/flatsurf/ipymuvue"
+Documentation = "https://flatsurf.github.io/ipymuvue/"
+
+[tool.hatch.version]
+path = "ipymuvue/version.py"
+
+[tool.hatch.build]
+# Do not descend into node_modules/ which is slow.
+skip-excluded-dirs = true
+
+[tool.hatch.build.targets.sdist]
+artifacts = ["ipymuvue/labextensions"]
+exclude = [".github", "*.ipynb"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ipymuvue"]
+# The labextension is installed as shared-data below, there is no need to
+# also ship it inside the Python package.
+exclude = ["ipymuvue/labextensions"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"ipymuvue/labextensions/ipymuvue" = "share/jupyter/labextensions/ipymuvue"
+"install.json" = "share/jupyter/labextensions/ipymuvue/install.json"
+
+# Build the frontend in js/ when building a wheel. The resulting prebuilt
+# JupyterLab extension ends up in ipymuvue/labextensions/ipymuvue.
+[tool.hatch.build.hooks.jupyter-builder]
+dependencies = ["hatch-jupyter-builder>=0.8"]
+build-function = "hatch_jupyter_builder.npm_builder"
+ensured-targets = ["ipymuvue/labextensions/ipymuvue/package.json"]
+skip-if-exists = ["ipymuvue/labextensions/ipymuvue/package.json"]
+# Editable installs do not need to build the frontend, see the README for how
+# to set up a development version of the extension.
+optional-editable-build = true
+
+[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
+path = "js"
+build_cmd = "build:prod"
+npm = ["jlpm"]
+
+[tool.pytest.ini_options]
+# The end-to-end tests in tests/e2e cannot run in the same process as the
+# asynchronous unit tests, see `pixi run test-e2e`.
+testpaths = ["tests/unit"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+timeout = 300
+
+# Changes are described by files in news/, see the README for details.
+[tool.towncrier]
+directory = "news"
+filename = "ChangeLog"
+start_string = ".. current developments\n"
+template = "news/template.rst.j2"
+title_format = "v{version}"
+underlines = ["=", "", ""]
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+# Bump the version with `pixi run release-prepare`, see the README.
+[tool.bumpversion]
+current_version = "0.3.0"
+commit = true
+commit_args = "--all"
+message = "Release {new_version}"
+tag = true
+tag_name = "{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "ipymuvue/version.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "js/package.json"
+search = '"version": "{current_version}"'
+replace = '"version": "{new_version}"'
+
+[tool.ruff]
+# Do not touch the code in the Markdown notebooks and the README. It is
+# formatted for readability.
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+# pyflakes, the error rules of pycodestyle that do not conflict with the
+# formatter, and flake8-bugbear.
+select = ["E4", "E7", "E9", "F", "B"]

@@ -25,7 +25,7 @@ In this document, we verify that all these concepts work in widgets written with
 
 * Minimal glue in Python on the server and Vue components in `.py` files interpreted by **pyodide**. This option is **highly experimental**. Also, it comes with some performance penalties. Python is much slower than JavaScript at the moment and at the interface between Python and Vue.js some transformations are necessary that might be costly in some cases.
 
-* Minimal glue in Python and components from an **external package**. For larger projects, this would probably be the best approach. You can use all the build tools, hot-module reloading, … while developing a Vue.js library and then consume it in a widget. This approach is not shown here, an example of consuming an external package is in the [Demo]([./Demo.md) notebook. For a full example of a widget following this approach, have a look at [ipyvue-flatsurf](https://github.com/flatsurf/ipyvue-flatsurf) which consumes the [vue-flatsurf](https://flatsurf/vue-flatsurf) components.
+* Minimal glue in Python and components from an **external package**. For larger projects, this would probably be the best approach. You can use all the build tools, hot-module reloading, … while developing a Vue.js library and then consume it in a widget. This approach is not shown here, an example of consuming an external package is in the [Demo](./Demo.md) notebook. For a full example of a widget following this approach, have a look at [ipyvue-flatsurf](https://github.com/flatsurf/ipyvue-flatsurf) which consumes the [vue-flatsurf](https://github.com/flatsurf/vue-flatsurf) components.
 
 ```python
 def show_source(fname):

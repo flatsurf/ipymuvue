@@ -35,9 +35,9 @@ async def run(future, poll=True):
 
         import jupyter_ui_poll
 
-        async with jupyter_ui_poll.ui_events() as poll:
+        async with jupyter_ui_poll.ui_events() as ui_poll:
             while not future.done():
-                await poll(events)
+                await ui_poll(events)
 
                 events = min(events + 1, 64)
 
@@ -47,5 +47,6 @@ async def run(future, poll=True):
                 # people, https://stackoverflow.com/a/44755058/812379.
                 delay = min(2 * delay, 0.25)
 
-    assert future.done()
+        assert future.done()
+
     return await future

@@ -1,0 +1,41 @@
+name: Test
+on:
+  push: { branches: [ "master" ] }
+  pull_request: { branches: [ "master" ] }
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        # The latest versions of our dependencies, the oldest ones we
+        # support, and an environment with SageMath for the examples that
+        # need it.
+        environment: [ "test", "test-oldest", "test-sage" ]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: prefix-dev/setup-pixi@v0.11.3
+        with:
+          environments: default ${{ matrix.environment }}
+      - name: Run unit tests
+        run: pixi run -e ${{ matrix.environment }} test
+      - name: Install browser and its system dependencies
+        run: pixi run -e ${{ matrix.environment }} playwright install --with-deps chromium
+      - name: Build the frontend
+        # We build the frontend with the default environment, like the wheels
+        # that we release (see dist.yml), and then test this build with the
+        # versions of JupyterLab in each environment.
+        run: pixi run build-js
+      - name: Run end-to-end tests
+        run: pixi run -e ${{ matrix.environment }} pytest tests/e2e --tracing retain-on-failure --output test-results
+      - name: Upload playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-traces-${{ matrix.environment }}
+          path: test-results

@@ -48,8 +48,9 @@ class VueWidget(DOMWidget):
     ):
         super().__init__()
 
-        components = components or {}
-        assets = assets or {}
+        # Copy the arguments since we are going to modify them.
+        components = dict(components or {})
+        assets = dict(assets or {})
 
         self.__template = template
         self.__type = type(self).__name__
@@ -67,7 +68,9 @@ class VueWidget(DOMWidget):
 
         self.__methods = [
             name
-            for (name, method) in type(self)._getmembers(self, predicate=inspect.ismethod)
+            for (name, method) in type(self)._getmembers(
+                self, predicate=inspect.ismethod
+            )
             if hasattr(method, "_VueWidget__is_callback") and method.__is_callback
         ]
         self.__on_msg(self._handle_message)
@@ -82,7 +85,9 @@ class VueWidget(DOMWidget):
         to be inspected from a non-static context so we hack around this
         problem here by ignoring assertions.
         """
-        from inspect import isclass
+        import types
+        from inspect import getmro, isclass
+
         if isclass(object):
             mro = (object,) + getmro(object)
         else:
@@ -128,7 +133,7 @@ class VueWidget(DOMWidget):
         r"""
         Link components to file in assets.
         """
-        for (component, definition) in components.items():
+        for component, definition in components.items():
             if not isinstance(component, str):
                 raise TypeError("component name must be a string")
 
@@ -160,26 +165,20 @@ class VueWidget(DOMWidget):
         r"""
         Prepare virtual file system for assets.
         """
-        import os.path
-        import glob
+        import pathlib
 
         # Ship ipymuvue to the client (they probably only need the things that are in pyodide/
-        for fname in glob.glob(
-            os.path.join(os.path.dirname(os.path.dirname(__file__)), "**/*.py"),
-            recursive=True,
-        ):
+        package = pathlib.Path(__file__).parent.parent
+        for path in package.glob("**/*.py"):
+            # The name of the file in the file system of the browser.
+            fname = path.relative_to(package.parent).as_posix()
             if fname in assets:
                 raise ValueError(
                     f"assets must not contain {fname} as it is shipped with ipymuvue"
                 )
-            assets[
-                os.path.relpath(
-                    fname,
-                    start=os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-                )
-            ] = open(fname, "rb").read()
+            assets[fname] = path.read_bytes()
 
-        for (fname, content) in assets.items():
+        for fname, content in assets.items():
             if not isinstance(fname, str):
                 raise TypeError("file name must be a string")
 
@@ -246,9 +245,10 @@ class VueWidget(DOMWidget):
         r"""
         Register ``handler`` for custom messages from the frontend.
         """
-        with (self.__output or contextlib.nullcontext):
+        with self.__output or contextlib.nullcontext():
+
             def logging_handler(*args, **kwargs):
-                with (self.__output or contextlib.nullcontext):
+                with self.__output or contextlib.nullcontext():
                     handler(*args, **kwargs)
 
             self.on_msg(logging_handler)
@@ -259,7 +259,7 @@ class VueWidget(DOMWidget):
         Handle a message coming in on the comm from the frontend model.
         """
         if "method" in content:
-            with (self.__output or contextlib.nullcontext()):
+            with self.__output or contextlib.nullcontext():
                 self._handle_callback(**content)
                 return
 

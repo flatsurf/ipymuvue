@@ -17,36 +17,20 @@
 
 from ipymuvue.version import version_info, __version__
 
+__all__ = ["version_info", "__version__"]
+
 
 def _jupyter_labextension_paths():
     r"""
     Called by JupyterLab to find out which JavaScript assets need to be copied.
     """
     # The command `jupyter labextension build` creates a package in
-    # labextension/, see jupyterlab.outputDir in js/package.json
+    # labextensions/ipymuvue/, see jupyterlab.outputDir in js/package.json
     # These files are copied to extensions/ipymuvue/ in
     # JupyterLab when this package is pip-installed.
     return [
         {
-            "src": "labextension",
+            "src": "labextensions/ipymuvue",
             "dest": "ipymuvue",
-        }
-    ]
-
-
-def _jupyter_nbextension_paths():
-    r"""
-    Called by Jupyter Notebook to find out which JavaScript assets need to be copied.
-    """
-    # The command `yarn build:prod` creates JavaScript assets in nbextension/.
-    # These files need to be copied to the nbextensions/ipymuvue/
-    # directory in Jupyter Notebook. The entrypoint in these files is
-    # extension.js.
-    return [
-        {
-            "section": "notebook",
-            "src": "nbextension",
-            "dest": "ipymuvue",
-            "require": "ipymuvue/extension",
         }
     ]

@@ -58,7 +58,7 @@ is easier.
 # along with ipymuvue. If not, see <https://www.gnu.org/licenses/>.
 # ******************************************************************************
 
-import pyodide
+import pyodide.ffi
 from ipymuvue.pyodide.types import (
     String,
     Number,
@@ -168,10 +168,10 @@ def prepare_setup(setup):
 
                 try:
                     export = vue_compatible(exports[name])
-                except Exception:
+                except Exception as e:
                     raise TypeError(
                         f"could not convert {name} returned by setup() to be used in the component template"
-                    )
+                    ) from e
 
                 setattr(js_exports, name, export)
 
@@ -193,7 +193,7 @@ def prepare_components(components):
     Rewrite the subcomponents dict to make it compatible with the Vue API.
     """
 
-    for (name, component) in components.items():
+    for name, component in components.items():
         if not isinstance(name, str):
             raise TypeError("name of component must be a string")
 
@@ -229,7 +229,7 @@ def prepare_components(components):
             # Since Python files have no default export, we use the global
             # variable "component" instead.
             if Path(fname).suffix.lower() == ".py":
-                component = getattr(component, "component")
+                component = component.component
 
             # Cannot destroy because the component is async. See #9.
             # read_file.destroy()
@@ -282,11 +282,10 @@ def watch(watched, on_change):
     When it changes, run ``on_change``.
     """
     if callable(watched):
-
         from ipymuvue.pyodide.proxies import create_proxy
 
         @create_proxy
-        def _watched():
+        def _watched(*args):
             reactive = vue_compatible(watched(), shallow=True)
             if not is_vue_ref(reactive) and not is_vue_proxy(reactive):
                 raise TypeError(
@@ -322,7 +321,9 @@ def computed(getter):
     from ipymuvue.pyodide.proxies import create_proxy
 
     @create_proxy
-    def _getter():
+    def _getter(*args):
+        # Vue (since 3.4) passes the previous value to the getter which we
+        # ignore.
         return vue_compatible(getter(), reference=None)
 
     return python_compatible(Vue.computed(_getter))

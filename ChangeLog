@@ -4,6 +4,16 @@ ipymuvue Change Log
 
 .. current developments
 
+v0.6.0
+====================
+
+**Fixed:**
+
+* Fixed the build of the JupyterLab extension and the installation
+  instructions.
+
+
+
 v0.3.0
 ====================
 

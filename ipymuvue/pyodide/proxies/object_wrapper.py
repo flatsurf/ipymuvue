@@ -76,7 +76,7 @@ class ObjectWrapper(MutableMapping):
         try:
             return self.__getattr__(key)
         except AttributeError:
-            raise KeyError(key)
+            raise KeyError(key) from None
 
 
 class ProxyDict(ObjectWrapper):

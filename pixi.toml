@@ -1,0 +1,124 @@
+[workspace]
+name = "ipymuvue"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = ">=3.9"
+ipywidgets = ">=8,<9"
+jupyter-ui-poll = ">=0.2.1,<0.3"
+# To build the frontend when installing ipymuvue below.
+nodejs = "22.*"
+jupyterlab = ">=4,<5"
+hatchling = ">=1.27"
+hatch-jupyter-builder = ">=0.8"
+
+[pypi-dependencies]
+# Installing ipymuvue builds the frontend once. Run `pixi run build-js` to
+# rebuild after making changes to the TypeScript/JavaScript code.
+ipymuvue = { path = ".", editable = true }
+
+[pypi-options]
+# Build ipymuvue with the nodejs and jupyterlab from this environment.
+no-build-isolation = ["ipymuvue"]
+
+[tasks]
+build-js = { cmd = "jlpm install && jlpm build", cwd = "js" }
+watch = { cmd = "jlpm watch", cwd = "js", depends-on = ["build-js"] }
+# We tell JupyterLab to load the frontend from ipymuvue/labextensions directly
+# so that it picks up the latest build (and the changes made by `watch`.) Note
+# that we cannot use `jupyter labextension develop` here since its symlink
+# breaks reinstalling ipymuvue into the pixi environment.
+lab = { cmd = "jupyter lab --LabApp.extra_labextensions_path=$PIXI_PROJECT_ROOT/ipymuvue/labextensions", depends-on = ["build-js"], cwd = "examples" }
+
+[feature.dist.dependencies]
+python-build = "*"
+
+[feature.dist.tasks]
+build = "python -m build --no-isolation"
+
+[feature.examples.dependencies]
+jupytext = "*"
+myst-nb = "*"
+
+[feature.test.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+pytest-timeout = "*"
+ipykernel = "*"
+# To run the examples written in MarkDown.
+jupytext = "*"
+
+[feature.test.pypi-dependencies]
+# We do not use playwright from conda-forge since the playwright-python package
+# there does not pin the version of the playwright driver it needs. The
+# wheels on PyPI ship with the correct driver.
+pytest-playwright = "*"
+
+[feature.test.tasks]
+install-browser = "playwright install chromium"
+test = "pytest"
+test-e2e = { cmd = "pytest tests/e2e", depends-on = ["install-browser", "build-js"] }
+
+# The oldest versions of our dependencies that we support.
+[feature.oldest.dependencies]
+python = "3.9.*"
+ipywidgets = "8.0.*"
+jupyterlab = "4.0.*"
+
+# SageMath for the examples that need a SageMath kernel, e.g., GraphEditor.md.
+# Note that the SageMath kernel only works when JupyterLab runs in the same
+# environment, i.e., run `pixi run -e sage lab`.
+[feature.sage]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[feature.sage.dependencies]
+sage = ">=10.10"
+
+[feature.docs.dependencies]
+sphinx = "*"
+myst-nb = "*"
+furo = "*"
+jupytext = "*"
+ipykernel = "*"
+
+[feature.docs.tasks]
+build-embed = { cmd = "jlpm install && jlpm build:embed", cwd = "js" }
+# Executes the examples and renders them with their widgets to docs/_build/html.
+# We always rebuild everything (-E) since sphinx does not notice when an asset
+# that a notebook loads changed.
+docs = { cmd = "sphinx-build -W -E -b html . _build/html", cwd = "docs", depends-on = ["build-embed"] }
+# Checks that the widgets on the pages built by `docs` render in a browser.
+test-docs = { cmd = "pytest tests/docs", depends-on = ["install-browser"] }
+
+[feature.lint.dependencies]
+ruff = "*"
+pre-commit = "*"
+
+[feature.lint.tasks]
+lint-python = "ruff check && ruff format --check"
+lint-js = { cmd = "jlpm install && jlpm lint", cwd = "js" }
+lint = { depends-on = ["lint-python", "lint-js"] }
+format-python = "ruff format && ruff check --fix"
+format-js = { cmd = "jlpm install && jlpm format", cwd = "js" }
+format = { depends-on = ["format-python", "format-js"] }
+
+[feature.release.dependencies]
+towncrier = "*"
+bump-my-version = "*"
+
+[feature.release.tasks.release-prepare]
+description = "Update the ChangeLog and bump the version, then commit and tag the release"
+args = ["version"]
+cmd = "git diff --quiet HEAD && towncrier build --yes --version {{ version }} && bump-my-version bump --allow-dirty --new-version {{ version }}"
+
+[environments]
+default = ["examples", "dist", "test"]
+test = ["test"]
+test-oldest = ["test", "oldest"]
+sage = ["examples", "sage"]
+test-sage = ["test", "sage"]
+release = { features = ["release"], no-default-feature = true }
+lint = ["lint"]
+# The documentation runs GraphEditor.md which needs a SageMath kernel.
+docs = ["docs", "sage", "test"]

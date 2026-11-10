@@ -1,9 +1,8 @@
 {
   "name": "ipymuvue",
   "version": "0.3.0",
-  "description": "Reactive Jupyter Widgets (ipymuvue-implementation repackaged for Jupyter Notebooks, JupyterLab, …)",
+  "description": "Reactive Vue 3 widgets for Jupyter",
   "author": "Julian Rüth",
-  "main": "src/index.js",
   "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -16,36 +15,61 @@
     "ipywidgets",
     "jupyterlab-extension"
   ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "files": [
-    "src/**/*.js"
+    "lib/**/*.{d.ts,js,js.map}"
   ],
   "scripts": {
-    "clean": "rimraf ../ipymuvue/labextension/",
-    "prepublish": "yarn run clean && (cd ../ts && yarn run build:prod) && yarn run build:prod",
-    "build": "jupyter labextension build --development True .",
-    "build:prod": "jupyter labextension build ."
-  },
-  "devDependencies": {
-    "@jupyterlab/builder": "^4.0.2",
-    "rimraf": "^2.6.1",
-    "webpack": "^5",
-    "webpack-cli": "^5.1.4"
+    "build": "jlpm build:lib && jlpm build:labextension:dev",
+    "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
+    "build:lib": "tsc --sourceMap",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:embed": "jlpm build:lib && webpack --config webpack.embed.config.js",
+    "clean": "rimraf lib dist tsconfig.tsbuildinfo ../ipymuvue/labextensions",
+    "watch": "run-p watch:lib watch:labextension",
+    "watch:lib": "tsc --sourceMap --watch --preserveWatchOutput",
+    "watch:labextension": "jupyter labextension watch .",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write . && eslint --fix ."
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^1.1 || ^2 || ^3 || ^4",
-    "ipymuvueimplementation": "../ts",
-    "lodash": "^4.18.1"
+    "@jupyter-widgets/base": "^6",
+    "is-promise": "^4.0.0",
+    "lodash-es": "^4.18.1",
+    "vue": "^3.5",
+    "vue3-sfc-loader": "^0.9.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10",
+    "@jupyterlab/application": "^4",
+    "@jupyterlab/builder": "^4.0",
+    "@jupyterlab/core-meta": "^4.6",
+    "@types/lodash-es": "^4.17.12",
+    "eslint": "^10",
+    "eslint-config-prettier": "^10",
+    "npm-run-all2": "^9",
+    "prettier": "^3",
+    "pyodide": "314.0.7",
+    "rimraf": "^6",
+    "typescript": "~5.9",
+    "typescript-eslint": "^8.72",
+    "webpack": "^5",
+    "webpack-cli": "^6",
+    "webpack-merge": "^6"
   },
   "jupyterlab": {
-    "extension": "src/labplugin",
-    "outputDir": "../ipymuvue/labextension",
+    "extension": "lib/plugin",
+    "outputDir": "../ipymuvue/labextensions/ipymuvue",
+    "webpackConfig": "./webpack.config.js",
     "sharedPackages": {
       "@jupyter-widgets/base": {
         "bundled": false,
         "singleton": true
       },
-      "vue": {},
-      "vue/dist/vue.esm-bundler.js": {}
+      "vue": false,
+      "vue3-sfc-loader": false
     }
   }
 }
