@@ -42,15 +42,28 @@ myst-nb = "*"
 pytest = "*"
 pytest-asyncio = "*"
 pytest-timeout = "*"
+ipykernel = "*"
+# To run the examples written in MarkDown.
+jupytext = "*"
+
+[feature.test.pypi-dependencies]
+# We do not use playwright from conda-forge since the playwright-python package
+# there does not pin the version of the playwright driver it needs. The
+# wheels on PyPI ship with the correct driver.
+pytest-playwright = "*"
 
 [feature.test.tasks]
+install-browser = "playwright install chromium"
 test = "pytest"
+test-e2e = { cmd = "pytest tests/e2e", depends-on = ["install-browser", "develop"] }
 
 # The oldest versions of our dependencies that we support.
 [feature.oldest.dependencies]
 python = "3.9.*"
 ipywidgets = "8.0.*"
 jupyterlab = "4.0.*"
+# Needed by `jupyter labextension develop` in JupyterLab 4.0.
+setuptools = "*"
 
 [feature.release.dependencies]
 rever = "*"

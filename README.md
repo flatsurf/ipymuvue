@@ -64,6 +64,17 @@ Any changes to the TypeScript/Javascript code become effective after you rebuild
 
     pixi run build-js
 
+To run the unit tests and the end-to-end tests (which run the widgets in
+JupyterLab in a headless browser), run:
+
+    pixi run test
+    pixi run test-e2e
+
+To see what the end-to-end tests are doing, run `pixi run test-e2e --headed
+--slowmo 500`. Note that playwright might need some extra system libraries to
+run the browser; on Debian and Ubuntu, `pixi run playwright install-deps
+chromium` installs them.
+
 To build the wheel and source distribution of ipymuvue, run:
 
     pixi run build

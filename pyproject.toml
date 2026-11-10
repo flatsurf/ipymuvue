@@ -70,7 +70,9 @@ build_cmd = "build:prod"
 npm = ["yarn"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# The end-to-end tests in tests/e2e cannot run in the same process as the
+# asynchronous unit tests, see `pixi run test-e2e`.
+testpaths = ["tests/unit"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 timeout = 300
