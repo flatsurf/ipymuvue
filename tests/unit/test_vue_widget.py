@@ -79,6 +79,13 @@ def test_callback_invoked_from_frontend():
     assert widget.audience == "World!?"
 
 
+def test_without_capture_output():
+    widget = Hello(capture_output=False)
+
+    widget._handle_message(widget, {"method": "exclaim", "args": []}, [])
+    assert widget.audience == "World!"
+
+
 def test_components_from_strings_become_assets():
     widget = VueWidget(
         template="<child/>",

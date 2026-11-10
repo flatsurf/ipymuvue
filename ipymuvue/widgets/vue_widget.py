@@ -246,9 +246,9 @@ class VueWidget(DOMWidget):
         r"""
         Register ``handler`` for custom messages from the frontend.
         """
-        with (self.__output or contextlib.nullcontext):
+        with (self.__output or contextlib.nullcontext()):
             def logging_handler(*args, **kwargs):
-                with (self.__output or contextlib.nullcontext):
+                with (self.__output or contextlib.nullcontext()):
                     handler(*args, **kwargs)
 
             self.on_msg(logging_handler)
