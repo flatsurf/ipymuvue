@@ -11,8 +11,7 @@ Getting Started
 ---------------
 
 There is no proper documentation for this project yet, but there are some
-[examples](https://flatsurf.github.io/ipymuvue/) whose widgets you can try in
-your browser. The notebooks for these examples are in [examples/](examples/).
+[examples/](examples/).
 
 To verify that your installation works correctly, open a Jupyter notebook and execute the following example:
 
@@ -92,17 +91,6 @@ To format all the code as these tools expect it, run `pixi run format`.
 
 To run these checks automatically before each commit, run `pixi run
 pre-commit install`.
-
-The [documentation](https://flatsurf.github.io/ipymuvue/) renders the
-notebooks in `examples/` with their widgets. To build it in `docs/_build/html`
-and check that its widgets render in a browser, run:
-
-    pixi run -e docs docs
-    pixi run -e docs test-docs
-
-The "Documentation" workflow publishes the documentation to GitHub Pages for
-every push to the master branch. (This needs the source of GitHub Pages to be
-set to "GitHub Actions" in the settings of the repository.)
 
 To build the wheel and source distribution of ipymuvue, run:
 
