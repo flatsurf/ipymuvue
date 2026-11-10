@@ -286,7 +286,7 @@ def watch(watched, on_change):
         from ipymuvue.pyodide.proxies import create_proxy
 
         @create_proxy
-        def _watched():
+        def _watched(*args):
             reactive = vue_compatible(watched(), shallow=True)
             if not is_vue_ref(reactive) and not is_vue_proxy(reactive):
                 raise TypeError(
@@ -322,7 +322,9 @@ def computed(getter):
     from ipymuvue.pyodide.proxies import create_proxy
 
     @create_proxy
-    def _getter():
+    def _getter(*args):
+        # Vue (since 3.4) passes the previous value to the getter which we
+        # ignore.
         return vue_compatible(getter(), reference=None)
 
     return python_compatible(Vue.computed(_getter))
